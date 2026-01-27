@@ -1,0 +1,20 @@
+# Python
+# Pythonのキャッシュフォルダ,消えても困らない,環境ごとに中身が違う,「__pycache__/」はフォルダだけ無視,「__pycache__」だとフォルダもファイルも無視
+__pycache__/
+# Pythonの中間ファイル,*.pyc/*.pyo/*.pydの3種類をまとめて無視,実行時に自動生成される,消えてもOK,環境依存
+*.py[cod]
+
+# Django
+db.sqlite3
+# ログファイル,拡張子が「.log」 のファイルを全部無視,DjangoやPythonはエラーや実行履歴をdebug.log みたいなファイルに吐くことあり,実行環境ごとに内容が違う,サイズがどんどん増える,機密情報が入ることもある
+*.log
+# 本番用静的ファイル
+staticfiles/
+# アップロードデータ
+media/
+
+# Virtual Environment
+.venv/
+
+# Environment variables (APIキー/パスワード/シークレットキーなど)
+.env
