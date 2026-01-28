@@ -7,5 +7,8 @@
 <body>
   <h1>おうちカレンダー</h1>
   <p>ポートフォリオページ（仮）</p>
+  <a href="{% url 'accounts:login' %}"> {# aタグは遷移を作るためのタグ。{% url %}を用いて、urls.pyで指定した遷移先に移動する。app_nameがaccounts、nameがloginのViewに遷移する。'app_name:name' #}
+  <button type="button">このアプリにアクセス</button> {# a の中に button → △（実務では避けることも多い。実務的には a にCSSを当ててボタン風が一番安全。<a href="{% url 'accounts:login' %}" class="btn">このアプリにアクセス</a>）#}
+  </a>
 </body>
 </html>
