@@ -20,5 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("pages.urls")), # ポートフォリオ（/）
-    path("ouchi-calendar/", include("accounts.urls")), # おうちカレンダー（/ouchi-calendar/...）
+    path("ouchi-calendar/", include("accounts.urls")), # おうちカレンダー（ログイン）
+    path("ouchi-calendar/schedule/", include("schedule.urls")), # おうちカレンダー（カレンダー本体）
 ]
