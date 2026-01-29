@@ -124,3 +124,4 @@ STATICFILES_DIRS = [
     STATIC_DIR,
 ]
 
+LOGIN_URL = "/ouchi-calendar/login/" #ログインが必要なページを見るとき、@login_requiredがログインしているかチェックして「未ログインの人は、 /ouchi-calendar/login/ に行ってください」と案内。
