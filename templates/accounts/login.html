@@ -8,7 +8,31 @@
   <h1>おうちカレンダー</h1>
 </header>
 
-<form>
-  <!-- ログインフォーム -->
+<form method="post">
+  {% csrf_token %}
+
+  <div>
+    <label for="email">メールアドレス</label>
+    <input type="email" name="email" id="email" required>
+  </div>
+  {% comment %}
+  label：input が「何の入力欄か」を説明する項目名 
+  input：ユーザーが文字を入力する欄
+  div：枠・区切り。input と label を ひとかたまりとしてまとめる箱
+
+  input：入力する箱（閉じタグなし）
+  type：何を書く箱か。「この箱にはメールアドレスを書いてほしい」という指定
+  name：サーバに送るときの名前。「この箱の中身は、email という名前で送る」。Django には「request.POST["email"] == "test@example.com"」で届く
+  id：目印（labelやCSS用）。「この箱にID（名前札）をつける」
+  required：空欄NG（ブラウザチェック）。「ここは空欄のまま送信できません」というブラウザへのお願い
+  →「メールアドレスを書くための箱を1つ作る。その中身は email という名前で送る。何も書いてないと送信させない。この箱のIDは email」という意味
+  {% endcomment %}
+
+  <div>
+    <label for="password">パスワード</label>
+    <input type="password" name="password" id="password" required>
+  </div>
+
+  <button type="submit">ログイン</button>
 </form>
 {% endblock %}
