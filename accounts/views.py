@@ -1,8 +1,39 @@
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
+from django.contrib.auth import authenticate, login
 
 def login_view(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        # 本人確認を実行して結果を返す
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
+            # その結果が成功かどうかを見る
+            # 認証成功
+            # 成功した人だけログイン状態にする（「この人はログイン済みです」をサーバ側で覚える）。
+            # requestとログインユーザで関数を呼び出すとログインが完了し、セッション内にログインユーザーの情報を格納する。
+            login(request, user)
+
+            # 次に行きたいページがあればそこへ、なければスケジュールへ。
+            # 「ログイン画面に来るとき、元々行きたかったURLがあればそれを取り出す。あればそこへ行かせる。なければ、決め打ちのスケジュール画面へ行かせる。」
+            next_url = request.GET.get("next")
+            return redirect(next_url or "/ouchi-calendar/schedule/")
+
+        
+        else:
+            # 認証失敗（メール or パスワード違い）
+            return render(
+            request,
+            "accounts/login.html",
+            {"error": "メールアドレスまたはパスワードが違います"}
+        )
+
     return render(request, "accounts/login.html")
+
+
 
 def signup_view(request):
     if request.method == "POST":
