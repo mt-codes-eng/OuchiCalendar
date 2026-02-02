@@ -8,7 +8,7 @@ def login_view(request):
         password = request.POST.get("password")
 
         # 本人確認を実行して結果を返す
-        user = authenticate(request, email=email, password=password)
+        user = authenticate(request, username=email, password=password)
 
         if user is not None:
             # その結果が成功かどうかを見る
