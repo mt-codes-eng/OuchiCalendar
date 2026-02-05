@@ -6,4 +6,4 @@ User = get_user_model() # AUTH_USER_MODEL で指定した User（accounts.User�
 class SignUpForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ("email",) # 登録フォームに「email」を出す指定。パスワード2つは UserCreationForm 側が元から持っている（自分で書かなくてOK）
+        fields = ("name", "email",) # 登録フォームに「name」「email」を出す指定。パスワード2つは UserCreationForm 側が元から持っている（自分で書かなくてOK）
