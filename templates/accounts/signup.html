@@ -11,4 +11,6 @@
   {{ form.as_p }} {# フォームの入力欄をまとめて表示してくれる便利表示 #}
   <button type="submit">登録</button> {# type="submit" があるとこのボタンを押した瞬間に、form の中身を送信するという特別な役割 #}
 </form>{# 送信先は、form タグで決まっている。action がない場合「今表示しているURL（住所）」に送信。実際に受け取るのは「URLを処理する関数：signup_view（人）」。#}
+
+<a href="{% url 'accounts:login' %}">ログイン画面へ戻る</a>
 {% endblock %}
