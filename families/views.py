@@ -1,3 +1,8 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
+@login_required
+def family_settings_view(request):
+    # ログインしているユーザー(request.user)の家族を取り出してfamily という変数に入れる
+    family = request.user.family
+    return render(request, "families/settings.html", {"family": family})
