@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
 from django.contrib.auth import authenticate, login
+from families.models import Family
 
 def login_view(request):
     if request.method == "POST":
@@ -42,8 +43,23 @@ def signup_view(request):
 
         # 入力チェック（メール形式、パスワード一致、強度など）
         if form.is_valid():
-            form.save()  # ユーザー作成（パスワードは安全にハッシュ化されて保存される）
-            return redirect("accounts:login")  # いったんログイン画面へ
+            # ① Userを作るけどまだDBには保存しない（familyを入れてから保存したい）
+            user = form.save(commit=False)
+            
+            # ② 1人目用：DBにFamilyレコードを1件作る。空のFamilyを作成（家族名はあとで設定画面で入れる）
+            family = Family.objects.create(name="")
+            
+            # ③ 紐づけ（さっき作ったfamilyを、Userのfamily欄に入れる）
+            user.family = family
+            
+            # ④ User保存（パスワードはUserCreationFormがハッシュ化してくれる）
+            user.save()
+            
+            # ⑤ そのままログイン状態にする
+            login(request, user)
+             
+            # ⑥ 家族設定画面へ遷移
+            return redirect("families:settings") 
 
     else:
         # GETのときは空のフォーム（空白の紙）
