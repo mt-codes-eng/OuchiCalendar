@@ -59,7 +59,7 @@ def signup_view(request):
             login(request, user)
              
             # ⑥ 家族設定画面へ遷移
-            return redirect("families:settings") 
+            return redirect("families:family_settings") 
 
     else:
         # GETのときは空のフォーム（空白の紙）
