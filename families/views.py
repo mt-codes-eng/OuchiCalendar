@@ -23,7 +23,7 @@ def family_profile_edit_view(request):
     # form = FamilyProfileForm(instance=family)はすでにあるfamilyを編集するためのフォーム。instanceありはすでに記入済みの申請書を渡されるイメージ
     # request.user.family（＝ログイン中ユーザーの家族データ）を使って編集用フォームを作り、フォームに最初から値を入れて表示
     else:
-         form = FamilyProfileForm(instance=family)
+        form = FamilyProfileForm(instance=family)
          
     return render(
         request,

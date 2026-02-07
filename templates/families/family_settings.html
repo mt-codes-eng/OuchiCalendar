@@ -1,4 +1,4 @@
-<!-- templates/families/settings.html -->
+<!-- templates/families_settings.html -->
 {% extends "base.html" %}
 
 {% block title %}家族設定 | おうちカレンダー{% endblock %}
@@ -6,7 +6,7 @@
 {% block content %}
 <h1>家族設定</h1>
 
-<p>苗字（家族名）：{{ family.name }}</p>
+<p>苗字（家族名）：{{ family.name|default:"未設定" }}</p>
 <p>家族ID：{{ family.id }}</p>
 
 <a href="{% url 'families:family_profile_edit' %}">苗字の設定を編集する</a>

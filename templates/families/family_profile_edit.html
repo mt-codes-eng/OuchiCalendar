@@ -4,7 +4,7 @@
 {% block title %}家族設定 | おうちカレンダー{% endblock %}
 
 {% block content %}
-<h1>○○家の設定を編集</h1>
+<h1>{{ family.name|default:"(未設定)"}}家の設定を編集</h1>
 
 <form method="post">
   {% csrf_token %}
