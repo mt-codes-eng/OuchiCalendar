@@ -6,6 +6,8 @@
 {% block content %}
 <h1>家族設定</h1>
 
-<p>家族名：{{ family.name }}</p>
+<p>苗字（家族名）：{{ family.name }}</p>
 <p>家族ID：{{ family.id }}</p>
+
+<a href="{% url 'families:family_profile_edit' %}">苗字の設定を編集する</a>
 {% endblock %}
