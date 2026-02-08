@@ -1,12 +1,35 @@
+<!-- templates/base.html -->
 <!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
+
+  {# viewportなし：PCサイズのページを縮小してスマホに押し込む。viewportあり：スマホサイズのページとして表示する #}
+  {# width=device-width：端末の画面の横幅（device-width）に合わせてページ幅を決める #}
+  {# initial-scale=1：最初のズーム倍率を「等倍（1倍）」にする #}
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>{% block title %}おうちカレンダー{% endblock %}</title>
+
+  {# headの中に追加したいもの用 #}
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
-
+  {# 画面上部（ヘッダー）#}
+  {% block header %}{% endblock %}
+    
+  <main>
+    {# 各ページのメイン内容 #}
     {% block content %}{% endblock %}
+  </main>
+
+  {# 画面下部（フッターやボトムナビ）#}
+  {% block footer %}{% endblock %}
+
+  {% block extra_js %}
+
+  {# ページごとに必要なJSを追加する場所 #}
+  {% block extra_js %}{% endblock %}
 
 </body>
 </html>
