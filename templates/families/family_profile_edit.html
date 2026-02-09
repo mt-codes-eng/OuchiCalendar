@@ -1,16 +1,17 @@
 <!-- templates/families/family_profile_edit.html -->
-{% extends "base.html" %}
+{% extends "base_flow.html" %}
 
 {% block title %}家族設定 | おうちカレンダー{% endblock %}
+{% block page_title %}{{ family.name|default:"(未設定)"}}家の設定を編集{% endblock %}
+
+{% block flow_left %}
+<a href="{% url 'families:family_settings' %}" aria-label="家族設定画面へ戻る">×</a>
+{% endblock %}
 
 {% block content %}
-<h1>{{ family.name|default:"(未設定)"}}家の設定を編集</h1>
-
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit">保存</button>
 </form>
-
-<a href="{% url 'families:family_settings' %}">戻る</a>
 {% endblock %}
