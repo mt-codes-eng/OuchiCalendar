@@ -3,11 +3,13 @@
 
 {% block title %}ログイン | おうちカレンダー{% endblock %}
 
-{% block content %}
+{% block header %}
 <header>
   <h1>おうちカレンダー</h1>
 </header>
+{% endblock %}
 
+{% block content %}
 {% if error %}
   <p style="color:red;">{{ error }}</p>
 {% endif %}
