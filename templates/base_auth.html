@@ -1,0 +1,12 @@
+<!-- templates/base_auth.html -->
+ {% extends "base.html" %}
+
+{% block header %}
+<header>
+  <div>
+    {% block auth_left %}{% endblock %}
+    <span>{% block page_title %}{% endblock %}</span>
+    {% block auth_right %}{% endblock %}
+  </div>
+</header>
+{% endblock %}
