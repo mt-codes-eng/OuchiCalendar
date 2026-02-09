@@ -1,10 +1,11 @@
-<!-- templates/families_settings.html -->
-{% extends "base.html" %}
+<!-- templates/families/family_settings.html -->
+{% extends "base_app.html" %}
 
 {% block title %}家族設定 | おうちカレンダー{% endblock %}
+{% block page_title %}私の家族{% endblock %}
 
 {% block content %}
-<h1>家族設定</h1>
+<h1>苗字の設定</h1>
 
 <p>苗字（家族名）：{{ family.name|default:"未設定" }}</p>
 <p>家族ID：{{ family.id }}</p>
