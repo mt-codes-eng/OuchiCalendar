@@ -1,0 +1,27 @@
+<!-- templates/base_app.html -->
+{% extends "base.html" %}
+
+{% block header %}
+<header>
+  <div>
+    {# aria-label="メニュー"：画面には表示されないが、読み上げソフト用（視覚障害者向け）にボタンの説明をつけるもの #}
+    <button type="button" aria-label="メニュー">☰</button>
+    
+    {# spanタグ：文字の一部を囲って、CSSで調整しやすくする #}
+    <span>{% block page_title %}{% endblock %}</span>
+  </div>
+</header>
+{% endblock %}
+
+{% block footer %}
+<footer>
+  {# nav：「ナビゲーション（メニューやページ移動リンクのまとまり）」を表すタグ #}
+  <nav>
+    <a href="#">カレンダー</a> |
+    <a href="#">コメント新着</a> |
+    <a href="#">追加</a> |
+    <a href="#">集計</a> |
+    <a href="#">検索</a>
+  </nav>
+</footer>
+{% endblock %}
