@@ -1,0 +1,17 @@
+<!-- templates/base_flow.html -->
+{% extends "base.html" %}
+
+{% block header %}
+<header>
+  <div>
+    {# 左側：← / × など #}
+    {% block flow_left %}{% endblock %}
+
+    {# 中央：画面タイトル #}
+    {% block page_title %}{% endblock %}
+
+    {# 右側：保存 / 削除 など #}
+    {% block flow_right %}{% endblock %}
+  </div>
+</header>
+{% endblock %}
