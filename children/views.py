@@ -49,8 +49,8 @@ def child_edit_view(request, pk):
         # ② POST：送信された内容で「既存childを更新するフォーム」を作る
         form = ChildForm(request.POST, instance=child)
         
-        if form.is_vaid():
-            form.save
+        if form.is_valid():
+            form.save()
             return redirect("children:child_list")
         
     else:
