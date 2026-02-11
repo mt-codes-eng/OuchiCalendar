@@ -1,5 +1,5 @@
 # children/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Child
@@ -40,7 +40,24 @@ def child_create_view(request):
 
 @login_required
 def child_edit_view(request, pk):
-    return HttpResponse(f"child_edit {pk}")
+    # pk=pk：URLの <int:pk> で渡された数字IDの子どものデータを探す
+    # family=request.user.family：ログイン中の家族の子どもだけに限定する（権限漏れ防止）
+    # ① 編集対象の子どもを取得（他家族のデータは取れないようにする。「他人の子どもをURL直打ちで編集」が防ぐ）
+    child = get_object_or_404(Child, pk=pk, family=request.user.family)
+    
+    if request.method == "POST":
+        # ② POST：送信された内容で「既存childを更新するフォーム」を作る
+        form = ChildForm(request.POST, instance=child)
+        
+        if form.is_vaid():
+            form.save
+            return redirect("children:child_list")
+        
+    else:
+        # ③ GET：最初に画面を開いたとき、既存データ入りのフォームを作る
+        form = ChildForm(instance=child)
+    
+    return render(request, "children/child_form.html", {"form":form, "child":child})
 
 @login_required
 def child_delete_view(request, pk):
