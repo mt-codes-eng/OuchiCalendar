@@ -7,7 +7,9 @@ from .models import Child
 @login_required
 def child_list_view(request):
     # クエリ（DB検索）を実行
-    # Child.objects → Childテーブルを操作するための入口
+    # Child → children_childテーブルを操作するためのモデル。Djangoのモデルクラスは「DBとつながった特別なクラス」
+    # objects → DB検索・DB操作をするための道具箱（窓口）
+    # Child.objects → テーブルを操作するための担当者。テーブル操作係
     # .filter(...) → 条件をつけて絞り込み
     # .order_by("id") → 並び順を指定
     # family が request.user.family の子どもだけに絞る = ログイン中のユーザーの家族に属する子どもだけを取得する
