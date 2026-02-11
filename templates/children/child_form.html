@@ -7,7 +7,13 @@
 <a href="{% url 'children:child_list' %}" aria-label="子どもメンバー画面へ戻る"> × </a>
 {% endblock %}
 
-{% block page_title %} 追加する子どもを入力する {% endblock %}
+{% block page_title %}
+  {% if child %}
+  子どもの設定を編集する
+  {% else %}
+  追加する子どもを入力する
+  {% endif %}
+{% endblock %}
 
 {% block content %}
   <form method="post">
