@@ -1,0 +1,17 @@
+<!-- templates/children/child_confirm_delete.html -->
+{% extends "base_flow.html" %}
+
+{% block title %}家族設定 | おうちカレンダー{% endblock %}
+
+{% block content %}
+ <p>本当に{{ child.name }}を削除しますか？</p>
+
+ <div>
+    <form method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit">OK</button>
+    </form>
+
+    <a href="{% url 'children:child_list' %}" >キャンセル</a>
+ </div>
+{% endblock %}
