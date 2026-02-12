@@ -30,7 +30,7 @@ def child_create_view(request):
             # ログイン中のユーザーが所属している家族をchildren_childテーブルのfamily欄に入れる
             child.family = request.user.family
             child.save()
-            return redirect("children:child_list")
+            return redirect("families:family_settings")
         
     else:
         form = ChildForm()
@@ -50,7 +50,7 @@ def child_edit_view(request, pk):
         
         if form.is_valid():
             form.save()
-            return redirect("children:child_list")
+            return redirect("families:family_settings")
         
     else:
         # ③ GET：最初に画面を開いたとき、既存データ入りのフォームを作る
@@ -66,6 +66,6 @@ def child_delete_view(request, pk):
     if request.method == "POST":
         # ② POST：DBから削除する
         child.delete()
-        return redirect("children:child_list")
+        return redirect("families:family_settings")
     
     return render(request, "children/child_confirm_delete.html", {"child":child})
