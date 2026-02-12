@@ -5,10 +5,34 @@
 {% block page_title %}私の家族{% endblock %}
 
 {% block content %}
-<h1>苗字の設定</h1>
+ <h2>苗字の設定</h2>
 
-<p>苗字（家族名）：{{ family.name|default:"未設定" }}</p>
-<p>家族ID：{{ family.id }}</p>
+ <p>苗字（家族名）：{{ family.name|default:"未設定" }}</p>
+ <p>家族ID：{{ family.id }}</p>
 
-<a href="{% url 'families:family_profile_edit' %}">苗字の設定を編集する</a>
+ <p>
+  <a href="{% url 'families:family_profile_edit' %}">苗字の設定を編集する</a>
+ </p>
+
+ <hr> {# Horizontal Rule（水平線）の略。「横線（区切り線）」を入れるタグ #}
+
+ <h2>子どもメンバー</h2>
+
+ {% if children %}
+  <ul>
+    {% for child in children %}
+      <li>
+        {{ child.name }}
+        <a href="{% url 'children:child_edit' child.id %}">編集</a>
+        <a href="{% url 'children:child_delete' child.id %}">削除</a>
+      </li>
+    {% endfor %}
+  </ul>
+ {% else %}
+  <p>まだメンバーが登録されていません</p>
+ {% endif %}
+
+ <p>
+  <a href="{% url 'children:child_create' %}">メンバーを追加する ＋ </a>
+ </p>
 {% endblock %}
