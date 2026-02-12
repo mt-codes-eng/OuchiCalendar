@@ -24,7 +24,6 @@
       <li>
         {{ child.name }}
         <a href="{% url 'children:child_edit' child.id %}">編集</a>
-        <a href="{% url 'children:child_delete' child.id %}">削除</a>
       </li>
     {% endfor %}
   </ul>
