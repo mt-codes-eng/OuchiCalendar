@@ -12,6 +12,6 @@
         <button type="submit">OK</button>
     </form>
 
-    <a href="{% url 'children:child_list' %}" >キャンセル</a>
+    <a href="{% url 'children:child_edit' child.id %}" >キャンセル</a>
  </div>
 {% endblock %}

@@ -4,14 +4,14 @@
 {% block title %}家族設定 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
-<a href="{% url 'children:child_list' %}" aria-label="子どもメンバー画面へ戻る"> × </a>
+<a href="{% url 'families:family_settings' %}" aria-label="家族設定画面へ戻る"> × </a>
 {% endblock %}
 
 {% block page_title %}
   {% if child %}
-  子どもの設定を編集する
+   子どもの設定を編集する
   {% else %}
-  追加する子どもを入力する
+   追加する子どもを入力する
   {% endif %}
 {% endblock %}
 
@@ -22,4 +22,10 @@
 
     <button type="submit">保存</button>
   </form>
+
+  {% if child %}
+    <p>
+      <a href="{% url 'children:child_delete' child.id %}">削除</a>
+    </p>
+  {% endif %}
 {% endblock %}
