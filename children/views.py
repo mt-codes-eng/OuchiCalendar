@@ -1,6 +1,5 @@
 # children/views.py
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Child
 from .forms import ChildForm
@@ -61,4 +60,12 @@ def child_edit_view(request, pk):
 
 @login_required
 def child_delete_view(request, pk):
-    return HttpResponse(f"child_delete {pk}")
+    # ① 削除対象の子どもを取得（他家族のデータは取れないようにする。「他人の子どもをURL直打ちで編集」が防ぐ）
+    child = get_object_or_404(Child, pk=pk, family=request.user.family)
+    
+    if request.method == "POST":
+        # ② POST：DBから削除する
+        child.delete()
+        return redirect("children:child_list")
+    
+    return render(request, "children/child_confirm_delete.html", {"child":child})
