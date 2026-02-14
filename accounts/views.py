@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import authenticate, login, update_session_auth_hash
 from .forms import SignUpForm
-from django.contrib.auth import authenticate, login
 from families.models import Family
 
 def login_view(request):
@@ -68,4 +70,18 @@ def signup_view(request):
     # Python的に省略していない形はreturn render(request=request,template_name="accounts/signup.html",context={"form": form})
     # {"form": form}でその紙をHTMLに渡して、『accounts/signup.htmlに表示して』と頼んだ。テンプレート側で form を使えるように。辞書の意味：左 "form" → HTMLで使う名前、右 form → Pythonで作った申込書そのもの。
     return render(request, "accounts/signup.html", {"form": form}) 
+    
+@login_required
+def password_change_view(request):
+    if request.method == "POST":
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            # update_session_auth_hash：パスワード変更後に、今のログイン状態（セッション）を壊さないための処理
+            update_session_auth_hash(request, user)
+            return redirect("families:family_settings")
+    else:
+        form = PasswordChangeForm(user=request.user)
+        
+    return render(request, "accounts/password_change.html", {"form": form})
     
