@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'schedule',
     'families', 
     'children',
+    'core',
 ]
 
 MIDDLEWARE = [
