@@ -20,9 +20,12 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("pages.urls")), # ポートフォリオ（/）
-    path("ouchi-calendar/", include("accounts.urls")), # おうちカレンダー（ログイン）
-    path("ouchi-calendar/schedule/", include("schedule.urls")), # おうちカレンダー（カレンダー本体）
-    path("ouchi-calendar/family/", include("families.urls")), # おうちカレンダー（家族）
-    path("ouchi-calendar/family/", include("children.urls")),  # おうちカレンダー（子ども）
+    path("ouchi-calendar/", include("accounts.urls")), 
+    path("ouchi-calendar/schedule/", include("schedule.urls")), 
+    path("ouchi-calendar/family/", include("families.urls")), 
     path("ouchi-calendar/core/", include("core.urls")),
+    path(
+        "ouchi-calendar/family/children/",
+        include(("children.urls", "children"), namespace="children"),
+    ),
 ]
