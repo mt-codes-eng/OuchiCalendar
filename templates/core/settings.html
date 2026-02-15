@@ -1,0 +1,14 @@
+<!-- templates/core/settings.html -->
+{% extends "base_flow.html" %}
+
+{% block title %}設定 | おうちカレンダー{% endblock %}
+
+{% block flow_right %}
+ <a href="#">×</a>
+{% endblock %}
+
+{% block content %}
+ <a href="{% url 'families:family_settings' %}">家族の設定</a>
+ <a href="#">アプリの使い方</a>
+ <a href="{% url 'core:logout_confirm' %}">ログアウト</a>
+{% endblock %}
