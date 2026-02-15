@@ -24,4 +24,5 @@ urlpatterns = [
     path("ouchi-calendar/schedule/", include("schedule.urls")), # おうちカレンダー（カレンダー本体）
     path("ouchi-calendar/family/", include("families.urls")), # おうちカレンダー（家族）
     path("ouchi-calendar/family/", include("children.urls")),  # おうちカレンダー（子ども）
+    path("ouchi-calendar/core/", include("core.urls")),
 ]
