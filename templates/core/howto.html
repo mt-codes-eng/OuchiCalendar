@@ -1,0 +1,87 @@
+<!-- templates/core/howto.html -->
+{% extends "base_flow.html" %}
+
+{% block title %}アプリの使い方 | おうちカレンダー{% endblock %}
+
+{% block flow_left %}
+ <a href="{% url 'core:settings'%}">←</a>
+{% endblock %}
+
+{% block page_title %}アプリの使い方{% endblock %}
+
+
+{% block content %}
+ <h2>①このアプリでできること</h2>
+ <ul>
+    <li>
+        家族の予定、記録をまとめて管理できます
+        <ul class="sub">
+         <li>予定：これから行う予定を登録できます</li>
+         <li>記録：起きた子どもの出来事を記録できます</li>
+        </ul>
+    </li>
+    <li>
+        対応/調整が必要な予定が一目で分かります
+        <ul class="sub">
+            <li>対応担当者の色で予定が表示され、担当者が決まっているかどうかも確認できます</li>
+        </ul>
+    </li>
+ </ul>
+
+
+ <h2>②表示のルールについて</h2>
+ <ul>
+    <li>
+        対応/調整が不要な予定(予定メンバーが一人)
+        <ul class="sub">
+         <li>予定メンバーのカラーバー＋予定タイトル</li>
+        </ul>
+    </li>
+    <li>
+        対応/調整が不要な予定(予定メンバーが複数人)
+        <ul class="sub">
+         <li>合同予定カラーバー＋予定タイトル</li>
+        </ul>
+    </li>
+    <li>
+        対応/調整が必要な予定
+        <ul class="sub">
+         <li>担当者のカラーマーカー＋ステータス/対応内容</li>
+        </ul>
+    </li>
+    <li>
+        予定
+        <ul class="sub">
+         <li>子どものカラーバー＋記録内容に応じたアイコン</li>
+        </ul>
+    </li>
+ </ul>
+
+ <h2>③よく迷いそうな点</h2>
+ <ul>
+    <li>
+        予定と記録の違い
+        <ul class="sub">
+         <li>これから行うことは「予定」、すでに起きたことは「記録」です</li>
+        </ul>
+    </li>
+    <li>
+        対応/調整が必要な予定の見分け方
+        <ul class="sub">
+         <li>担当者のカラーマーカーで表示されます</li>
+        </ul>
+    </li>
+    <li>
+        コメントについて
+        <ul class="sub">
+         <li>対応/調整が必要な予定ごとの連絡メモとして使えます</li>
+        </ul>
+    </li>
+ 
+ {# list-style: none; デフォルトの点（・）を消す #}
+ {# padding-left: 0; 左の余白（インデント）を消す。ulは通常、勝手に左にずれてしまうためずれないように #}
+ {# margin-top: 0px; 親の文章と、補足のリストの間隔をなくす #}
+ <style>
+    ul.sub { list-style: none; padding-left: 0; margin-top: 0px; }
+ </style>
+{% endblock %}
