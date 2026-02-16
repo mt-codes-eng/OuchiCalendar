@@ -13,5 +13,9 @@ def logout_view(request):
         return redirect("accounts:login")
     return render(request, "core/logout_confirm.html")
 
+@login_required
+def howto_view(request):
+    return render(request, "core/howto.html")
+
     
 
