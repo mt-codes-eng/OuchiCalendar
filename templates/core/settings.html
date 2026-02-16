@@ -9,6 +9,6 @@
 
 {% block content %}
  <div><a href="{% url 'families:family_settings' %}">家族の設定</a></div>
- <div><a href="#">アプリの使い方</a></div>
+ <div><a href="{% url 'core:howto' %}">アプリの使い方</a></div>
  <div><a href="{% url 'core:logout' %}">ログアウト</a></div>
 {% endblock %}
