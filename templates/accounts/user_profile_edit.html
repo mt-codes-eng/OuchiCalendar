@@ -1,0 +1,20 @@
+<!-- templates/accounts/user_profile_edit.html -->
+{% extends "base_flow.html" %}
+
+{% block title %}家族設定 | おうちカレンダー{% endblock %}
+
+{% block flow_left %}
+ <a href="{% url 'families:family_settings' %}"> × </a>
+{% endblock %}
+
+{% block page_title %}
+ {{ user_obj.name|default:"私" }}の設定を編集する
+{% endblock %}
+
+{% block content %}
+ <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">保存</button>
+ </form>
+{% endblock %}
