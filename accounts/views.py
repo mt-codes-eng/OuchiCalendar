@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import authenticate, login, update_session_auth_hash
-from .forms import SignUpForm
+from .forms import SignUpForm, UserProfileForm
 from families.models import Family
 
 def login_view(request):
@@ -84,4 +84,29 @@ def password_change_view(request):
         form = PasswordChangeForm(user=request.user)
         
     return render(request, "accounts/password_change.html", {"form": form})
+
+
+
+@login_required
+def user_profile_edit_view(request):
+    # ログイン中のユーザー（＝自分）
+    user = request.user
     
+    if request.method == "POST":
+        # POSTされた内容でフォームを作る（既存ユーザーを更新するため instance=user）
+        form = UserProfileForm(request.POST, instance=user)
+        
+        # 入力チェック
+        if form.is_valid():
+            # DBに保存
+            form.save()
+            
+            return redirect("families:family_settings")
+        
+        else:
+            # GETのとき：すでに登録済みの値が入力欄に入った状態のフォームを作る
+            form = UserProfileForm(instance=user)
+        
+        # ビューでuser = request.userとしており、このuserをテンプレで使いたいとき混乱しないようにuser_objという別名で渡している
+        # テンプレでuserという名前がすでに別で使われている場合があり、この場合と混乱しないため   
+        return render(request, "accounts/user_profile_edit.html", {"form": form, "user_obj":user})
