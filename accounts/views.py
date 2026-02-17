@@ -103,10 +103,10 @@ def user_profile_edit_view(request):
             
             return redirect("families:family_settings")
         
-        else:
-            # GETのとき：すでに登録済みの値が入力欄に入った状態のフォームを作る
-            form = UserProfileForm(instance=user)
+    else:
+        # GETのとき：すでに登録済みの値が入力欄に入った状態のフォームを作る
+        form = UserProfileForm(instance=user)
         
         # ビューでuser = request.userとしており、このuserをテンプレで使いたいとき混乱しないようにuser_objという別名で渡している
         # テンプレでuserという名前がすでに別で使われている場合があり、この場合と混乱しないため   
-        return render(request, "accounts/user_profile_edit.html", {"form": form, "user_obj":user})
+    return render(request, "accounts/user_profile_edit.html", {"form": form, "user_obj":user})
