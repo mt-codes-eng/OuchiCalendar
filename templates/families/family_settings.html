@@ -5,37 +5,56 @@
 {% block page_title %}私の家族{% endblock %}
 
 {% block content %}
- <h2>苗字の設定</h2>
-
- <p>苗字（家族名）：{{ family.name|default:"未設定" }}</p>
- <p>家族ID：{{ family.id }}</p>
-
+ <section> {# 意味づけ用の区切りタグ。見出しごとの箱。1つのまとまり（セクション）#}
+    <div>
+      <h2 style="display: inline;"> {# style="display: inline;"見出しを改行しないで、横並びにしたい #}
+      {{ request.user.name|default:"未設定(ユーザー名)"}}
+      </h2>
+      <a href="{% url 'accounts:user_profile_edit' %}" aria-label="私の設定を編集">✏️</a>
+    </div>
+    <p>Email：{{ request.user.email }}</p>
+    <p>パスワード：********</p>
+    <p>ユーザーアイコン：{{ request.user.image_url|default:"未設定" }}</p>
+ </section>
  <p>
-  <a href="{% url 'families:family_profile_edit' %}">苗字の設定を編集する</a>
+  <a href="{% url 'accounts:password_change' %}">※パスワードの変更はこちら</a>
  </p>
-
- <p>
-  <a href="{% url 'accounts:password_change' %}">パスワードの変更はこちら</a>
- </p>
-
+ 
  <hr> {# Horizontal Rule（水平線）の略。「横線（区切り線）」を入れるタグ #}
 
- <h2>子どもメンバー</h2>
+ <section>
+    <div>
+      <h2 style="display: inline;">
+        {{ family.name|default:"未設定(家族名)" }}家
+      </h2>
+      <a href="{% url 'families:family_profile_edit' %}" aria-label="苗字の設定を編集">✏️</a>
+    </div>
+    {% if request.user.family %}
+      <p>家族アイコン：{{ request.user.family.image_url|default:"未設定" }}</p>
+    {% else %}
+     <p>家族アイコン：未設定</p>
+    {% endif %}
+    <p>家族ID：{{ family.id }}</p>
+  </section>
 
- {% if children %}
-  <ul>
-    {% for child in children %}
-      <li>
-        {{ child.name }}
-        <a href="{% url 'children:child_edit' child.id %}">編集</a>
-      </li>
-    {% endfor %}
-  </ul>
- {% else %}
-  <p>まだメンバーが登録されていません</p>
- {% endif %}
+ <hr>
 
- <p>
-  <a href="{% url 'children:child_create' %}">メンバーを追加する ＋ </a>
- </p>
+ <section>
+  <h2>子どもメンバー</h2>
+  {% if children %}
+    <ul>
+      {% for child in children %}
+        <li>
+          {{ child.name }}
+          <a href="{% url 'children:child_edit' child.id %}" aria-label="子どもメンバーを編集">✏️</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>まだメンバーが登録されていません</p>
+  {% endif %}
+  <p>
+    <a href="{% url 'children:child_create' %}">メンバーを追加する ＋ </a>
+  </p>
+ </section>
 {% endblock %}
