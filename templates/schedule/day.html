@@ -1,0 +1,22 @@
+<!-- templates/schedule/day.html -->
+{% extends "base_flow.html" %}
+
+{% block title %}予定・記録概要 | おうちカレンダー{% endblock %}
+{% block page_title %}{{ date }}{% endblock %}
+
+{% block flow_left %}
+ <a href="{% url 'schedule:month' %}" aria-label="カレンダーへ戻る">←</a>
+{% endblock %}
+
+{% block flow_right %}
+ <a href="{% url 'schedule:day_create_choice' date %}" aria-label="予定・記録作成選択へ進む">＋</a>
+{% endblock %}
+
+{% block content %}
+{% if not schedules %}
+    <p>予定・記録がありません</p>
+{% else %}
+    <h2>予定</h2>
+    <h2>記録</h2>
+{% endif %}
+{% endblock %}
