@@ -1,0 +1,24 @@
+<!-- templates/schedule/schedule_form.html -->
+{% extends "base_flow.html" %}
+{% block title %}予定 | おうちカレンダー{% endblock %}
+
+{% block flow_left %}
+    <a href="{% url 'schedule:day' '2026-02-23' %}" aria-label="予定・記録概要へ戻る">× (仮)</a>
+{% endblock %}
+
+{% block page_title %}
+    {% if mode == "edit" %}
+        <p style="display: inline;">予定を編集</p>
+    {% else %}
+        <p style="display: inline;">予定を作成</p>
+    {% endif %}
+{% endblock %}
+
+{% block flow_right %}
+    <button>保存</button>
+    <button>削除</button>
+{% endblock %}
+
+{% block content %}
+    <p>フォーム未実装</p>
+{% endblock %}
