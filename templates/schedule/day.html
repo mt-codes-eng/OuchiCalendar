@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block flow_right %}
- <a href="{% url 'schedule:day_create_choice' date %}" aria-label="予定・記録作成選択へ進む">＋</a>
+ <a href="{% url 'schedule:day_create_choice' date %}?next={% url 'schedule:day' date %}" aria-label="予定・記録作成選択へ進む">＋</a>
 {% endblock %}
 
 {% block content %}
