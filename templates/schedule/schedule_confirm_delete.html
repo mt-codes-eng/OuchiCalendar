@@ -1,0 +1,14 @@
+<!-- templates/schedule/schedule_confirm_delete.html -->
+{% extends "base_flow.html" %}
+
+{% block title %}予定・記録削除 | おうちカレンダー{% endblock %}
+
+{% block content %}
+<p>本当にこの予定・記録を削除しますか？</p>
+
+<p>
+  <a href="{% url 'schedule:day' date %}">OK</a>
+  |
+  <a href="{% url 'schedule:schedule_edit' schedule.id %}">キャンセル</a>
+</p>
+{% endblock %}
