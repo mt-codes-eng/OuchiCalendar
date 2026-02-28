@@ -1,0 +1,20 @@
+<!-- templates/schedule/schedule_detail.html -->
+{% extends "base_flow.html" %}
+{% block title %}予定詳細 | おうちカレンダー{% endblock %}
+
+{% block flow_left %}
+    <a href="{% url 'schedule:day' '2026-02-23' %}" aria-label="予定・記録概要へ戻る">× (仮)</a>
+{% endblock %}
+
+{% block page_title %}
+        <p style="display: inline;">予定</p>
+{% endblock %}
+
+{% block flow_right %}
+    <a href="{% url 'schedule_edit' schedule.id %}" aria-label="予定を編集">✏️</a>
+{% endblock %}
+
+{% block content %}
+    <p>予定のタイトル：{{schedule.title|default:"(未設定)"}}</p>
+    <p>予定詳細未実装</p>
+{% endblock %}
