@@ -1,18 +1,63 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from datetime import datetime, time, timedelta
+from django.utils import timezone
 from .models import Schedule
+from .forms import ScheduleForm
 
 @login_required
 def month_view(request):
     context = {}
     return render(request, "schedule/month.html", context)
 
+# ①URLからくるdateは文字列であるため、文字列を日付(date型)に変換する（DBと比較するため）
+def _parse_date(date_str: str):
+    """
+    date_str: str→型ヒント。date_str は str型と書いているだけ。str型を強制するものではない
+    datetime.strptime→文字列 から 日付（datetime型）に変換する関数。例"2026-02-23"をdatetime(2026, 2, 23, 0, 0)
+    .date()→date型にする。例datetime(2026, 2, 23, 0, 0)をdate(2026, 2, 23)
+    """
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").date()
+    except(ValueError,TypeError):
+        return None
 
+# ②その日の範囲を作る（2026-02-23 の 00:00〜2026-02-24 の 00:00 までの間にある予定を取得するため）    
+def _day_range(target_date):
+    """
+    datetime.combine(target_date, time.min)→date(2026,2,23)+00:00をつくる
+    timedelta(days=1)→1日足す。2026-02-23 00:00 + 1日 = 2026-02-24 00:00
+    
+    PythonとDjangoでは、日時には2種類ある。
+    タイムゾーンなし（naive）→「2026-02-23 10:00」とだけ書いてある状態。日本時間の10時？アメリカ時間の10時？
+    タイムゾーンあり（aware）→「日本時間2026-02-23 10:00」と明確
+    """
+    start_naive = datetime.combine(target_date, time.min)
+    end_naive = start_naive + timedelta(days=1)
+    
+    start =timezone.make_aware(start_naive)
+    end = timezone.make_aware(end_naive)
+    return start, end
+    
 @login_required
 def day_view(request, date):
+    target_date = _parse_date(date)
+    if target_date is None:
+        return redirect("schedule:month")
+    start_dt,end_dt = _day_range(target_date)
+    
+    """
+    その日の予定だけを取ってくるための条件
+    「フィールド名__条件」と書く
+    フィールド名__gte → gte = greater than or equal。以上。start_at >= start_dt。
+    フィールド名__lt → lt = less than。未満。start_at < end_dt
+    2026-02-23 00:00 以上 かつ 2026-02-24 00:00 未満
+    """
     schedules =Schedule.objects.filter(
-        family = request.user.family
-    )
+        family = request.user.family,
+        start_at__gte=start_dt,
+        start_dt__lt=end_dt,
+    ).order_by("start_at")
     
     context = {
         "date": date,
