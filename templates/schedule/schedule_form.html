@@ -15,10 +15,13 @@
 {% endblock %}
 
 {% block flow_right %}
-    <button>保存</button>
+    <button type="submit">保存</button>
     <button>削除</button>
 {% endblock %}
 
 {% block content %}
-    <p>フォーム未実装</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+</form>
 {% endblock %}
