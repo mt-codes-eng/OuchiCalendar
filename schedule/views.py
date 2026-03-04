@@ -78,9 +78,26 @@ def create_choice_view(request, date):
 
 @login_required
 def schedule_create_view(request):
+    date_str = request.GET.get("date")  # create-choice から ?date= で渡す想定
+    
+    if request.method == "POST":
+        form = ScheduleForm(request.POST, target_date=date_str)
+        if form.is_valid():
+            schedule = form.save(commit=False)
+            schedule.family = request.user.family
+            schedule.save()
+
+            day_str = schedule.start_at.date().isoformat() # 予定・記録概要画面のURLに渡すには 文字列 が必要だから、.isoformat()
+            return redirect("schedule:day", date=day_str)
+    else:
+        form = ScheduleForm(target_date=date_str)
+        
     context = {
-        "mode": "create",
+        "mode": "create", # 作成/編集表示
+        "date": date_str,  # 戻るリンク用
+        "form": form, # 入力フォーム
     }
+    
     return render(request, "schedule/schedule_form.html", context)
     
     
