@@ -56,7 +56,7 @@ def day_view(request, date):
     schedules =Schedule.objects.filter(
         family = request.user.family,
         start_at__gte=start_dt,
-        start_dt__lt=end_dt,
+        start_at__lt=end_dt,
     ).order_by("start_at")
     
     context = {
