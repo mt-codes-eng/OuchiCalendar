@@ -3,7 +3,7 @@ from django import forms
 from django.utils import timezone
 from .models import Schedule
 
-class ScheduleFrom(forms.ModelForm):
+class ScheduleForm(forms.ModelForm):
     """
     予定の作成/編集フォーム
     - 条件付き必須（調整ONなら必須など）は clean() で判定する
