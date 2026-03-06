@@ -4,6 +4,55 @@ from django.utils import timezone
 from .models import Schedule
 
 class ScheduleForm(forms.ModelForm):
+    # 画面設計図に合わせて「日付」と「時間」を別フィールドで用意する（DBには保存しない）
+    date = forms.DateField(
+        label="日付",
+        required=True, # required：入力必須
+        widget=forms.DateInput(attrs={"type": "date"}) # widget：入力欄の見た目（UI）を決めるもの。カレンダーからクリックして日付を選べるようになる
+    ) # attrs：HTMLの属性を追加する仕組み。attrs={"HTML属性": "値"}と書く。Pythonではattrs={"type": "date"}→HTMLでは<input type="date">となる。
+    start_time = forms.TimeField(
+        label="開始",
+        required=False,
+        widget=forms.TimeInput(attrs={"type": "time"})
+    )
+    end_time = forms.TimeField(
+        label="終了",
+        required=False,
+        widget=forms.TimeInput(attrs={"type": "time"})
+    )
+    
+    # どのモデルの、どの項目をフォームに出すか。フォームに表示するフィールドはこのリストのものだけ        
+    class Meta:
+        model = Schedule
+        fields = [
+            # 画面順に並べる
+            "date",
+            "is_all_day",
+            "start_time",
+            "end_time",
+            "title",
+            "memo",
+            "requires_coordination",
+            "coordination_type",
+            "coordination_other_detail",
+            "user",
+            "status",
+            "is_consecutive_coordination",
+            "coordination_end_date",
+        ]
+        labels = {
+            "is_all_day": "終日",
+            "title": "予定のタイトル",
+            "memo": "メモ",
+            "requires_coordination": "この予定は対応・調整が必要",
+            "coordination_type": "対応内容",
+            "coordination_other_detail": "その他の詳細",
+            "user": "担当",
+            "status": "ステータス",
+            "is_consecutive_coordination": "連続して対応",
+            "coordination_end_date": "終了",
+        }
+    
     """
     予定の作成/編集フォーム
     - 条件付き必須（調整ONなら必須など）は clean() で判定する
@@ -13,40 +62,41 @@ class ScheduleForm(forms.ModelForm):
     # フォームが作られた瞬間に1回だけ動く関数
     # target_dateはビューからフォームへ渡される追加情報。None はビューから「渡されなくてもOK」の意味
     def __init__(self, *args, target_date=None, **kwargs):
-        super().__init__(*args, **kwargs) #「ModelFormの元々の初期化（お約束）」を呼ぶ
+        super().__init__(*args, **kwargs) # ModelForm本来の初期化を先に実行する。self.instanceやself.fieldsなどが使えるようになる
         self.target_date = target_date # フォームがtarget_dateを覚えて clean() で使う
         
-        # pkがない（新規作成）のとき画面上のステータスの初期表示を△調整中にする
+        # 新規作成時(pkがないとき)：ステータスの初期表示を△調整中
+        # instanceはこのフォームが相手にしている Schedule データ
         if not self.instance.pk:
             self.fields["status"].initial = Schedule.Status.ADJUSTING
-    
-    # どのモデルの、どの項目をフォームに出すか。フォームに表示するフィールドはこのリストのものだけ        
-    class Meta:
-        model = Schedule
-        fields = [
-            "title",
-            "memo",
-            "is_all_day",
-            "start_at",
-            "end_at",
-            "requires_coordination",
-            "coordination_type",
-            "coordination_other_detail",
-            "user",
-            "status",
-            "is_consecutive_coordination",
-            "coordination_end_date",
-        ]
+            
+        # 編集時：既存の start_at/end_at を date/start_time/end_time に分解して初期表示
+        if self.instance.pk and self.instance.start_at:
+            self.fields["date"].initial = self.instance.start_at.date()
+            self.fields["start_time"].initial = self.instance.start_at.time().replace(second=0, microsecond=0)
+            if self.instance.end_at:
+                self.fields["end_time"].initial = self.instance.end_at.time().replace(second=0, microsecond=0)
+
+        # 新規作成時でURLで ?date= を渡されたとき：「日付」の初期値に入れる
+        if (not self.instance.pk) and self.target_date:
+            try:
+                self.fields["date"].initial = datetime.strptime(self.target_date, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+
     
     # POST送信されたあとに自動で呼ばれるチェック関数。clenメソッドで複数のフィールドのバリデーションチェック  
     def clean(self):
         # 親クラスのcleanを呼び出す。cleaned は辞書。cleaned["title"]、cleaned["start_at"]というような入力された値が入っている
         cleaned = super().clean()
-        # 値を取り出して変数に入れている
+        
+        # 画面入力（分割）
+        d = cleaned.get("date")
         is_all_day = cleaned.get("is_all_day")
-        start_at = cleaned.get("start_at")
-        end_at = cleaned.get("end_at")
-
+        start_t = cleaned.get("start_time")
+        end_t = cleaned.get("end_time")
+        
+        # 既存項目（条件必須用）値を取り出して変数に入れている
         requires = cleaned.get("requires_coordination")
         coordination_type = cleaned.get("coordination_type")
         other_detail = cleaned.get("coordination_other_detail")
@@ -55,37 +105,36 @@ class ScheduleForm(forms.ModelForm):
         is_consecutive = cleaned.get("is_consecutive_coordination")
         end_date = cleaned.get("coordination_end_date")
 
-        # --- 終日ONなら start_at/end_at を自動セット ---
-        # 自動セットするためには終日は「何日なのか」が必要。優先順位を作ってbase_dateを決める
-        if is_all_day:
-            base_date = None
-            # 優先：target_date（URLやGETから渡す）
-            if self.target_date:
-                try:
-                    base_date = datetime.strptime(self.target_date, "%Y-%m-%d").date()
-                except ValueError:
-                    base_date = None
-            
-            # 保険①：優先がなければ start_at から日付を使う
-            if base_date is None and start_at:
-                base_date = start_at.date()
-            
-            # 保険②：優先、保険①の両方なければエラー   
-            if base_date is None:
-                raise forms.ValidationError("終日予定のための日付が取得できません。日付を指定してください。")
-            
-            start_naive = datetime.combine(base_date, time.min)
-            end_naive = start_naive + timedelta(days=1)
+        # 日付が無いのはフォーム自体のエラー（ここは必須なので通常は起きない）
+        if not d:
+            raise forms.ValidationError("日付を選択してください。")
 
+        # --- 終日ONなら start_at/end_at を自動セット ---
+        if is_all_day:
+            start_naive = datetime.combine(d, time.min)
+            end_naive = start_naive + timedelta(days=1)
             cleaned["start_at"] = timezone.make_aware(start_naive)
             cleaned["end_at"] = timezone.make_aware(end_naive)
-
-            start_at = cleaned["start_at"]
-            end_at = cleaned["end_at"]
         
-        # --- start < end の基本チェック。開始と終了が入力されているのに開始が終了より後ならダメ ---    
-        if start_at and end_at and start_at >= end_at:
-            self.add_error("end_at", "終了日時は開始日時より後にしてください。")
+        # --- 終日OFF：開始・終了時刻が必要 ---   
+        else:
+            if not start_t:
+                self.add_error("start_time", "開始時刻を入力してください。")
+            if not end_t:
+                self.add_error("end_time", "終了時刻を入力してください。")
+
+            # 両方ある場合だけ start_at/end_at を作る
+            if start_t and end_t:
+                start_naive = datetime.combine(d, start_t)
+                end_naive = datetime.combine(d, end_t)
+                start_at = timezone.make_aware(start_naive)
+                end_at = timezone.make_aware(end_naive)
+
+                if start_at >= end_at:
+                    self.add_error("end_time", "終了時刻は開始時刻より後にしてください。")
+
+                cleaned["start_at"] = start_at
+                cleaned["end_at"] = end_at
 
         # --- 調整OFFなら、調整系は空に寄せる（DBを綺麗に） ---
         if not requires:
@@ -113,7 +162,20 @@ class ScheduleForm(forms.ModelForm):
 
         # 連続対応がONなら終了日必須
         if is_consecutive and not end_date:
-            self.add_error("coordination_end_date", "連続そて対応する場合は終了日を入力してください。")
+            self.add_error("coordination_end_date", "連続して対応する場合は終了日を入力してください。")
 
         # Djangoに「チェック済みのデータ」を返す
         return cleaned
+    
+    def save(self, commit=True):
+        """
+        分割入力（date/start_time/end_time）から start_at/end_at を作ってモデルに入れる。
+        clean() で cleaned["start_at"], cleaned["end_at"] を作っている前提。
+        """
+        instance = super().save(commit=False)
+        instance.start_at = self.cleaned_data["start_at"]
+        instance.end_at = self.cleaned_data["end_at"]
+
+        if commit:
+            instance.save()
+        return instance
