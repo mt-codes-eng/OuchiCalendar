@@ -19,7 +19,6 @@
 {% endblock %}
 
 {% block flow_right %}
-    <button type="submit">保存</button>
     <button>削除</button>
 {% endblock %}
 
@@ -59,7 +58,7 @@
     
     {# 時間・終日 #}
     <p>
-        <label>時間：</label>
+        時間:
         {{ form.is_all_day }} {{ form.is_all_day.label }}
         {{ form.start_time }}
         ～
@@ -120,7 +119,7 @@
 
     {# 連続して対応要否 #}
     <p>
-        連続して対応：
+        連続して対応:
         {{ form.is_consecutive_coordination }}
         {{ form.is_consecutive_coordination.label }}
         {{ form.is_consecutive_coordination.errors }}
@@ -132,5 +131,7 @@
         {{ form.coordination_end_date }}
         {{ form.coordination_end_date.errors }}
     </p>
+
+    <button type="submit">保存</button>
 </form>
 {% endblock %}
