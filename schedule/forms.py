@@ -20,6 +20,12 @@ class ScheduleForm(forms.ModelForm):
         required=False,
         widget=forms.TimeInput(attrs={"type": "time"})
     )
+    coordination_end_date = forms.DateField(
+        label="終了",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"})
+    )
+
     
     # どのモデルの、どの項目をフォームに出すか。フォームに表示するフィールドはこのリストのものだけ        
     class Meta:
@@ -49,8 +55,7 @@ class ScheduleForm(forms.ModelForm):
             "coordination_other_detail": "その他の詳細",
             "user": "担当",
             "status": "ステータス",
-            "is_consecutive_coordination": "連続して対応",
-            "coordination_end_date": "終了",
+            "is_consecutive_coordination": "連続する",
         }
     
     """
