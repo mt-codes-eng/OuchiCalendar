@@ -26,6 +26,111 @@
 {% block content %}
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    
+    {# 特定の項目ではなく、フォーム全体のエラーを表示 例：「開始時刻は終了時刻より前にしてください」など #}
+    {% if form.non_field_errors %}
+        <div class="form-errors">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+    
+    {% comment %}
+    {{ form.フィールド名.label_tag }} 項目名
+    {{ form.フィールド名 }} 入力欄
+    {{ form.フィールド名.errors }} エラー
+    で1セット
+    {% endcomment %}
+
+    {# 日付 #}
+    <p>
+        {{ form.date.label_tag }}
+        {{ form.date }}
+        {{ form.date.errors }}
+    </p>
+
+    
+    {% comment %}
+    チェックボックスは普通の入力欄と違い、label_tagよりもlabelの方が自然に並ぶことが多い
+    {{ form.フィールド名 }} 入力欄
+    {{ form.フィールド名.label }} 項目名
+    {{ form.フィールド名.errors }} エラー
+    で1セット
+    {% endcomment %}
+    
+    {# 時間・終日 #}
+    <p>
+        <label>時間：</label>
+        {{ form.is_all_day }} {{ form.is_all_day.label }}
+        {{ form.start_time }}
+        ～
+        {{ form.end_time }}
+        {{ form.is_all_day.errors }}
+        {{ form.start_time.errors }}
+        {{ form.end_time.errors }}
+    </p>
+
+    {# タイトル #}
+    <p>
+        {{ form.title.label_tag }}
+        {{ form.title }}
+        {{ form.title.errors }}
+    </p>
+
+    {# メモ #}
+    <p>
+        {{ form.memo.label_tag }}
+        {{ form.memo }}
+        {{ form.memo.errors }}
+    </p>
+
+    {# 対応/調整要否 #}
+    <p>
+        {{ form.requires_coordination }}
+        {{ form.requires_coordination.label }}
+        {{ form.requires_coordination.errors }}
+    </p>
+
+    {# 対応内容 #}
+    <p>
+        {{ form.coordination_type.label_tag }}
+        {{ form.coordination_type }}
+        {{ form.coordination_type.errors }}
+    </p>
+
+    {# その他詳細 #}
+    <p>
+        {{ form.coordination_other_detail.label_tag }}
+        {{ form.coordination_other_detail }}
+        {{ form.coordination_other_detail.errors }}
+    </p>
+
+    {# 担当者 #}
+    <p>
+        {{ form.user.label_tag }}
+        {{ form.user }}
+        {{ form.user.errors }}
+    </p>
+
+    {# ステータス #}
+    <p>
+        {{ form.status.label_tag }}
+        {{ form.status }}
+        {{ form.status.errors }}
+    </p>
+
+    {# 連続して対応要否 #}
+    <p>
+        連続して対応：
+        {{ form.is_consecutive_coordination }}
+        {{ form.is_consecutive_coordination.label }}
+        {{ form.is_consecutive_coordination.errors }}
+    </p>
+
+    {# 対応/調整終了日 #}
+    <p>
+        {{ form.coordination_end_date.label_tag }}
+        {{ form.coordination_end_date }}
+        {{ form.coordination_end_date.errors }}
+    </p>
 </form>
 {% endblock %}
