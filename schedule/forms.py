@@ -69,6 +69,24 @@ class ScheduleForm(forms.ModelForm):
     def __init__(self, *args, target_date=None, **kwargs):
         super().__init__(*args, **kwargs) # ModelForm本来の初期化を先に実行する。self.instanceやself.fieldsなどが使えるようになる
         self.target_date = target_date # フォームがtarget_dateを覚えて clean() で使う
+
+        # --- placeholder ---
+        self.fields["title"].widget.attrs["placeholder"] = "タイトルを入力"
+        self.fields["memo"].widget.attrs["placeholder"] = "メモを入力"
+        self.fields["coordination_other_detail"].widget.attrs["placeholder"] = "詳細を入力"
+
+        # --- Select系の先頭文言を調整 ---
+        # IntegerChoicesに空選択肢を先頭追加
+        self.fields["coordination_type"].choices = [
+            ("", "対応内容を選択")
+        ] + list(Schedule.CoordinationType.choices)
+        
+        self.fields["status"].choices = [
+            ("", "ステータスを選択")
+        ] + list(Schedule.Status.choices)
+
+        # user は ModelChoiceField なので empty_label が使える
+        self.fields["user"].empty_label = "担当者を選択"
         
         # 新規作成時(pkがないとき)：ステータスの初期表示を△調整中
         # instanceはこのフォームが相手にしている Schedule データ
@@ -78,10 +96,17 @@ class ScheduleForm(forms.ModelForm):
         # 編集時：既存の start_at/end_at を date/start_time/end_time に分解して初期表示
         if self.instance.pk and self.instance.start_at:
             self.fields["date"].initial = self.instance.start_at.date()
-            self.fields["start_time"].initial = self.instance.start_at.time().replace(second=0, microsecond=0)
-            if self.instance.end_at:
-                self.fields["end_time"].initial = self.instance.end_at.time().replace(second=0, microsecond=0)
 
+            # 終日でないときだけ時間を初期表示
+            if not self.instance.is_all_day:
+                self.fields["start_time"].initial = self.instance.start_at.time().replace(second=0, microsecond=0)
+                if self.instance.end_at:
+                    self.fields["end_time"].initial = self.instance.end_at.time().replace(second=0, microsecond=0)
+
+        # 編集時：連続対応終了日も初期表示
+        if self.instance.pk and self.instance.coordination_end_date:
+            self.fields["coordination_end_date"].initial = self.instance.coordination_end_date
+            
         # 新規作成時でURLで ?date= を渡されたとき：「日付」の初期値に入れる
         if (not self.instance.pk) and self.target_date:
             try:
@@ -101,6 +126,7 @@ class ScheduleForm(forms.ModelForm):
         start_t = cleaned.get("start_time")
         end_t = cleaned.get("end_time")
         
+        # 調整関連
         # 既存項目（条件必須用）値を取り出して変数に入れている
         requires = cleaned.get("requires_coordination")
         coordination_type = cleaned.get("coordination_type")
@@ -114,7 +140,7 @@ class ScheduleForm(forms.ModelForm):
         if not d:
             raise forms.ValidationError("日付を選択してください。")
 
-        # --- 終日ONなら start_at/end_at を自動セット ---
+        # --- 終日ON： start_at/end_at を自動セット ---
         if is_all_day:
             start_naive = datetime.combine(d, time.min)
             end_naive = start_naive + timedelta(days=1)
