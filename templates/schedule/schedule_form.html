@@ -19,7 +19,9 @@
 {% endblock %}
 
 {% block flow_right %}
-    <button>削除</button>
+    {% if mode == "edit" %}
+        <button>削除</button>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -57,16 +59,25 @@
     {% endcomment %}
     
     {# 時間・終日 #}
-    <p>
-        時間:
-        {{ form.is_all_day }} {{ form.is_all_day.label }}
-        {{ form.start_time }}
-        ～
-        {{ form.end_time }}
-        {{ form.is_all_day.errors }}
-        {{ form.start_time.errors }}
-        {{ form.end_time.errors }}
-    </p>
+    <div>
+        <p>
+            時間:
+            {{ form.is_all_day }} {{ form.is_all_day.label }}
+            {{ form.is_all_day.errors }}
+        </p>
+        <div id="time-fields">
+            <p>
+                {{ form.start_time.label_tag }}
+                {{ form.start_time }}～
+                {{ form.start_time.errors }}
+            </p>
+            <p>
+                {{ form.end_time.label_tag }}
+                {{ form.end_time }}
+                {{ form.end_time.errors }}
+            </p>
+        </div>
+    </div>
 
     {# タイトル #}
     <p>
@@ -89,49 +100,189 @@
         {{ form.requires_coordination.errors }}
     </p>
 
-    {# 対応内容 #}
-    <p>
-        {{ form.coordination_type.label_tag }}
-        {{ form.coordination_type }}
-        {{ form.coordination_type.errors }}
-    </p>
+    {# 対応/調整関連まとめ #}
+    <div id="coordination-fields">
+        {# 対応内容 #}
+        <p>
+            {{ form.coordination_type.label_tag }}
+            {{ form.coordination_type }}
+            {{ form.coordination_type.errors }}
+        </p>
 
-    {# その他詳細 #}
-    <p>
-        {{ form.coordination_other_detail.label_tag }}
-        {{ form.coordination_other_detail }}
-        {{ form.coordination_other_detail.errors }}
-    </p>
+        {# その他詳細 #}
+        <p id="coordination-other-detail-field">
+            {{ form.coordination_other_detail.label_tag }}
+            {{ form.coordination_other_detail }}
+            {{ form.coordination_other_detail.errors }}
+        </p>
 
-    {# 担当者 #}
-    <p>
-        {{ form.user.label_tag }}
-        {{ form.user }}
-        {{ form.user.errors }}
-    </p>
+        {# 担当者 #}
+        <p>
+            {{ form.user.label_tag }}
+            {{ form.user }}
+            {{ form.user.errors }}
+        </p>
 
-    {# ステータス #}
-    <p>
-        {{ form.status.label_tag }}
-        {{ form.status }}
-        {{ form.status.errors }}
-    </p>
+        {# ステータス #}
+        <p>
+            {{ form.status.label_tag }}
+            {{ form.status }}
+            {{ form.status.errors }}
+        </p>
+        <p id="status-message"></p>
 
-    {# 連続して対応要否 #}
-    <p>
-        連続して対応:
-        {{ form.is_consecutive_coordination }}
-        {{ form.is_consecutive_coordination.label }}
-        {{ form.is_consecutive_coordination.errors }}
-    </p>
+        {# 連続して対応要否 #}
+        <p>
+            連続して対応:
+            {{ form.is_consecutive_coordination }}
+            {{ form.is_consecutive_coordination.label }}
+            {{ form.is_consecutive_coordination.errors }}
+        </p>
 
-    {# 対応/調整終了日 #}
-    <p>
-        {{ form.coordination_end_date.label_tag }}
-        {{ form.coordination_end_date }}
-        {{ form.coordination_end_date.errors }}
-    </p>
-
+        {# 対応/調整終了日 #}
+        <p id="coordination-end-date-field">
+            {{ form.coordination_end_date.label_tag }}
+            {{ form.coordination_end_date }}
+            {{ form.coordination_end_date.errors }}
+        </p>
+    </div>
     <button type="submit">保存</button>
 </form>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+// ①HTMLが読み込み終わってから、中の処理を実行する(ページの部品がそろってからJSを動かす)
+document.addEventListener("DOMContentLoaded", function () {
+    // ②画面の部品を変数に入れている。
+    // document.getElementById("id_is_all_day")：id でHTMLの部品を取る。終日チェックボックスを取得
+    const isAllDayField = document.getElementById("id_is_all_day");
+    // 対応/調整要否チェックボックスを取得
+    const requiresCoordinationField = document.getElementById("id_requires_coordination");
+    // 対応内容を取得
+    const coordinationTypeField = document.getElementById("id_coordination_type");
+    // ステータスを取得
+    const statusField = document.getElementById("id_status");
+    // 連続して対応チェックボックスを取得
+    const isConsecutiveField = document.getElementById("id_is_consecutive_coordination");
+
+    // 時間欄のまとまりを取得
+    const timeFields = document.getElementById("time-fields");
+    // 対応/調整関連のまとまりを取得
+    const coordinationFields = document.getElementById("coordination-fields");
+    // その他詳細を取得
+    const coordinationOtherDetailField = document.getElementById("coordination-other-detail-field");
+    // 対応/調整終了日を取得
+    const coordinationEndDateField = document.getElementById("coordination-end-date-field");
+    // ステータス下のメッセージを取得
+    const statusMessage = document.getElementById("status-message");
+
+    // ③function は「あとで使う処理のセット」。関数
+    // toggleTimeFields という名前で時間欄を表示するか隠すかを決める処理 をまとめている
+    function toggleTimeFields() {
+        // isAllDayField.checked：チェックされているか見る。チェックボックスがONかどうか
+        // 終日チェックボックスにチェックが入っているなら
+        if (isAllDayField.checked) {
+            // 時間欄を隠す
+            timeFields.style.display = "none";
+        // そうでないなら
+        } else {
+            // 時間欄を表示する
+            timeFields.style.display = "block";
+        }
+    }
+
+    function toggleCoordinationFields() {
+        // 対応/調整要否チェックボックスにチェックが入っているなら
+        if (requiresCoordinationField.checked) {
+            // 対応/調整関連のまとまりを表示する
+            coordinationFields.style.display = "block";
+        // そうでないなら
+        } else {
+            // 対応/調整関連のまとまりを隠す
+            coordinationFields.style.display = "none";
+        }
+    }
+
+    function toggleOtherDetailField() {
+        // OTHER = 4  、&& ：なおかつ
+        // 対応/調整要否チェックボックスにチェックが入っている かつ 対応内容の値が4(その他)なら
+        if (
+            requiresCoordinationField.checked &&
+            coordinationTypeField.value === "4"
+        ) {
+            // その他詳細を表示する
+            coordinationOtherDetailField.style.display = "block";
+        // そうでないなら
+        } else {
+            // その他詳細を隠す
+            coordinationOtherDetailField.style.display = "none";
+        }
+    }
+
+    function toggleCoordinationEndDateField() {
+        // 対応/調整要否チェックボックスにチェックが入っている かつ 連続して対応チェックボックスにチェックが入っているなら
+        if (
+            requiresCoordinationField.checked &&
+            isConsecutiveField.checked
+        // 対応/調整終了日を表示する
+        ) {
+            coordinationEndDateField.style.display = "block";
+        // そうでないなら
+        } else {
+            // 対応/調整終了日を隠す
+            coordinationEndDateField.style.display = "none";
+        }
+    }
+
+    function updateStatusMessage() {
+        // !：〜ではない
+        // 対応/調整要否チェックボックスにチェックが入っていないなら
+        if (!requiresCoordinationField.checked) {
+            // ステータス下のメッセージは空文字
+            statusMessage.textContent = "";
+            // ここでこの関数を終わりにする
+            return;
+        }
+
+        // statusField.value：選ばれている値を見る。selectで今選ばれている値を見る
+        if (statusField.value === "0") {
+            statusMessage.textContent = "＊ この予定の調整は完了しています。";
+        } else if (statusField.value === "1") {
+            statusMessage.textContent = "＊ 担当者の返事が分かったら、ステータスを「確定」または「不可」に変更してください。";
+        } else if (statusField.value === "2") {
+            statusMessage.textContent = "＊ 現在、対応できる担当者がいない状態です。";
+        } else {
+            statusMessage.textContent = "";
+        }
+    }
+
+    // ④updateAll() は「全部まとめて更新」画面の見た目に関する更新を全部まとめて実行する
+    function updateAll() {
+        toggleTimeFields();
+        toggleCoordinationFields();
+        toggleOtherDetailField();
+        toggleCoordinationEndDateField();
+        updateStatusMessage();
+    }
+
+    // ⑤addEventListener("change", updateAll) は「変わったら実行」
+    // 終日チェックボックスの値が変わったとき、updateAll() を実行する
+    isAllDayField.addEventListener("change", updateAll);
+    // 対応/調整要否チェックボックスの値が変わったとき
+    requiresCoordinationField.addEventListener("change", updateAll);
+    // 対応内容の値が変わったとき
+    coordinationTypeField.addEventListener("change", updateAll);
+    // ステータスが変わったとき
+    statusField.addEventListener("change", updateAll);
+    // 連続して対応チェックボックスの値が変わったとき
+    isConsecutiveField.addEventListener("change", updateAll);
+
+    // ⑥ページを開いた直後にも updateAll() を実行する
+    updateAll();
+});
+</script>
+{% endblock %}
+
+{% comment %}
+{% endcomment %}
