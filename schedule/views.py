@@ -103,25 +103,38 @@ def month_view(request):
 
 
 
-# ①URLからくるdateは文字列であるため、文字列を日付(date型)に変換する（DBと比較するため）
+# ①URLから受け取った "2026-02-23" のような文字列を、Pythonで扱える date型 に変換する関数
 def _parse_date(date_str: str):
     """
-    date_str: str→型ヒント。date_str は str型と書いているだけ。str型を強制するものではない
-    datetime.strptime→文字列 から 日付（datetime型）に変換する関数。例"2026-02-23"をdatetime(2026, 2, 23, 0, 0)
-    .date()→date型にする。例datetime(2026, 2, 23, 0, 0)をdate(2026, 2, 23)
+    date_str: str
+    → 型ヒント。date_str は str型と書いているだけ。str型を強制するものではない
+    
+    datetime.strptime()
+    →文字列を datetime型 に変換する。例:"2026-02-23"をdatetime(2026, 2, 23, 0, 0)
+    
+    .date()
+    → datetime型 から date型 だけ取り出す。例:datetime(2026, 2, 23, 0, 0)をdate(2026, 2, 23)
     """
     try:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
     except(ValueError,TypeError):
         return None
 
-# ②その日の範囲を作る（2026-02-23 の 00:00〜2026-02-24 の 00:00 までの間にある予定を取得するため）    
+# ②その日1日分の範囲を作る関数
+# 例: 2026-02-23 なら 2026-02-23 00:00 〜 2026-02-24 00:00 の範囲を作る。
+# その間にある予定を取得するため    
 def _day_range(target_date):
     """
-    datetime.combine(target_date, time.min)→date(2026,2,23)+00:00をつくる
-    timedelta(days=1)→1日足す。2026-02-23 00:00 + 1日 = 2026-02-24 00:00
+    datetime.combine(target_date, time.min)
+    → date(2026,2,23)+00:00をつくる
     
-    PythonとDjangoでは、日時には2種類ある。
+    timedelta(days=1)
+    → 1日足す。2026-02-23 00:00 + 1日 = 2026-02-24 00:00
+    
+    timezone.make_aware(...)
+    → タイムゾーン付き日時に変換する
+    
+    PythonとDjangoでは、日時には2種類ある
     タイムゾーンなし（naive）→「2026-02-23 10:00」とだけ書いてある状態。日本時間の10時？アメリカ時間の10時？
     タイムゾーンあり（aware）→「日本時間2026-02-23 10:00」と明確
     """
@@ -134,17 +147,22 @@ def _day_range(target_date):
     
 @login_required
 def day_view(request, date):
+    # URLの date を date型 に変換
     target_date = _parse_date(date)
+    # 不正な日付なら月カレンダーへ戻す
     if target_date is None:
         return redirect("schedule:month")
+     # その日の開始・終了時刻を作る
     start_dt,end_dt = _day_range(target_date)
     
     """
+    その日の予定だけを取得する
+    
     その日の予定だけを取ってくるための条件
     「フィールド名__条件」と書く
     フィールド名__gte → gte = greater than or equal。以上。start_at >= start_dt。
     フィールド名__lt → lt = less than。未満。start_at < end_dt
-    2026-02-23 00:00 以上 かつ 2026-02-24 00:00 未満
+    start_at が 2026-02-23 00:00 以上 かつ 2026-02-24 00:00 未満
     """
     schedules =Schedule.objects.filter(
         family = request.user.family,
@@ -196,14 +214,19 @@ def schedule_create_view(request):
     
 @login_required
 def schedule_detail_view(request, pk):
+    # ログイン中ユーザーの家族に属する予定だけ取得する
     schedule = get_object_or_404(
         Schedule,
         pk=pk,
         family=request.user.family
     )
     
+    # 戻るリンク用に、予定の日付を "YYYY-MM-DD" 文字列にする
+    day_str = schedule.start_at.date().isoformat()
+    
     context = {
         "schedule": schedule,
+        "day_str": day_str,  # day画面へ戻るために使う
     }
     
     return render(request, "schedule/schedule_detail.html", context)
