@@ -1,10 +1,63 @@
 <!-- templates/schedule/month.html -->
 {% extends "base_app.html" %}
 
-{% block title %}スケージュール | おうちカレンダー{% endblock %}
-{% block page_title %}〇〇年〇〇月{% endblock %}
+{% block title %}スケジュール | おうちカレンダー{% endblock %}
+
+{% block page_title %}
+    {{ year }}年{{ month }}月
+{% endblock %}
 
 {% block content %}
-<h1>カレンダー（月表示・仮）</h1>
-<p>ログイン後の到達点（scheduleアプリ）</p>
+<table border="1">
+    <thead>
+      <tr>
+        {# 曜日を表示 #}
+        {% for week_name in week_names %}
+          <th>{{ week_name }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+
+    <tbody>
+      {# 1週間ごとに1行ずつ表示 #}
+      {% for week in calendar_rows %}
+        <tr>
+          {# その週の1日ずつを表示 #}
+          {% for cell in week %}
+            <td valign="top" width="120" height="100">
+              <div>
+                {# 日付を押すとその日の概要画面へ移動 #}
+                <a href="{% url 'schedule:day' cell.date_str %}">
+                  {{ cell.date.day }}
+                </a>
+
+                {# 今日なら目印をつける（仮） #}
+                {% if cell.is_today %}
+                  <strong>今日</strong>
+                {% endif %}
+              </div>
+
+              {# 今月以外の日付は薄く扱うための仮表示 #}
+              {% if not cell.is_current_month %}
+                <div>
+                  <small>今月外</small>
+                </div>
+              {% endif %}
+
+              {# その日の予定一覧を表示 #}
+              {% if cell.schedules %}
+                <ul>
+                  {% for schedule in cell.schedules %}
+                    <li>
+                      {{ schedule.title }}
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}
