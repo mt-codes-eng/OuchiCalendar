@@ -231,9 +231,41 @@ def schedule_detail_view(request, pk):
     # 戻るリンク用に、予定の日付を "YYYY-MM-DD" 文字列にする
     day_str = schedule.start_at.date().isoformat()
     
+    # 画面表示用の日付文字列を作る
+    week_map = ["月", "火", "水", "木", "金", "土", "日"]
+    start_date = schedule.start_at.date()
+    start_weekday = week_map[start_date.weekday()]
+    page_date = f"{start_date.year}/{start_date.month}/{start_date.day}（{start_weekday}）"
+    
+    # 連続対応の終了日がある場合の画面表示用の日付文字列を作る
+    coordination_end_date_display = None
+    
+    if schedule.coordination_end_date:
+        end_date = schedule.coordination_end_date
+        end_weekday = week_map[end_date.weekday()]
+        coordination_end_date_display = (
+            f"{end_date.year}/{end_date.month}/{end_date.day}（{end_weekday}）"
+        )
+
+    # ステータスごとの補助メッセージを作る
+    # 対応・調整が必要な予定のときに表示する
+    status_message = ""
+
+    if schedule.requires_coordination:
+        if schedule.status == Schedule.Status.CONFIRMED:
+            status_message = "＊ この予定の調整は完了しています。"
+        elif schedule.status == Schedule.Status.ADJUSTING:
+            status_message = "＊ 担当者の返事が分かったら、編集からステータスを「確定」または「不可」に変更してください。"
+        elif schedule.status == Schedule.Status.IMPOSSIBLE:
+            status_message = "＊ 現在、対応できる担当者がいない状態です。"
+
+    
     context = {
         "schedule": schedule,
         "day_str": day_str,  # day画面へ戻るために使う
+        "page_date": page_date,  # 画面表示用の日付
+        "coordination_end_date_display": coordination_end_date_display,  # 画面表示用の終了日
+        "status_message": status_message,  # ステータスの補助文
     }
     
     return render(request, "schedule/schedule_detail.html", context)
