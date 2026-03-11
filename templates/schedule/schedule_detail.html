@@ -17,45 +17,73 @@
 
 {% block content %}
     <p>
-    日付：
-    {{ schedule.start_at|date:"Y-m-d" }}
+        日付：{{ page_date }}
     </p>
 
-    <p>
-    時間：
-    {% if schedule.is_all_day %}
-      終日
-    {% else %}
-      {{ schedule.start_at|date:"H:i" }}〜{{ schedule.end_at|date:"H:i" }}
-    {% endif %}
-    </p>
+    <div>
+        <p>時間：</p>
+
+        {% if schedule.is_all_day %}
+            <p><input type="checkbox" checked disabled>終日</p>
+        {% else %}
+            <p>開始 {{ schedule.start_at|date:"H:i" }}〜</p>
+            <p>終了 {{ schedule.end_at|date:"H:i" }}</p>
+        {% endif %}
+    </div> 
 
     <p>予定のタイトル：{{schedule.title|default:"(未設定)"}}</p>
+
+    <p>予定メンバー:未実装</p>
     
     {% if schedule.memo %}
         <p>メモ：{{ schedule.memo }}</p>
     {% endif %}
 
-    {% if schedule.user %}
-    <p>担当：{{ schedule.user }}</p>
-    {% endif %}
+    <p>添付ファイル:未実装</p>
 
+    {# 対応・調整が必要な予定のときだけ表示するブロック #}
     {% if schedule.requires_coordination %}
+         <p>
+            <input type="checkbox" checked disabled>
+            この予定は対応・調整が必要
+        </p>
+    
     <p>対応内容：{{ schedule.get_coordination_type_display }}</p>
-    <p>ステータス：{{ schedule.get_status_display }}</p>
-    {% endif %}
-
+    
     {% if schedule.coordination_other_detail %}
-      <p>その他の詳細：{{ schedule.coordination_other_detail }}</p>
+        <p>その他の詳細：{{ schedule.coordination_other_detail }}</p>
+    {% endif %}
+    
+    {% if schedule.user %}
+        <p>担当：{{ schedule.user }}</p>
     {% endif %}
 
-    {% if schedule.is_consecutive_coordination %}
+    <p>ステータス：{{ schedule.get_status_display }}</p>
+
+    {# ステータスに応じた補助メッセージ #}
+    {% if status_message %}
       <p>
-        連続対応：
-        はい
-        {% if schedule.coordination_end_date %}
-          （終了日：{{ schedule.coordination_end_date|date:"Y-m-d" }}）
-        {% endif %}
+        {{ status_message }}
       </p>
     {% endif %}
+
+    <p>
+      連続して対応 ：
+      {% if schedule.is_consecutive_coordination %}
+        <input type="checkbox" checked disabled>
+        連続する
+      {% else %}
+        なし
+      {% endif %}
+    </p>
+
+    {# 連続対応の終了日があるときだけ表示 #}
+    {% if schedule.is_consecutive_coordination and coordination_end_date_display %}
+      <p>
+        終了 ： {{ coordination_end_date_display }}
+      </p>
+    {% endif %}
+ 
+    {% endif %}
+    
 {% endblock %}
