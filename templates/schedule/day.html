@@ -2,7 +2,7 @@
 {% extends "base_flow.html" %}
 
 {% block title %}予定・記録概要 | おうちカレンダー{% endblock %}
-{% block page_title %}{{ date }}{% endblock %}
+{% block page_title %}{{ page_date }}{% endblock %}
 
 {% block flow_left %}
  <a href="{% url 'schedule:month' %}" aria-label="カレンダーへ戻る">←</a>
