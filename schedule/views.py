@@ -170,8 +170,15 @@ def day_view(request, date):
         start_at__lt=end_dt,
     ).order_by("start_at")
     
+    # 画面表示用の日付文字列を作る
+    week_map = ["月", "火", "水", "木", "金", "土", "日"]
+    # weekday()は曜日を数字で返す関数で、weekday() が返した数字をそのままインデックスとして使っている
+    weekday = week_map[target_date.weekday()]
+    page_date = f"{target_date.year}/{target_date.month}/{target_date.day}({weekday})"
+
     context = {
-        "date": date,
+        "date": date, # URL用
+        "page_date": page_date, # 画面表示用
         "schedules": schedules,
     }
 
