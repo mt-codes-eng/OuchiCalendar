@@ -329,14 +329,25 @@ def schedule_edit_view(request, pk):
     
 @login_required
 def schedule_delete_view(request, pk):
+    # 1. 削除対象の予定を取得する
     schedule = get_object_or_404(
         Schedule,
         pk=pk,
         family = request.user.family
     )
     
+    # 2. 戻るリンク用の日付文字列を作る
+    day_str = schedule.start_at.date().isoformat()
+    
+    # 3. POSTなら本当に削除する
+    # 削除後は、その日の day画面 に戻る
+    if request.method == "POST":
+        schedule.delete()
+        return redirect("schedule:day", date=day_str)
+
     context = {
         "schedule": schedule,
+        "day_str": day_str,
     }
     
     return render(request, "schedule/schedule_confirm_delete.html", context)
