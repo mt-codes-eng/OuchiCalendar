@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from families.models import Family
+from children.models import Child
 
 class Schedule(models.Model):
     class CoordinationType(models.IntegerChoices):
@@ -61,3 +62,65 @@ class Schedule(models.Model):
     
     def __str__(self):
         return self.title
+    
+
+class ScheduleUserMember(models.Model):
+    """
+    予定メンバー（大人）を管理する中間モデル
+    1つの予定に対して、複数の大人メンバーを紐づけるために使う
+    """
+
+    schedule = models.ForeignKey(
+        Schedule,
+        on_delete=models.CASCADE,
+        related_name="user_memberships",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="schedule_memberships",
+    )
+    created_at = models.DateTimeField( auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["schedule", "user"],
+                name="unique_schedule_user_member"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.schedule.title} - {self.user}"
+
+
+class ScheduleChildMember(models.Model):
+    """
+    予定メンバー（子ども）を管理する中間モデル
+    1つの予定に対して、複数の子どもメンバーを紐づけるために使う
+    """
+
+    schedule = models.ForeignKey(
+        Schedule,
+        on_delete=models.CASCADE,
+        related_name="child_memberships",
+    )
+    child = models.ForeignKey(
+        Child,
+        on_delete=models.CASCADE,
+        related_name="schedule_memberships",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["schedule", "child"],
+                name="unique_schedule_child_member"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.schedule.title} - {self.child}"
