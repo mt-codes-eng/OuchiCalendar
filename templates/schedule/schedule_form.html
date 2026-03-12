@@ -20,7 +20,7 @@
 
 {% block flow_right %}
     {% if mode == "edit" %}
-        <button>削除</button>
+        <a href="{% url 'schedule:schedule_delete' schedule.id %}" aria-label="予定を削除">削除</a>
     {% endif %}
 {% endblock %}
 
