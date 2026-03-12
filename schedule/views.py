@@ -273,14 +273,54 @@ def schedule_detail_view(request, pk):
     
 @login_required
 def schedule_edit_view(request, pk):
+    # 1. 編集対象の予定を取得する
     schedule = get_object_or_404(
         Schedule,
         pk=pk,
         family = request.user.family
     )
     
+    # 2. 戻るリンク用の日付文字列を作る
+    date_str = schedule.start_at.date().isoformat()
+    
+    # 3. POSTかGETかで処理を分ける
+    # GET  : 画面を開いたとき → 既存内容入りフォームを表示
+    # POST : 保存ボタンを押したとき → 入力内容で更新する
+    if request.method == "POST":
+        # POSTのときは、送信されたデータ(request.POST)をフォームに入れる
+        # instance=schedule を付けることで、
+        # 「新規作成」ではなく「この予定を更新する」動きになる。「この schedule の内容を使ってフォームを作ってください」という意味
+        form = ScheduleForm(
+            request.POST,
+            instance=schedule
+        )
+    
+        # 入力チェックOKなら保存する
+        if form.is_valid():
+            updated_schedule = form.save(commit=False)
+
+            # family は元の予定に入っているが、
+            # 念のためログイン中ユーザーの家族をセットしておく
+            updated_schedule.family = request.user.family
+            updated_schedule.save()
+
+            # 保存後は、その予定が属する day画面 に戻る
+            day_str = updated_schedule.start_at.date().isoformat()
+            return redirect("schedule:day", date=day_str)
+
+    else:
+        # GETのときは、既存の予定内容を初期表示したフォームを作る
+        # instance=schedule があることで、
+        # title や memo などが最初から入った状態になる
+        form = ScheduleForm(
+            instance=schedule
+        )    
+    
+    # 4. template に渡す    
     context = {
         "mode": "edit",
+        "date": date_str,
+        "form": form,
         "schedule": schedule,
     }
     
