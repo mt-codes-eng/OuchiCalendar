@@ -267,6 +267,11 @@ def schedule_detail_view(request, pk):
         elif schedule.status == Schedule.Status.IMPOSSIBLE:
             status_message = "＊ 現在、対応できる担当者がいない状態です。"
 
+     # 予定メンバー（大人）を取得
+    user_memberships = schedule.user_memberships.select_related("user").all()
+
+    # 予定メンバー（子ども）を取得
+    child_memberships = schedule.child_memberships.select_related("child").all()
     
     context = {
         "schedule": schedule,
@@ -274,6 +279,8 @@ def schedule_detail_view(request, pk):
         "page_date": page_date,  # 画面表示用の日付
         "coordination_end_date_display": coordination_end_date_display,  # 画面表示用の終了日
         "status_message": status_message,  # ステータスの補助文
+        "user_memberships": user_memberships,
+        "child_memberships": child_memberships,
     }
     
     return render(request, "schedule/schedule_detail.html", context)
