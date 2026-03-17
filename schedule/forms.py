@@ -1,7 +1,12 @@
 from datetime import datetime, time, timedelta
 from django import forms
 from django.utils import timezone
-from .models import Schedule
+from django.db import transaction
+from .models import Schedule, ScheduleUserMember, ScheduleChildMember
+from children.models import Child
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class ScheduleForm(forms.ModelForm):
     # 画面設計図に合わせて「日付」と「時間」を別フィールドで用意する（DBには保存しない）
@@ -25,7 +30,21 @@ class ScheduleForm(forms.ModelForm):
         required=False,
         widget=forms.DateInput(attrs={"type": "date"})
     )
-
+    # 大人メンバーを複数選択
+    user_members = forms.ModelMultipleChoiceField(
+        queryset=User.objects.none(),   # 最初は空。__init__で家族メンバーに絞る
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="大人メンバー",
+    )
+    
+    # 子どもメンバーを複数選択
+    child_members = forms.ModelMultipleChoiceField(
+        queryset=Child.objects.none(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="子どもメンバー",
+    )
     
     # どのモデルの、どの項目をフォームに出すか。フォームに表示するフィールドはこのリストのものだけ        
     class Meta:
@@ -37,6 +56,8 @@ class ScheduleForm(forms.ModelForm):
             "start_time",
             "end_time",
             "title",
+            "user_members",
+            "child_members",
             "memo",
             "requires_coordination",
             "coordination_type",
@@ -65,11 +86,16 @@ class ScheduleForm(forms.ModelForm):
     """
     
     # フォームが作られた瞬間に1回だけ動く関数
-    # target_dateはビューからフォームへ渡される追加情報。None はビューから「渡されなくてもOK」の意味
-    def __init__(self, *args, target_date=None, **kwargs):
-        super().__init__(*args, **kwargs) # ModelForm本来の初期化を先に実行する。self.instanceやself.fieldsなどが使えるようになる
-        self.target_date = target_date # フォームがtarget_dateを覚えて clean() で使う
-
+    # None はビューから「渡されなくてもOK」の意味
+    def __init__(self, *args, target_date=None, family=None, **kwargs):
+        # ModelForm本来の初期化を先に実行する。self.instanceやself.fieldsなどが使えるようになる
+        super().__init__(*args, **kwargs)
+        # target_dateはビューからフォームへ渡される追加情報。フォームがtarget_dateを覚えて clean() で使う
+        # target_date:カレンダー画面などから ?date=2026-03-13 のように渡された日付を新規作成時の初期値に使う
+        self.target_date = target_date 
+        # family:その家族に属する大人・子どもだけを予定メンバー候補として表示するために使う
+        self.family = family
+        
         # --- placeholder ---
         self.fields["title"].widget.attrs["placeholder"] = "タイトルを入力"
         self.fields["memo"].widget.attrs["placeholder"] = "メモを入力"
@@ -88,6 +114,14 @@ class ScheduleForm(forms.ModelForm):
         # user は ModelChoiceField なので empty_label が使える
         self.fields["user"].empty_label = "担当者を選択"
         
+        # 予定メンバーの候補を家族内に絞る
+        if family:
+            self.fields["user_members"].queryset = family.users.all()
+            self.fields["child_members"].queryset = family.children.all()
+        else:
+            self.fields["user_members"].queryset = User.objects.none()
+            self.fields["child_members"].queryset = Child.objects.none()
+            
         # 新規作成時(pkがないとき)：ステータスの初期表示を△調整中
         # instanceはこのフォームが相手にしている Schedule データ
         if not self.instance.pk:
@@ -113,7 +147,18 @@ class ScheduleForm(forms.ModelForm):
                 self.fields["date"].initial = datetime.strptime(self.target_date, "%Y-%m-%d").date()
             except ValueError:
                 pass
+            
+        # 編集画面のとき、既存の予定メンバーにチェックを入れる
+        if self.instance.pk: # self.instance.pk：編集画面かどうかの判定
+            user_member_ids = []
+            for membership in self.instance.user_memberships.all(): # self.instance.user_memberships.all()：この予定に紐づく中間モデル一覧を取る
+                user_member_ids.append(membership.user_id)
+            self.fields["user_members"].initial = user_member_ids # self.fields["user_members"].initial = [...]：フォーム表示時に最初からチェックを入れる
 
+            child_member_ids = []
+            for membership in self.instance.child_memberships.all():
+                child_member_ids.append(membership.child_id)
+            self.fields["child_members"].initial = child_member_ids
     
     # POST送信されたあとに自動で呼ばれるチェック関数。clenメソッドで複数のフィールドのバリデーションチェック  
     def clean(self):
@@ -138,7 +183,7 @@ class ScheduleForm(forms.ModelForm):
 
         # 日付が無いのはフォーム自体のエラー（ここは必須なので通常は起きない）
         if not d:
-            raise forms.ValidationError("日付を選択してください。")
+            raise forms.ValidationError("日付を選択してください")
 
         # --- 終日ON： start_at/end_at を自動セット ---
         if is_all_day:
@@ -150,9 +195,9 @@ class ScheduleForm(forms.ModelForm):
         # --- 終日OFF：開始・終了時刻が必要 ---   
         else:
             if not start_t:
-                self.add_error("start_time", "開始時刻を入力してください。")
+                self.add_error("start_time", "開始時刻を入力してください")
             if not end_t:
-                self.add_error("end_time", "終了時刻を入力してください。")
+                self.add_error("end_time", "終了時刻を入力してください")
 
             # 両方ある場合だけ start_at/end_at を作る
             if start_t and end_t:
@@ -162,7 +207,7 @@ class ScheduleForm(forms.ModelForm):
                 end_at = timezone.make_aware(end_naive)
 
                 if start_at >= end_at:
-                    self.add_error("end_time", "終了時刻は開始時刻より後にしてください。")
+                    self.add_error("end_time", "終了時刻は開始時刻より後にしてください")
 
                 cleaned["start_at"] = start_at
                 cleaned["end_at"] = end_at
@@ -198,15 +243,40 @@ class ScheduleForm(forms.ModelForm):
         # Djangoに「チェック済みのデータ」を返す
         return cleaned
     
+    # transaction.atomic を付けることで、途中で失敗したらまとめて元に戻せる
+    @transaction.atomic
     def save(self, commit=True):
         """
-        分割入力（date/start_time/end_time）から start_at/end_at を作ってモデルに入れる。
-        clean() で cleaned["start_at"], cleaned["end_at"] を作っている前提。
+        分割入力（date/start_time/end_time）から start_at/end_at を作ってモデルに入れる
         """
         instance = super().save(commit=False)
+        # clean() で作った値をモデルに入れる
         instance.start_at = self.cleaned_data["start_at"]
         instance.end_at = self.cleaned_data["end_at"]
 
         if commit:
+            # まず Schedule を保存
             instance.save()
+            
+            # 既存の予定メンバーをいったん削除
+            ScheduleUserMember.objects.filter(schedule=instance).delete()
+            ScheduleChildMember.objects.filter(schedule=instance).delete()
+            
+            # 新しい大人メンバーを保存
+            user_members = self.cleaned_data.get("user_members")
+            if user_members:
+                ScheduleUserMember.objects.bulk_create([ # bulk_create([...])：複数データを一気にDB登録する方法
+                    ScheduleUserMember(schedule=instance, user=user)
+                    for user in user_members
+                ])
+
+            # 新しい子どもメンバーを保存
+            child_members = self.cleaned_data.get("child_members")
+            if child_members:
+                ScheduleChildMember.objects.bulk_create([
+                    ScheduleChildMember(schedule=instance, child=child)
+                    for child in child_members
+                ])
+
         return instance
+    
