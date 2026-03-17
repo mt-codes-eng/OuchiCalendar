@@ -33,7 +33,18 @@
 
     <p>予定のタイトル：{{schedule.title|default:"(未設定)"}}</p>
 
-    <p>予定メンバー:未実装</p>
+    <p>予定メンバー:
+        {% if user_memberships or child_memberships %}
+            {% for membership in user_memberships %}
+                {{ membership.user.name|default:membership.user.email }}{% if not forloop.last or child_memberships %}、{% endif %}
+            {% endfor %}
+            {% for membership in child_memberships %}
+                {{ membership.child.name }}{% if not forloop.last %}、{% endif %}
+            {% endfor %}
+        {% else %}
+            なし
+        {% endif %}
+    </p>
     
     {% if schedule.memo %}
         <p>メモ：{{ schedule.memo }}</p>
