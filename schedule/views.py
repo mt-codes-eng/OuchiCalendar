@@ -199,16 +199,24 @@ def schedule_create_view(request):
     date_str = request.GET.get("date")  # create-choice から ?date= で渡す想定
     
     if request.method == "POST":
-        form = ScheduleForm(request.POST, target_date=date_str)
+        form = ScheduleForm(
+            request.POST,
+            target_date=date_str,
+            family=request.user.family,
+        )
         if form.is_valid():
-            schedule = form.save(commit=False)
-            schedule.family = request.user.family
-            schedule.save()
+            # form.instance：そのフォームが今保存対象として持っているモデルインスタンス
+            # このフォームで保存する予定の family を、ログイン中ユーザーの family にする
+            form.instance.family = request.user.family
+            schedule = form.save()
 
             day_str = schedule.start_at.date().isoformat() # 予定・記録概要画面のURLに渡すには 文字列 が必要だから、.isoformat()
             return redirect("schedule:day", date=day_str)
     else:
-        form = ScheduleForm(target_date=date_str)
+        form = ScheduleForm(
+            target_date=date_str,
+            family=request.user.family, 
+        )
         
     context = {
         "mode": "create", # 作成/編集表示
@@ -292,17 +300,16 @@ def schedule_edit_view(request, pk):
         # 「新規作成」ではなく「この予定を更新する」動きになる。「この schedule の内容を使ってフォームを作ってください」という意味
         form = ScheduleForm(
             request.POST,
-            instance=schedule
+            instance=schedule,
+            family=request.user.family,
         )
     
         # 入力チェックOKなら保存する
         if form.is_valid():
-            updated_schedule = form.save(commit=False)
-
             # family は元の予定に入っているが、
             # 念のためログイン中ユーザーの家族をセットしておく
-            updated_schedule.family = request.user.family
-            updated_schedule.save()
+            form.instance.family = request.user.family
+            updated_schedule = form.save()
 
             # 保存後は、その予定が属する day画面 に戻る
             day_str = updated_schedule.start_at.date().isoformat()
@@ -313,7 +320,8 @@ def schedule_edit_view(request, pk):
         # instance=schedule があることで、
         # title や memo などが最初から入った状態になる
         form = ScheduleForm(
-            instance=schedule
+            instance=schedule,
+            family=request.user.family,
         )    
     
     # 4. template に渡す    
