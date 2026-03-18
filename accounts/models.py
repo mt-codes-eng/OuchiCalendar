@@ -27,10 +27,12 @@ class User(AbstractUser):
         blank=True,
     )
     
-    image_url = models.CharField(
+    # mageField：画像ファイルをアップロードして保存するためのフィールド（画像ファイルを受け取る。保存する。画像のパスをDBに保存する）
+    image = models.ImageField(
         verbose_name="ユーザーアイコン",
-        max_length=300,
-        blank=True,
+        upload_to="users/",   # media/users/ に保存される
+        blank=True,           
+        null=True,            
     )
 
     # 作成日時は AbstractUser の date_joined を使う

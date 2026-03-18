@@ -5,15 +5,45 @@ from django import forms
 User = get_user_model() # AUTH_USER_MODEL で指定した User（accounts.User）を取り出す。「標準UserじゃなくてカスタムUserを使う」ために必要
 
 class SignUpForm(UserCreationForm):
+    """
+    新規アカウント登録フォーム
+    UserCreationForm がもともと持っている password1 / password2 を使いながら、
+    表示順と表示名を整える
+    """
     class Meta:
         model = User
-        fields = ("name", "email") # 登録フォームに「name」「email」を出す指定。パスワード2つは UserCreationForm 側が元から持っている（自分で書かなくてOK）
+        # パスワード2つは UserCreationForm 側が元から持っている（自分で書かなくてOK）が、
+        # UserCreationForm の password1 / password2 も、ここに書くと表示順を指定できる
+        fields = ("name", "email", "password1", "password2", "image") 
+        labels = {
+            "name": "名前",
+            "email": "Email",
+            "password1": "パスワード",
+            "password2": "パスワード再入力",
+            "image": "個人アイコン",
+        }
         
+    def __init__(self, *args, **kwargs):
+        # フォーム生成時に、各項目の見た目や表示名を整える
+        super().__init__(*args, **kwargs)
+
+        # password1 / password2 は UserCreationForm 側が持っているフィールド
+        # ここでラベルを上書きすると、画面表示をわかりやすくできる
+        self.fields["password1"].label = "パスワード"
+        self.fields["password2"].label = "パスワード再入力"
 
 class UserProfileForm(forms.ModelForm):
+    """
+    ユーザープロフィール編集フォーム
+    """
     class Meta:
         model = User
-        fields = ("name", "email", "image_url")
+        fields = ("name", "email", "image")
+        labels = {
+            "name": "名前",
+            "email": "Email",
+            "image": "個人アイコン",
+        }
     
     """
     clean_email()：email欄専用の入力チェック（追加ルール）を自分で作れる仕組み
