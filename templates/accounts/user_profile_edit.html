@@ -34,19 +34,24 @@
       {{ form.email.errors }}
    </p>
 
-   {# 現在のアイコン表示（あれば） #}
-   {% if user_obj.image %}
-      <p>
-         <img src="{{ user_obj.image.url }}" width="80">
-      </p>
-    {% endif %}
+   {# 個人アイコン #}
+   <div>
+      <p>{{ form.image.label }}:</p>
 
-   <p>
-      {{ form.image.label_tag }}
-      {{ form.image }}
-      {{ form.image.errors }}
-   </p>
-    
+      {# 現在のアイコン画像を表示する #}
+      {% if user_obj.image %}
+         <p>
+            <img src="{{ user_obj.image.url }}" alt="個人アイコン" width="80">
+         </p>
+      {% endif %}
+
+      {# 新しい画像を選ぶ欄 #}
+      <p>
+         {{ form.image }}
+         {{ form.image.errors }}
+      </p>
+   </div>
+
    <button type="submit">保存</button>
  </form>
 {% endblock %}
