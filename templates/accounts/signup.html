@@ -9,9 +9,45 @@
 {% endblock %}
 
 {% block content %}
-<form method="post"> {# 「登録ボタンを押したら、POSTという方法でサーバに送る」宣言 #}
+<form method="post" enctype="multipart/form-data"> {# 「登録ボタンを押したら、POSTという方法でサーバに送る」宣言 #}{# ファイルを含むフォーム送信をするときには enctype の追加が必須#}
   {% csrf_token %} {# Djangoの“なりすまし防止”の安全装置。POSTフォームには必須 #}
-  {{ form.as_p }} {# フォームの入力欄をまとめて表示してくれる便利表示 #}
+  
+  {# フォーム全体に関わるエラーを表示する場所 #}
+  {% if form.non_field_errors %}
+    <div class="form-errors">
+      {{ form.non_field_errors }}
+    </div>
+  {% endif %}
+
+  <p>
+    {{ form.name.label_tag }}
+    {{ form.name }}
+    {{ form.name.errors }}
+  </p>
+
+  <p>
+    {{ form.email.label_tag }}
+    {{ form.email }}
+    {{ form.email.errors }}
+  </p>
+
+  <p>
+    {{ form.password1.label_tag }}
+    {{ form.password1 }}
+    {{ form.password1.errors }}
+  </p>
+
+  <p>
+    {{ form.password2.label_tag }}
+    {{ form.password2 }}
+    {{ form.password2.errors }}
+  </p>
+
+  <p>
+    {{ form.image.label_tag }}
+    {{ form.image }}
+    {{ form.image.errors }}
+  </p>
   <button type="submit">登録</button> {# type="submit" があるとこのボタンを押した瞬間に、form の中身を送信するという特別な役割 #}
 </form>{# 送信先は、form タグで決まっている。action がない場合「今表示しているURL（住所）」に送信。実際に受け取るのは「URLを処理する関数：signup_view（人）」。#}
 {% endblock %}
