@@ -12,9 +12,41 @@
 {% endblock %}
 
 {% block content %}
- <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">保存</button>
+ <form method="post" enctype="multipart/form-data">
+   {% csrf_token %}
+
+   {# フォーム全体エラー #}
+   {% if form.non_field_errors %}
+      <div class="form-errors">
+         {{ form.non_field_errors }}
+      </div>
+   {% endif %}
+
+   <p>
+      {{ form.name.label_tag }}
+      {{ form.name }}
+      {{ form.name.errors }}
+   </p>
+
+   <p>
+      {{ form.email.label_tag }}
+      {{ form.email }}
+      {{ form.email.errors }}
+   </p>
+
+   {# 現在のアイコン表示（あれば） #}
+   {% if user_obj.image %}
+      <p>
+         <img src="{{ user_obj.image.url }}" width="80">
+      </p>
+    {% endif %}
+
+   <p>
+      {{ form.image.label_tag }}
+      {{ form.image }}
+      {{ form.image.errors }}
+   </p>
+    
+   <button type="submit">保存</button>
  </form>
 {% endblock %}
