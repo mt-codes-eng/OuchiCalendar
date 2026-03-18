@@ -41,30 +41,37 @@ def login_view(request):
 def signup_view(request):
     if request.method == "POST":
         # 送信されたデータ（記入済みの紙）でフォームを作る
-        form = SignUpForm(request.POST)
+        # 送信された文字データは request.POST、
+        # アップロードされた画像ファイルは request.FILES に入る
+        # 画像アップロード対応のフォームでは、両方を渡す必要がある
+        form = SignUpForm(request.POST, request.FILES)
 
         # 入力チェック（メール形式、パスワード一致、強度など）
         if form.is_valid():
-            # ① Userを作るけどまだDBには保存しない（familyを入れてから保存したい）
+            # ① Userを作るけどまだDBには保存しない
+            # 先に family をセットしたいので commit=False にする
             user = form.save(commit=False)
             
-            # ② 1人目用：DBにFamilyレコードを1件作る。空のFamilyを作成（家族名はあとで設定画面で入れる）
+            # ② 1人目用：DBにFamilyレコードを1件作る。
+            # 家族名はあとで家族設定画面で入力する想定なので、まずは空文字で作成
             family = Family.objects.create(name="")
             
             # ③ 紐づけ（さっき作ったfamilyを、Userのfamily欄に入れる）
             user.family = family
             
-            # ④ User保存（パスワードはUserCreationFormがハッシュ化してくれる）
+            # ④ User保存
+            # SignUpForm は UserCreationForm を継承しているので、
+            # パスワードは平文ではなくハッシュ化されて安全に保存される
             user.save()
             
-            # ⑤ そのままログイン状態にする
+            # ⑤ 登録後、そのままログイン状態にする
             login(request, user)
              
             # ⑥ 家族設定画面へ遷移
             return redirect("families:family_settings") 
 
     else:
-        # GETのときは空のフォーム（空白の紙）
+        # GETのときは空のフォーム（空白の紙）を表示する
         form = SignUpForm() # その型から作られた実物（インスタンス）。何も書かれていない入力用の紙を1枚用意した
 
     # Python的に省略していない形はreturn render(request=request,template_name="accounts/signup.html",context={"form": form})
@@ -93,8 +100,10 @@ def user_profile_edit_view(request):
     user = request.user
     
     if request.method == "POST":
-        # POSTされた内容でフォームを作る（既存ユーザーを更新するため instance=user）
-        form = UserProfileForm(request.POST, instance=user)
+        # プロフィール編集でも、画像ファイルが送られる可能性があるので
+        # request.POST に加えて request.FILES も渡す
+        # POSTされた内容でフォームを作る。instance=user を付けることで、新規作成ではなく「既存ユーザーの更新」になる
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
         
         # 入力チェック
         if form.is_valid():
@@ -104,7 +113,7 @@ def user_profile_edit_view(request):
             return redirect("families:family_settings")
         
     else:
-        # GETのとき：すでに登録済みの値が入力欄に入った状態のフォームを作る
+        # GETのとき：登録済みの値が入力欄に入った状態のフォームを作る
         form = UserProfileForm(instance=user)
         
         # ビューでuser = request.userとしており、このuserをテンプレで使いたいとき混乱しないようにuser_objという別名で渡している
