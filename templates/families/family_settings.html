@@ -14,7 +14,10 @@
     </div>
     <p>Email：{{ request.user.email }}</p>
     <p>パスワード：********</p>
-    <p>ユーザーアイコン：{{ request.user.image_url|default:"未設定" }}</p>
+    <p>個人アイコン：</p>
+    <p>
+      <img src="{{ request.user.image.url }}" alt="個人アイコン" width="40" style="border-radius:50%;">
+    </p>
  </section>
  <p>
   <a href="{% url 'accounts:password_change' %}">※パスワードの変更はこちら</a>
