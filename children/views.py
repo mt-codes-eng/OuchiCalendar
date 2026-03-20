@@ -20,7 +20,7 @@ def child_list_view(request):
 def child_create_view(request):
     if request.method == "POST":
         # 送信されたデータ（記入済みの紙）でフォームを作る
-        form = ChildForm(request.POST)
+        form = ChildForm(request.POST, request.FILES)
         
         if form.is_valid():
             # フォームに入っているデータを使って、Childオブジェクトを作る
@@ -45,11 +45,16 @@ def child_edit_view(request, pk):
     child = get_object_or_404(Child, pk=pk, family=request.user.family)
     
     if request.method == "POST":
+        old_image = child.image
+        
         # ② POST：送信された内容で「既存childを更新するフォーム」を作る
-        form = ChildForm(request.POST, instance=child)
+        form = ChildForm(request.POST, request.FILES, instance=child)
         
         if form.is_valid():
+            new_image = form.cleaned_data.get("image")
             form.save()
+            if new_image and old_image and old_image != child.image:
+                old_image.delete(save=False)
             return redirect("families:family_settings")
         
     else:
@@ -64,6 +69,9 @@ def child_delete_view(request, pk):
     child = get_object_or_404(Child, pk=pk, family=request.user.family)
     
     if request.method == "POST":
+        if child.image:
+            child.image.delete(save=False)
+            
         # ② POST：DBから削除する
         child.delete()
         return redirect("families:family_settings")
