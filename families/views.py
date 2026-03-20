@@ -24,10 +24,22 @@ def family_profile_edit_view(request):
     family = request.user.family
     
     if request.method == "POST":
+        # もともとの古い画像（保存前の画像）を覚えておく
+        old_image = family.image
+        
         # 送信された内容で既存の家族データを更新するためのフォームを作る
-        form = FamilyProfileForm(request.POST, instance=family)
+        form = FamilyProfileForm(request.POST, request.FILES, instance=family)
         if form.is_valid():
+            # 今回新しく画像が選ばれたか確認する
+            new_image = form.cleaned_data.get("image")
+
             form.save()
+            
+            # 新しい画像が送られたときだけ差し替え後に古い画像を削除
+            # 新しい画像が送られた、もともと古い画像があった、保存後に画像が変わった、この3つを満たしたときだけ古いファイルを削除
+            if new_image and old_image and old_image != family.image:
+                old_image.delete(save=False)
+                
             return redirect("families:family_settings")
     
     # form = FamilyProfileForm()は新しくfamilyを作るためのフォーム。instanceなしは白紙の申請書を渡されるイメージ
