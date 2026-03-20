@@ -4,11 +4,25 @@
 {% block title %}設定 | おうちカレンダー{% endblock %}
 
 {% block flow_right %}
- <a href="#">×</a>
+ <a href="#" aria-label="設定画面を閉じる">×</a>
 {% endblock %}
 
 {% block content %}
- <div><a href="{% url 'families:family_settings' %}">家族の設定</a></div>
- <div><a href="{% url 'core:howto' %}">アプリの使い方</a></div>
- <div><a href="{% url 'core:logout' %}">ログアウト</a></div>
-{% endblock %}
+    <section>
+        {% if family.image %}
+          <p>
+            <img
+                src="{{ family.image.url }}"
+                alt="{{ family.name }}家の家族アイコン"
+                width="80"
+            >
+          </p>
+        {% endif %}
+    </section>
+
+    <section>
+        <div><a href="{% url 'families:family_settings' %}">家族の設定</a></div>
+        <div><a href="{% url 'core:howto' %}">アプリの使い方</a></div>
+        <div><a href="{% url 'core:logout' %}">ログアウト</a></div>
+    </section>
+ {% endblock %}
