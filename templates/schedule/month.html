@@ -7,6 +7,17 @@
     {{ year }}年{{ month }}月
 {% endblock %}
 
+{% block header_right %}
+  {% if family.image %}
+    <img
+      src="{{ family.image.url }}"
+      alt="{{ family.name }}家の家族アイコン"
+      width="40"
+      style="border-radius: 8px;"
+    >
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 <table border="1">
     <thead>
