@@ -16,9 +16,37 @@
 {% endblock %}
 
 {% block content %}
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
+    
+    {# フォーム全体エラー #}
+    {% if form.non_field_errors %}
+      <div>
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <p>
+      {{ form.name.label_tag }}
+      {{ form.name }}
+      {{ form.name.errors }}
+    </p>
+
+    <div>
+      <p>{{ form.image.label }}:</p>
+
+    {# 編集時だけ現在の画像を表示 #}
+    {% if child and child.image %}
+      <p>
+        <img src="{{ child.image.url }}" alt="{{ child.name }}のアイコン" width="80">
+      </p>
+    {% endif %}
+
+    <p>
+      {{ form.image }}
+      {{ form.image.errors }}
+    </p>
+    </div>
 
     <button type="submit">保存</button>
   </form>
