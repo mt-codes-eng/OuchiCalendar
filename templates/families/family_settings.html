@@ -8,7 +8,7 @@
  <section> {# 意味づけ用の区切りタグ。見出しごとの箱。1つのまとまり（セクション）#}
     <div>
       <h2 style="display: inline;"> {# style="display: inline;"見出しを改行しないで、横並びにしたい #}
-      {{ request.user.name|default:"未設定(ユーザー名)"}}
+      {{ request.user.name}}
       </h2>
       <a href="{% url 'accounts:user_profile_edit' %}" aria-label="私の設定を編集">✏️</a>
     </div>
@@ -16,9 +16,16 @@
     <p>パスワード：********</p>
     <p>個人アイコン：</p>
     <p>
-      <img src="{{ request.user.image.url }}" alt="個人アイコン" width="40" style="border-radius:50%;">
+      <img
+        src="{{ request.user.image.url }}"
+        alt="{{ request.user.name }}の個人アイコン"
+        width="40"
+        style="border-radius:50%;"
+      >
     </p>
+    <p>個人カラー：未実装</p>
  </section>
+
  <p>
   <a href="{% url 'accounts:password_change' %}">※パスワードの変更はこちら</a>
  </p>
@@ -32,12 +39,19 @@
       </h2>
       <a href="{% url 'families:family_profile_edit' %}" aria-label="苗字の設定を編集">✏️</a>
     </div>
-    {% if request.user.family %}
-      <p>家族アイコン：{{ request.user.family.image_url|default:"未設定" }}</p>
+    <p>家族アイコン：</p>
+    {% if family.image %}
+      <p>
+        <img
+          src="{{ family.image.url }}"
+          alt="{{ family.name }}家の家族アイコン"
+          width="40"
+        >
+      </p>
     {% else %}
-     <p>家族アイコン：未設定</p>
+     <p>未設定</p>
     {% endif %}
-    <p>家族ID：{{ family.id }}</p>
+    <p>合同予定カラー：未実装</p>
   </section>
 
  <hr>
@@ -48,6 +62,12 @@
     <ul>
       {% for child in children %}
         <li>
+          <img
+            src="{{ child.image.url }}"
+            alt="{{ child.name }}のアイコン"
+            width="40"
+            style="border-radius: 50%; vertical-align: middle;"
+          >
           {{ child.name }}
           <a href="{% url 'children:child_edit' child.id %}" aria-label="子どもメンバーを編集">✏️</a>
         </li>
