@@ -4,7 +4,13 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def settings_view(request):
-    return render(request, "core/settings.html")
+    family = request.user.family
+    
+    return render(
+        request,
+        "core/settings.html",
+        {"family": family},
+    )
 
 @login_required
 def logout_view(request):
