@@ -25,15 +25,44 @@
         <li>
           {# 予定をクリックすると予定詳細画面へ移動する。schedule.pk はその予定のID#}
           <a href="{% url 'schedule:schedule_detail' schedule.pk %}">
-            {# 終日予定かどうかで表示を分ける #}
-            {% if schedule.is_all_day %}
-            終日
-            {% else %}
-            {# date フィルタで時刻を "09:00" 形式で表示する #}
-            {{ schedule.start_at|date:"H:i" }}〜{{ schedule.end_at|date:"H:i" }}
-            {% endif %}
-            /
-            {{ schedule.title }}
+            <div>
+              {# 予定メンバー画像（大人） #}
+              {% for membership in schedule.user_memberships.all %}
+                {% if membership.user.image %}
+                  <img
+                    src="{{ membership.user.image.url }}"
+                    alt="{{ membership.user.name }}のアイコン"
+                    width="32"
+                    style="border-radius: 50%; vertical-align: middle;"
+                  >
+                {% endif %}
+              {% endfor %}
+
+              {# 予定メンバー画像（子ども） #}
+              {% for membership in schedule.child_memberships.all %}
+                {% if membership.child.image %}
+                  <img
+                    src="{{ membership.child.image.url }}"
+                    alt="{{ membership.child.name }}のアイコン"
+                    width="32"
+                    style="border-radius: 50%; vertical-align: middle;"
+                  >
+                {% endif %}
+              {% endfor %}
+              
+              {# 終日予定かどうかで表示を分ける #}
+              {% if schedule.is_all_day %}
+                終日
+              {% else %}
+              {# date フィルタで時刻を "09:00" 形式で表示する #}
+                {{ schedule.start_at|date:"H:i" }}〜{{ schedule.end_at|date:"H:i" }}
+              {% endif %}
+
+              /
+
+              {# タイトル表示 #}
+              {{ schedule.title }}
+            </div>
           </a>
 
           {# 対応・調整が必要な予定だけ表示する #}
