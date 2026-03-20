@@ -168,6 +168,11 @@ def day_view(request, date):
         family = request.user.family,
         start_at__gte=start_dt,
         start_at__lt=end_dt,
+    ).select_related(
+        "user"
+    ).prefetch_related(
+        "user_memberships__user",
+        "child_memberships__child",
     ).order_by("start_at")
     
     # 画面表示用の日付文字列を作る
