@@ -2,16 +2,52 @@
 {% extends "base_flow.html" %}
 
 {% block title %}家族設定 | おうちカレンダー{% endblock %}
-{% block page_title %}{{ family.name|default:"(未設定)"}}家の設定を編集{% endblock %}
+{% block page_title %}{{ family.name|default:"(未設定)"}}家の設定を編集する{% endblock %}
 
 {% block flow_left %}
 <a href="{% url 'families:family_settings' %}" aria-label="家族設定画面へ戻る">×</a>
 {% endblock %}
 
 {% block content %}
-<form method="post">
+<form method="post" enctype="multipart/form-data">
   {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">保存</button>
+
+  {# フォーム全体エラー #}
+   {% if form.non_field_errors %}
+      <div class="form-errors">
+         {{ form.non_field_errors }}
+      </div>
+   {% endif %}
+
+  <p>
+    {{ form.name.label_tag }}
+    {{ form.name }}
+    {{ form.name.errors }}
+  </p>
+
+  {# 家族アイコン #}
+  <div>
+    <p>{{ form.image.label }}:</p>
+
+    {# 現在のアイコン画像を表示する #}
+    {% if family.image %}
+      <p>
+        <img src="{{ family.image.url }}" alt="{{ family.name }}家の家族アイコン" width="80">
+      </p>
+    {% else %}
+      <p>未設定</p>
+    {% endif %}
+
+    {# 新しい画像を選ぶ欄 #}
+    <p>
+      {{ form.image }}
+      {{ form.image.errors }}
+    </p>
+  </div>
+
+  <div>
+    <button type="submit">保存</button>
+  </div>
+   
 </form>
 {% endblock %}
