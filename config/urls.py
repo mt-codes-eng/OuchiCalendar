@@ -24,7 +24,8 @@ urlpatterns = [
     path("", include("pages.urls")), # ポートフォリオ（/）
     path("ouchi-calendar/", include("accounts.urls")), 
     path("ouchi-calendar/schedule/", include("schedule.urls")), 
-    path("ouchi-calendar/family/", include("families.urls")), 
+    path("ouchi-calendar/family/", include("families.urls")),
+    path("ouchi-calendar/invitations/", include("invitations.urls")),  
     path("ouchi-calendar/core/", include("core.urls")),
     path(
         "ouchi-calendar/family/children/",
