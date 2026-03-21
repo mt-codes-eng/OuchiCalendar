@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'families', 
     'children',
     'core',
+    'invitations',
 ]
 
 MIDDLEWARE = [
