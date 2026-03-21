@@ -1,0 +1,22 @@
+<!-- templates/invitations/invitation_create.html -->
+{% extends "base_flow.html" %}
+
+{% block title %}家族の招待 | おうちカレンダー{% endblock %}
+{% block page_title %}家族を招待する{% endblock %}
+
+{% block flow_left %}
+<a href="{% url 'families:family_settings' %}" aria-label="家族設定へ戻る">×</a>
+{% endblock %}
+
+{% block content %}
+<p>
+以下のURLを家族に共有してください。<br>
+相手のアカウント登録が完了するとおうちカレンダーを共有できます。<br>
+発行したURLは一度利用した時点で無効になります。<br>
+また、利用されなかった場合は72時間後に無効になります。
+</p>
+
+<p>{{ invite_url }}</p>
+
+<p>有効期限：{{ invitation.expires_at }}</p>
+{% endblock %}
