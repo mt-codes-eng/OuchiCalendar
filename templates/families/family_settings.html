@@ -57,6 +57,32 @@
  <hr>
 
  <section>
+  <h2>大人メンバー</h2>
+  {% if adult_members %}
+    <ul>
+      {% for member in adult_members %}
+        <li>
+          <img
+            src="{{ member.image.url }}"
+            alt="{{ member.name }}のアイコン"
+            width="40"
+            style="border-radius: 50%; vertical-align: middle;"
+          >
+          {{ member.name }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>まだ大人メンバーが登録されていません</p>
+  {% endif %}
+  <p>
+    <a href="{% url 'invitations:create' %}">家族を招待する ＋</a>
+  </p>
+</section>
+
+ <hr>
+
+ <section>
   <h2>子どもメンバー</h2>
   {% if children %}
     <ul>
