@@ -46,6 +46,7 @@ def signup_view(request):
 
     ・通常登録 → 新しいFamilyを作る
     ・招待URL経由 → 招待のFamilyに参加する
+    ・招待トークンが無効なら 無効画面へ戻す
     """
     # ① 招待トークンを取得しておく
     # 例:/ouchi-calendar/signup/?invitation_token=abc123
@@ -77,25 +78,30 @@ def signup_view(request):
                 except Invitation.DoesNotExist:
                     invitation = None
                 
-                # 招待が存在し、未使用で、期限切れでない場合がその家族に参加
-                if invitation and invitation.status == Invitation.Status.UNUSED and not invitation.is_expired():
-                    # 招待のfamilyに所属させる
-                    user.family = invitation.family
+                # 招待トークンが存在しない → 無効画面へ
+                if not invitation:
+                    return redirect("invitations:invalid")
 
-                    # User保存後に招待を使用済みにするため、
-                    # ここではまだ invitation.save() しない
-                else:
-                    # 無効な招待なら通常登録扱い
-                    # DBにFamilyレコードを1件作る
-                    # 家族名はあとで家族設定画面で入力する想定なので、まずは空文字で作成
-                    family = Family.objects.create(name="")
-                    # 紐づけ（さっき作ったfamilyを、Userのfamily欄に入れる）
-                    user.family = family
-                    invitation = None
-            
+                # すでに使用済み → 無効画面へ
+                if invitation.status != Invitation.Status.UNUSED:
+                    return redirect("invitations:invalid")
+
+                # 期限切れ → status を EXPIRED にして無効画面へ
+                if invitation.is_expired():
+                    invitation.status = Invitation.Status.EXPIRED
+                    invitation.save()
+                    return redirect("invitations:invalid")
+                
+                # ここまで来たら有効な招待
+                # 招待のfamilyに所属させる
+                user.family = invitation.family
+                
             else:
                 # 通常登録（招待なし）
+                # DBにFamilyレコードを1件作る
+                # 家族名はあとで家族設定画面で入力する想定なので、まずは空文字で作成
                 family = Family.objects.create(name="")
+                # 紐づけ（さっき作ったfamilyを、Userのfamily欄に入れる）
                 user.family = family
                 invitation = None
 
@@ -104,15 +110,15 @@ def signup_view(request):
             # パスワードは平文ではなくハッシュ化されて安全に保存される
             user.save()
             
-            # 有効な招待だった場合だけ使用済みにする
-            if invitation:
+            # ⑤ 有効な招待だった場合だけ使用済みにする
+            if invitation_token and invitation:
                 invitation.status = Invitation.Status.USED
                 invitation.save()
 
-            # ⑤ 自動ログイン。登録後、そのままログイン状態にする
+            # ⑥ 自動ログイン。登録後、そのままログイン状態にする
             login(request, user)
 
-            # ⑥ 遷移
+            # ⑦ 遷移
             return redirect("families:family_settings")
 
     else:
