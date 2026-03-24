@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -82,7 +82,57 @@ def invitation_create_view(request):
 
 
 def invitation_accept_view(request, token):
-    return HttpResponse(f"招待受け取り: {token}")
+    """
+    招待URLを受け取ったときのビュー
+    
+    ・URLに含まれる token から招待データを探す
+    ・その招待が有効かどうか確認する
+    ・有効なら新規アカウント登録画面へ案内する
+    ・無効なら無効画面へ移動する
+    """
+
+    # ----------------------------------------
+    # ① URLに入っている token に対応する招待データを取得する
+    # ----------------------------------------
+    # token が存在しない場合は 404ページ になる
+    invitation = get_object_or_404(
+        Invitation,
+        invitation_token=token,
+    )
+
+    # ----------------------------------------
+    # ② すでに使用済みなら無効画面へ
+    # ----------------------------------------
+    if invitation.status == Invitation.Status.USED:
+        return redirect("invitations:invalid")
+
+    # ----------------------------------------
+    # ③ 期限切れかどうか確認する
+    # ----------------------------------------
+    # 期限切れなら status も EXPIRED に更新してから無効画面へ
+    if invitation.is_expired(): # invitation.is_expired()はモデルに書いたメソッド
+        invitation.status = Invitation.Status.EXPIRED
+        invitation.save()
+        return redirect("invitations:invalid")
+
+    # ----------------------------------------
+    # ④ まだログインしていない人は新規アカウント登録画面へ送る
+    # ----------------------------------------
+    # invitation_token をクエリパラメータで引き継ぐ
+    # 例: /ouchi-calendar/signup/?invitation_token=abc123
+    if not request.user.is_authenticated: # ログイン済みでないなら True,ログイン済みなら False
+        signup_url = reverse("accounts:signup") # signup の URLを作る。/ouchi-calendar/signup/
+        return redirect(f"{signup_url}?invitation_token={token}") # URLの後ろにクエリパラメータとして付ける。/ouchi-calendar/signup/?invitation_token=abc123xyz
+
+    # ----------------------------------------
+    # ⑤ すでにログイン済みの場合
+    # ----------------------------------------
+    # 今回の仕様では「URLをクリックした相手が新規登録する」流れが中心なので、
+    # まずはログイン済みユーザーにも signup ではなく別画面に送るより、
+    # シンプルに無効画面へ送る、または専用メッセージを出す方が安全
+    #
+    # 今回は簡単に invalid 画面へ送る
+    return redirect("invitations:invalid")
 
 def invitation_invalid_view(request):
     return HttpResponse("無効な招待URLです")
