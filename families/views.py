@@ -2,11 +2,16 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import FamilyProfileForm
 from children.models import Child
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 @login_required
 def family_settings_view(request):
     # ログインしているユーザー(request.user)の家族を取り出してfamily という変数に入れる
     family = request.user.family
+    # ログイン中のユーザーの家族に属する大人だけを取得する
+    adult_members = User.objects.filter(family=family).order_by("id")
     # children_childテーブルからfamily が request.user.family の子どもだけに絞る = ログイン中のユーザーの家族に属する子どもだけを取得する
     children = Child.objects.filter(family=family).order_by("id")
     
@@ -15,6 +20,7 @@ def family_settings_view(request):
         "families/family_settings.html",
         {
             "family": family,
+            "adult_members": adult_members,
             "children": children,
         },
     )
