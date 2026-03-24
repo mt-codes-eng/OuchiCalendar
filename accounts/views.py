@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import authenticate, login, update_session_auth_hash
+from django.utils import timezone
 from .forms import SignUpForm, UserProfileForm
 from families.models import Family
+from invitations.models import Invitation
 
 def login_view(request):
     if request.method == "POST":
@@ -39,44 +41,94 @@ def login_view(request):
 
 
 def signup_view(request):
+    """
+    新規アカウント登録ビュー
+
+    ・通常登録 → 新しいFamilyを作る
+    ・招待URL経由 → 招待のFamilyに参加する
+    """
+    # ① 招待トークンを取得しておく
+    # 例:/ouchi-calendar/signup/?invitation_token=abc123
+    # GETで画面を開いたときは request.GET から
+    # POSTでフォーム送信されたときは request.POST から取る
+    if request.method == "POST":
+        invitation_token = request.POST.get("invitation_token")
+    else:
+        invitation_token = request.GET.get("invitation_token")
+    
     if request.method == "POST":
         # 送信されたデータ（記入済みの紙）でフォームを作る
-        # 送信された文字データは request.POST、
-        # アップロードされた画像ファイルは request.FILES に入る
+        # 送信された文字データは request.POST、アップロードされた画像ファイルは request.FILES に入る
         # 画像アップロード対応のフォームでは、両方を渡す必要がある
         form = SignUpForm(request.POST, request.FILES)
 
         # 入力チェック（メール形式、パスワード一致、強度など）
         if form.is_valid():
-            # ① Userを作るけどまだDBには保存しない
+            # ② Userを作るけどまだDBには保存しない
             # 先に family をセットしたいので commit=False にする
             user = form.save(commit=False)
             
-            # ② 1人目用：DBにFamilyレコードを1件作る。
-            # 家族名はあとで家族設定画面で入力する想定なので、まずは空文字で作成
-            family = Family.objects.create(name="")
+            # ③ 招待URL経由かどうかで処理を分ける
+            if invitation_token:
+                try:
+                    invitation = Invitation.objects.get(
+                        invitation_token=invitation_token
+                    )
+                except Invitation.DoesNotExist:
+                    invitation = None
+                
+                # 招待が存在し、未使用で、期限切れでない場合がその家族に参加
+                if invitation and invitation.status == Invitation.Status.UNUSED and not invitation.is_expired():
+                    # 招待のfamilyに所属させる
+                    user.family = invitation.family
+
+                    # User保存後に招待を使用済みにするため、
+                    # ここではまだ invitation.save() しない
+                else:
+                    # 無効な招待なら通常登録扱い
+                    # DBにFamilyレコードを1件作る
+                    # 家族名はあとで家族設定画面で入力する想定なので、まずは空文字で作成
+                    family = Family.objects.create(name="")
+                    # 紐づけ（さっき作ったfamilyを、Userのfamily欄に入れる）
+                    user.family = family
+                    invitation = None
             
-            # ③ 紐づけ（さっき作ったfamilyを、Userのfamily欄に入れる）
-            user.family = family
-            
+            else:
+                # 通常登録（招待なし）
+                family = Family.objects.create(name="")
+                user.family = family
+                invitation = None
+
             # ④ User保存
             # SignUpForm は UserCreationForm を継承しているので、
             # パスワードは平文ではなくハッシュ化されて安全に保存される
             user.save()
             
-            # ⑤ 登録後、そのままログイン状態にする
+            # 有効な招待だった場合だけ使用済みにする
+            if invitation:
+                invitation.status = Invitation.Status.USED
+                invitation.save()
+
+            # ⑤ 自動ログイン。登録後、そのままログイン状態にする
             login(request, user)
-             
-            # ⑥ 家族設定画面へ遷移
-            return redirect("families:family_settings") 
+
+            # ⑥ 遷移
+            return redirect("families:family_settings")
 
     else:
         # GETのときは空のフォーム（空白の紙）を表示する
-        form = SignUpForm() # その型から作られた実物（インスタンス）。何も書かれていない入力用の紙を1枚用意した
+        # その型から作られた実物（インスタンス）。何も書かれていない入力用の紙を1枚用意した
+        form = SignUpForm()
+    
+    context = {
+        "form": form,
+        "invitation_token": invitation_token,
+    }
 
     # Python的に省略していない形はreturn render(request=request,template_name="accounts/signup.html",context={"form": form})
     # {"form": form}でその紙をHTMLに渡して、『accounts/signup.htmlに表示して』と頼んだ。テンプレート側で form を使えるように。辞書の意味：左 "form" → HTMLで使う名前、右 form → Pythonで作った申込書そのもの。
-    return render(request, "accounts/signup.html", {"form": form}) 
+    return render(request, "accounts/signup.html", context)
+
     
 @login_required
 def password_change_view(request):
