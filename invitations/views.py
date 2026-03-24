@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
@@ -135,4 +134,4 @@ def invitation_accept_view(request, token):
     return redirect("invitations:invalid")
 
 def invitation_invalid_view(request):
-    return HttpResponse("無効な招待URLです")
+    return render(request, "invitations/invalid.html")
