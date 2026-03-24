@@ -5,8 +5,10 @@
 {% block page_title %}新規アカウント登録{% endblock %}
 
 {% block auth_left %}
-<a href="{% url 'accounts:login' %}" aria-label="ログイン画面へ戻る">×</a>
-{% endblock %}
+  {% if not invitation_token %}
+    <a href="{% url 'accounts:login' %}" aria-label="ログイン画面へ戻る">×</a>
+  {% endif %}
+    {% endblock %}
 
 {% block content %}
 <form method="post" enctype="multipart/form-data"> {# 「登録ボタンを押したら、POSTという方法でサーバに送る」宣言 #}{# ファイルを含むフォーム送信をするときには enctype の追加が必須#}
@@ -15,6 +17,10 @@
   {# 招待URL経由で来たときだけ、招待トークンをhiddenで一緒に送る #}
   {% if invitation_token %}
     <input type="hidden" name="invitation_token" value="{{ invitation_token }}">
+    <p>
+      この画面は、家族からの招待を受けた方専用のアカウント登録画面です。<br>
+      登録が完了すると、この家族グループのおうちカレンダーを共有できます。
+    </p>
   {% endif %}
   
   {# フォーム全体に関わるエラーを表示する場所 #}
