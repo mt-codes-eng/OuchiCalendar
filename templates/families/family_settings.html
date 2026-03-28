@@ -23,7 +23,20 @@
         style="border-radius:50%;"
       >
     </p>
-    <p>個人カラー：未実装</p>
+    <p>個人カラー：
+      {% if my_color_hex %}
+        <span
+          style="
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: {{ my_color_hex }};
+            border: 1px solid #ccc;
+            vertical-align: middle;
+        ">
+        </span>
+      {% endif %}
+    </p>
  </section>
 
  <p>
@@ -69,6 +82,19 @@
             style="border-radius: 50%; vertical-align: middle;"
           >
           {{ member.name }}
+          {% if member.color_hex %}
+            <span
+              style="
+                display: inline-block;
+                width: 15px;
+                height: 15px;
+                background-color: {{ member.color_hex }};
+                border: 1px solid #ccc;
+                margin-left: 5px;
+                vertical-align: middle;
+            ">
+            </span>
+          {% endif %}
         </li>
       {% endfor %}
     </ul>
