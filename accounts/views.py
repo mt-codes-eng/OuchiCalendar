@@ -202,6 +202,18 @@ def password_change_view(request):
 
 @login_required
 def user_profile_edit_view(request):
+    """
+    自分のプロフィール編集ビュー
+
+    この画面では、次の内容を変更できる
+    - 名前
+    - Email
+    - 個人アイコン
+    - 個人カラー
+
+    個人カラーは User モデルではなく
+    FamilyColorAssignment に保存する
+    """
     # ログイン中のユーザー（＝自分）
     user = request.user
     
@@ -213,15 +225,54 @@ def user_profile_edit_view(request):
         
         # 入力チェック
         if form.is_valid():
-            # DBに保存
-            form.save()
-            
-            return redirect("families:family_settings")
+            # フォームで選んだ個人カラーを取り出す
+            # clean_color_code() で int に変換済み
+            color_code = form.cleaned_data["color_code"]
+
+            try:
+                # User の更新と、個人カラーの更新を
+                # 「全部成功するか、全部やめるか」でまとめる
+                with transaction.atomic():
+                    # ① User本体を保存する
+                    #    （名前、Email、画像 など）
+                    form.save()
+
+                    # ② 個人カラーを保存する
+                    #
+                    # update_or_create の意味：
+                    # - すでにこの user の色設定があれば更新
+                    # - まだなければ新規作成
+                    #
+                    # 既存ユーザーの中にはまだ色設定がない人もいるので、
+                    # 「更新も新規作成もどちらも対応できる」この書き方が便利
+                    FamilyColorAssignment.objects.update_or_create(
+                        user=user,
+                        defaults={
+                            "family": user.family,
+                            "child": None,  # 大人メンバーの個人カラーなので child は空
+                            "color_code": color_code,
+                            "assign_type": FamilyColorAssignment.AssignType.USER,
+                        }
+                    )
+
+                # ここまで成功したら家族設定画面へ戻す
+                return redirect("families:family_settings")
+
+            except IntegrityError:
+                # 同じ家族の中で、すでに別の人が使っている色を選んだ場合など
+                # DBの一意制約エラーが起きることがある
+                #
+                # そのままエラー画面にせず、
+                # 「個人カラー欄のエラー」として画面に戻す
+                form.add_error(
+                    "color_code",
+                    "この色はすでに家族内で使われています。別の色を選択してください"
+                )
         
     else:
         # GETのとき：登録済みの値が入力欄に入った状態のフォームを作る
         form = UserProfileForm(instance=user)
         
-        # ビューでuser = request.userとしており、このuserをテンプレで使いたいとき混乱しないようにuser_objという別名で渡している
-        # テンプレでuserという名前がすでに別で使われている場合があり、この場合と混乱しないため   
+    # ビューでuser = request.userとしており、このuserをテンプレで使いたいとき混乱しないようにuser_objという別名で渡している
+    # テンプレでuserという名前がすでに別で使われている場合があり、この場合と混乱しないため   
     return render(request, "accounts/user_profile_edit.html", {"form": form, "user_obj":user})
