@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm # Djangoが用意してくれている「ユーザー登録用フォーム」。パスワードの確認（password1/password2）や、パスワードの安全な保存（ハッシュ化）まで面倒をみてくれる 
 from django import forms
 
+from color_assignments.constants import COLOR_HEX_MAP # 色一覧を読み込む
 User = get_user_model() # AUTH_USER_MODEL で指定した User（accounts.User）を取り出す。「標準UserじゃなくてカスタムUserを使う」ために必要
 
 class SignUpForm(UserCreationForm):
@@ -10,6 +11,15 @@ class SignUpForm(UserCreationForm):
     UserCreationForm がもともと持っている password1 / password2 を使いながら、
     表示順と表示名を整える
     """
+    # 個人カラー選択欄をフォームに追加する
+    # User モデルに color_code がなくても追加できる
+    # ChoiceField = 選択肢の中から1つ選ぶ欄
+    color_code = forms.ChoiceField(
+        label="個人カラー",
+        required=True,
+        widget=forms.RadioSelect,
+    )
+    
     class Meta:
         model = User
         # パスワード2つは UserCreationForm 側が元から持っている（自分で書かなくてOK）が、
@@ -41,6 +51,35 @@ class SignUpForm(UserCreationForm):
         # 新規登録では個人アイコンを必須にしたいので required=True にする
         # モデル側でも必須だが、フォーム側でも明示しておくとわかりやすい
         self.fields["image"].required = True
+        
+        self.fields["color_code"].choices = [
+            ("", "選択してください"),
+            *[(code, COLOR_HEX_MAP[code]) for code in COLOR_HEX_MAP]
+        ]
+        
+    def clean_color_code(self):
+        """
+        color_code 専用の入力チェック
+
+        ChoiceField なので、送信される値は文字列になりやすい
+        後で保存しやすいように、ここで int に変換して返す
+        """
+        color_code = self.cleaned_data.get("color_code")
+
+        # 万一、未選択のまま来たらエラー
+        if color_code in [None, ""]:
+            raise forms.ValidationError("個人カラーを選択してください")
+
+        try:
+            color_code = int(color_code)
+        except (TypeError, ValueError):
+            raise forms.ValidationError("個人カラーの値が不正です")
+
+        # 13色パレットの範囲内かチェック
+        if color_code not in COLOR_HEX_MAP:
+            raise forms.ValidationError("選択できない色です")
+
+        return color_code
 
 class UserProfileForm(forms.ModelForm):
     """
