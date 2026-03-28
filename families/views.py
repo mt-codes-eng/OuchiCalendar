@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import FamilyProfileForm
 from children.models import Child
 from django.contrib.auth import get_user_model
+from color_assignments.models import FamilyColorAssignment
+from color_assignments.constants import COLOR_HEX_MAP
 
 User = get_user_model()
 
@@ -15,14 +17,44 @@ def family_settings_view(request):
     # children_childテーブルからfamily が request.user.family の子どもだけに絞る = ログイン中のユーザーの家族に属する子どもだけを取得する
     children = Child.objects.filter(family=family).order_by("id")
     
+    # ① ログイン中ユーザーの個人カラーを取得する
+    my_color_hex = None
+
+    # request.user に対応する色設定を探す
+    my_assignment = FamilyColorAssignment.objects.filter(
+        user=request.user
+    ).first()
+
+    # 色設定が見つかったら、color_code から実際のHEXカラーを取り出す
+    if my_assignment:
+        my_color_hex = COLOR_HEX_MAP.get(my_assignment.color_code)
+
+    # ② 大人メンバー一覧に、表示用の色を付ける
+    # テンプレートで使いやすいように、
+    # 各 user オブジェクトに color_hex という属性を追加する
+    for member in adult_members:
+        member.color_hex = None
+
+        # その大人メンバーの色設定を探す
+        assignment = FamilyColorAssignment.objects.filter(
+            user=member
+        ).first()
+
+        # 色設定があれば HEXカラーに変換して持たせる
+        if assignment:
+            member.color_hex = COLOR_HEX_MAP.get(assignment.color_code)
+
+    context = {
+        "family": family,
+        "adult_members": adult_members,
+        "children": children,
+        "my_color_hex": my_color_hex,
+    }
+    
     return render(
         request, 
         "families/family_settings.html",
-        {
-            "family": family,
-            "adult_members": adult_members,
-            "children": children,
-        },
+        context
     )
 
 @login_required
