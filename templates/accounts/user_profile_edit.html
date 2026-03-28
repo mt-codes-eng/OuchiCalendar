@@ -75,7 +75,7 @@
             type="radio"
             name="color_code"
             value="{{ value }}"
-            {% if form.color_code.value == value|stringformat:"s" %}checked{% endif %}
+            {% if form.color_code.value == value|stringformat:"s" or form.fields.color_code.initial|stringformat:"s" == value|stringformat:"s" %}checked{% endif %}
           >{# value を文字列に変換し今の値（編集時なら保存されてる値）と同じなら checked をつける → 編集時やバリデーションエラー時に選択状態を維持するため #}
 
           {# 色の見た目 #}
