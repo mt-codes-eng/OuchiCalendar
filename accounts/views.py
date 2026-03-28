@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import authenticate, login, update_session_auth_hash
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from .forms import SignUpForm, UserProfileForm
 from families.models import Family
 from invitations.models import Invitation
+from color_assignments.models import FamilyColorAssignment
 
 def login_view(request):
     if request.method == "POST":
@@ -47,6 +49,7 @@ def signup_view(request):
     ・通常登録 → 新しいFamilyを作る
     ・招待URL経由 → 招待のFamilyに参加する
     ・招待トークンが無効なら 無効画面へ戻す
+    ・登録時に選んだ個人カラーを FamilyColorAssignment に保存する
     """
     # ① 招待トークンを取得しておく
     # 例:/ouchi-calendar/signup/?invitation_token=abc123
@@ -58,18 +61,25 @@ def signup_view(request):
         invitation_token = request.GET.get("invitation_token")
     
     if request.method == "POST":
-        # 送信されたデータ（記入済みの紙）でフォームを作る
+        # ② 送信されたデータ（記入済みの紙）でフォームを作る
         # 送信された文字データは request.POST、アップロードされた画像ファイルは request.FILES に入る
         # 画像アップロード対応のフォームでは、両方を渡す必要がある
         form = SignUpForm(request.POST, request.FILES)
 
-        # 入力チェック（メール形式、パスワード一致、強度など）
+        # ③ 入力チェック（メール形式、パスワード一致、強度など）
         if form.is_valid():
-            # ② Userを作るけどまだDBには保存しない
+            # ④ 個人カラーを取り出す
+            # SignUpForm の clean_color_code() で int に変換済み
+            color_code = form.cleaned_data["color_code"]
+            
+            # ⑤ Userオブジェクトを作るけどまだDBには保存しない
             # 先に family をセットしたいので commit=False にする
             user = form.save(commit=False)
             
-            # ③ 招待URL経由かどうかで処理を分ける
+            # 招待オブジェクトを、あとで使えるように先に None で用意しておく
+            invitation = None
+            
+            # ⑥ 招待URL経由かどうかで処理を分ける
             if invitation_token:
                 try:
                     invitation = Invitation.objects.get(
@@ -103,14 +113,52 @@ def signup_view(request):
                 family = Family.objects.create(name="")
                 # 紐づけ（さっき作ったfamilyを、Userのfamily欄に入れる）
                 user.family = family
-                invitation = None
+                
+            try:
+                with transaction.atomic():
+                    # ⑦ Userを保存する
+                    # SignUpForm は UserCreationForm を継承しているので、
+                    # パスワードは平文ではなくハッシュ化されて安全に保存される
+                    user.save()
 
-            # ④ User保存
-            # SignUpForm は UserCreationForm を継承しているので、
-            # パスワードは平文ではなくハッシュ化されて安全に保存される
-            user.save()
+                    # ⑧ 個人カラーを保存する
+                    #
+                    # update_or_create の意味：
+                    # - すでにその user の色設定があれば更新
+                    # - なければ新規作成
+                    #
+                    # signup直後は基本的に新規作成になるが、
+                    # 今後の設計とも相性がよいのでこの形にしておく
+                    FamilyColorAssignment.objects.update_or_create(
+                        user=user, # user=user でその大人メンバーの色設定を探す。あれば更新。なければ新規作成
+                        defaults={
+                            "family": user.family,
+                            "child": None,
+                            "color_code": color_code,
+                            "assign_type": FamilyColorAssignment.AssignType.USER,
+                        }
+                    )
+
+            except IntegrityError:
+                # ⑨ 家族内ですでに同じ色が使われているなど、
+                # DBの一意制約に引っかかった場合
+                #
+                # このままだとユーザーには意味不明なエラーになるので、
+                # フォームエラーとしてやさしく返す
+                form.add_error(
+                    "color_code",
+                    "この色はすでに家族内で使われています。別の色を選択してください"
+                )
+                return render(
+                    request,
+                    "accounts/signup.html",
+                    {
+                        "form": form,
+                        "invitation_token": invitation_token,
+                    }
+                )
             
-            # ⑤ 有効な招待だった場合だけ使用済みにする
+            # ⑩ 有効な招待だった場合だけ使用済みにする
             if invitation_token and invitation:
                 invitation.status = Invitation.Status.USED
                 invitation.save()
