@@ -52,6 +52,45 @@
       </p>
    </div>
 
+   <p>
+    <label>個人カラー</label>
+   </p>
+
+   {# display: flex; → 横並び。flex-wrap: wrap; → はみ出したら折り返しOK。gap: 10px; → 余白つける。要素同士のすき間。#}
+   <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {# formに設定した選択肢を1つずつ取り出す #}
+    {# value = 0,1,2... の数字 #}
+    {# hex = "#ff7f7f" などの色コード #}
+
+    {% for value, hex in form.fields.color_code.choices %}
+    
+      {# 最初の「選択してください」は表示しない #}
+      {% if value %}
+      
+        {# カーソルを指マークにする。クリックできることを示す #}
+        <label style="cursor: pointer;">
+        
+          {# ラジオボタン（実際の入力データ） #}
+          <input
+            type="radio"
+            name="color_code"
+            value="{{ value }}"
+            {% if form.color_code.value == value|stringformat:"s" %}checked{% endif %}
+          >{# value を文字列に変換し今の値（編集時なら保存されてる値）と同じなら checked をつける → 編集時やバリデーションエラー時に選択状態を維持するため #}
+
+          {# 色の見た目 #}
+          {# display: inline-block; → spanは普通だとサイズ指定できないがこれでwidth / height が効くように #}
+          {# background-color: {{ hex }}; → その色で塗りつぶす #}
+          {# border: 1px solid #ccc; → 薄いグレーの枠。#}
+          {# margin-left: 0px; inputとの間の左の余白 #}
+          <span style="display: inline-block; width: 15px; height: 15px; background-color: {{ hex }}; border: 1px solid #ccc; margin-left: 0px;"></span>
+         </label>
+      {% endif %}
+    {% endfor %}
+   </div>
+
+  {{ form.color_code.errors }}
+
    <button type="submit">保存</button>
  </form>
 {% endblock %}
