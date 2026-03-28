@@ -142,7 +142,7 @@ class UserProfileForm(forms.ModelForm):
 
             if assignment:
                 # フォームを開いたときに、現在の色が最初から選ばれた状態にする
-                self.fields["color_code"].initial = assignment.color_code
+                self.fields["color_code"].initial = str(assignment.color_code)
        
     def clean_email(self):
         """
