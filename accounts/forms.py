@@ -18,7 +18,6 @@ class SignUpForm(UserCreationForm):
     color_code = forms.ChoiceField(
         label="個人カラー",
         required=True,
-        widget=forms.RadioSelect,
     )
     
     class Meta:
