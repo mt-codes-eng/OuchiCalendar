@@ -60,46 +60,218 @@
     {{ form.image.errors }}
   </p>
 
-  <p>
-    <label>個人カラー</label>
-  </p>
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <label>個人カラー：</label>
 
-  {# display: flex; → 横並び。flex-wrap: wrap; → はみ出したら折り返しOK。gap: 10px; → 余白つける。要素同士のすき間。#}
-  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-  
-    {# formに設定した選択肢を1つずつ取り出す #}
-    {# value = 0,1,2... の数字 #}
-    {# hex = "#ff7f7f" などの色コード #}
-
-    {% for value, hex in form.fields.color_code.choices %}
-    
-      {# 最初の「選択してください」は表示しない #}
-      {% if value %}
-      
-        {# カーソルを指マークにする。クリックできることを示す #}
-        <label style="cursor: pointer;">
-        
-          {# ラジオボタン（実際の入力データ） #}
-          <input
-            type="radio"
-            name="color_code"
-            value="{{ value }}"
-            {% if form.color_code.value == value|stringformat:"s" %}checked{% endif %}
-          >{# value を文字列に変換し今の値（編集時なら保存されてる値）と同じなら checked をつける → 編集時やバリデーションエラー時に選択状態を維持するため #}
-
-          {# 色の見た目 #}
-          {# display: inline-block; → spanは普通だとサイズ指定できないがこれでwidth / height が効くように #}
-          {# background-color: {{ hex }}; → その色で塗りつぶす #}
-          {# border: 1px solid #ccc; → 薄いグレーの枠。#}
-          {# margin-left: 0px; inputとの間の左の余白 #}
-          <span style="display: inline-block; width: 15px; height: 15px; background-color: {{ hex }}; border: 1px solid #ccc; margin-left: 0px;"></span>
-        </label>
-      {% endif %}
-    {% endfor %}
+    {# 実際にサーバーへ送る値を入れる。hidden inputは画面には見えないが、フォーム送信時に color_code として送られる #}
+    {# [input] 実際の値を送信 #}
+    <input
+      type="hidden"
+      name="color_code"
+      id="id_color_code"
+      value="{{ form.color_code.value|default:'' }}"
+    >
+    {# いま選択中の色を表示するボタン。ここを押すと、下の色候補一覧を開いたり閉じたりする #}
+    {# [button] 押す。操作する（クリック）#}
+    {# border → 枠線。1px → 太さ。solid → 実線。#ccc → 薄いグレー#}
+    {# background-color → 背景色 #}
+    {# cursor: pointer → マウス乗せたら指になる（クリックできる）#}
+    {# display: inline-flex →  中の要素を中央揃えする準備 #}
+    {# align-items: center → 縦方向の中央揃え #}
+    {# justify-content: center → 横方向の中央揃え #}
+    {# padding: 0 → 内側の余白をなくす #}
+    <button
+      type="button"
+      id="color-picker-toggle"
+      style="
+        width: 70px;
+        height: 34px;
+        border: 0px solid #ccc;
+        background-color: #fff;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      "
+      aria-label="個人カラーを選択"
+    >
+      {# 選択中の色を表示する四角 #}
+      {# [span] 色を表示。見た目（表示）#}
+      {# display: inline-block; → spanは普通だとサイズ指定できないがこれでwidth / height が効くように #}
+      {# transparent → 透明 #}
+      <span
+        id="selected-color-preview"
+        style="
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          border: 1px solid #ccc;
+          background-color: transparent;
+        "
+      ></span>
+    </button>
+  </div>
+  {# 色候補一覧。最初は非表示。ボタンを押すと表示される #}
+  {# width: fit-content; → 中身の大きさピッタリにする #}
+  <div
+    id="color-picker-options"
+    style="
+      display: none;
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      width: fit-content;
+    "
+  >
+    {# 色を横並び＋折り返しで表示 #}
+    {# display: flex; → 横並び。flex-wrap: wrap; → はみ出したら折り返しOK。gap: 10px; → 余白つける。要素同士のすき間。#}
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+      {# formに設定した選択肢を1つずつ取り出す #}
+      {# value = 0,1,2... の数字 #}
+      {# hex = "#ff7f7f" などの色コード #}
+      {% for value, hex in form.fields.color_code.choices %}
+        {# 最初の「選択してください」は表示しない #}
+        {% if value != "" %}
+          <button
+            type="button"
+            class="color-option-button"
+            data-value="{{ value }}"
+            data-hex="{{ hex }}"
+            style="
+              width: 24px;
+              height: 24px;
+              border: 1px solid #ccc;
+              background-color: {{ hex }};
+              cursor: pointer;
+            "
+            aria-label="色 {{ value }} を選択"
+          ></button>
+        {% endif %}
+      {% endfor %}
+    </div>
   </div>
 
   {{ form.color_code.errors }}
 
-  <button type="submit">登録</button> {# type="submit" があるとこのボタンを押した瞬間に、form の中身を送信するという特別な役割 #}
+  <div style="margin-top: 20px;">
+    <button type="submit">登録</button> {# type="submit" があるとこのボタンを押した瞬間に、form の中身を送信するという特別な役割 #}
+  </div>
 </form>{# 送信先は、form タグで決まっている。action がない場合「今表示しているURL（住所）」に送信。実際に受け取るのは「URLを処理する関数：signup_view（人）」。#}
+
+<script>
+/*
+① HTMLがすべて読み込み終わってから処理を実行する
+→ これを書かないと、まだ存在しないHTMLを取ろうとしてエラーになることがある
+*/
+document.addEventListener("DOMContentLoaded", function () {
+    /*
+    ② 画面の部品（HTML）を取得して、変数に入れる
+    */
+    // hidden input（実際にサーバーへ送るcolor_code）
+    // id="id_color_code" の要素を取得
+    const colorInput = document.getElementById("id_color_code");
+
+    // 色選択のボタン（押すと候補が開く）
+    const toggleButton = document.getElementById("color-picker-toggle");
+
+    // 色の候補一覧（最初は非表示）
+    const optionsBox = document.getElementById("color-picker-options");
+
+    // 今選択中の色を表示する四角
+    const previewBox = document.getElementById("selected-color-preview");
+
+    // 色のボタン全部（querySelectorAllは複数取得）
+    const optionButtons = document.querySelectorAll(".color-option-button");
+
+    /*
+    ③ 初期表示の色を設定する関数
+    → すでに値が入っている場合（エラー後など）に色を復元する
+    */
+    function updatePreviewFromValue() {
+        // hidden input の中に入っている値を取り出す
+        const currentValue = colorInput.value;
+        // 「該当する色が見つかったかどうか」を記録するための変数。最初は「見つかっていない」ので false
+        let found = false;
+
+        // 色ボタンを1つずつ取り出して処理する
+        optionButtons.forEach(function (button) {
+            // ボタンの持っている値（data-value）と今の値（hidden input）を比較し同じなら
+            if (button.dataset.value === currentValue) {
+              // 見た目の四角（プレビュー）の色を変更する。例：#bf7fff
+              previewBox.style.backgroundColor = button.dataset.hex;
+                found = true;
+            }
+        });
+
+        // 該当がなければ色を透明にする
+        if (!found) {
+            previewBox.style.backgroundColor = "transparent";
+        }
+    }
+
+    /*
+    ④ ボタンを押したら、候補一覧を開く・閉じる
+    */
+    // ボタンがクリックされたときに処理を実行する
+    toggleButton.addEventListener("click", function () {
+        if (optionsBox.style.display === "none") {
+            optionsBox.style.display = "block";
+        } else {
+            optionsBox.style.display = "none";
+        }
+    });
+
+    /*
+    ⑤ 色をクリックしたときの処理
+    */
+    optionButtons.forEach(function (button) {
+        // 各ボタンが押されたとき
+        button.addEventListener("click", function () {
+
+            // ボタンに仕込んだ押した色の番号を取得
+            const selectedValue = button.dataset.value;
+            // 押した色の番号を取得
+            const selectedHex = button.dataset.hex;
+
+            // hidden input に値を入れる（これがサーバーに送られる）
+            colorInput.value = selectedValue;
+
+            // 表示している色を変更
+            previewBox.style.backgroundColor = selectedHex;
+
+            // 色候補一覧を閉じる
+            optionsBox.style.display = "none";
+        });
+    });
+
+
+    /*
+    ⑥ 候補一覧の外をクリックしたら閉じる
+    */
+    // 画面のどこかがクリックされたときに発火
+    document.addEventListener("click", function (event) {
+        // 「内側クリックかどうか」を判定する変数
+        const clickedInside =
+            // ボタンの中をクリックしたか？または
+            toggleButton.contains(event.target) ||
+            // 色一覧の中をクリックしたか？
+            optionsBox.contains(event.target);
+        // それ以外（外クリック）の場合
+        if (!clickedInside) {
+            // 色一覧を閉じる
+            optionsBox.style.display = "none";
+        }
+    });
+
+
+    /*
+    ⑦ ページ表示時に初期状態をセット
+    */
+    updatePreviewFromValue();
+
+});
+</script>
 {% endblock %}
+
