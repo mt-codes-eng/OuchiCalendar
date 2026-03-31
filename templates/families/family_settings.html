@@ -64,7 +64,22 @@
     {% else %}
      <p>未設定</p>
     {% endif %}
-    <p>合同予定カラー：未実装</p>
+    <p>合同予定カラー：
+      {% if shared_color_hex %}
+        <span
+          style="
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background-color: {{ shared_color_hex }};
+            border: 1px solid #ccc;
+            vertical-align: middle;
+        "
+        ></span>
+      {% else %}
+        未設定
+      {% endif %}
+    </p>
   </section>
 
  <hr>
