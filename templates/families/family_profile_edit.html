@@ -45,9 +45,173 @@
     </p>
   </div>
 
-  <div>
-    <button type="submit">保存</button>
+  {# ラベルと色選択ボタンを横並びにする #}
+  <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+    <label>合同予定カラー:</label>
+    <input
+      type="hidden"
+      name="color_code"
+      id="id_color_code"
+      value="{{ form.color_code.value|default:form.fields.color_code.initial|default:'' }}"
+    >
+    <button
+      type="button"
+      id="color-picker-toggle"
+      style="
+        width: 70px;
+        height: 34px;
+        border: 0px solid #ccc;
+        background-color: #fff;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      "
+      aria-label="合同予定カラーを選択"
+    >
+      <span
+        id="selected-color-preview"
+        style="
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          border: 1px solid #ccc;
+          background-color: transparent;
+        "
+      ></span>
+    </button>
   </div>
-   
+
+  {# 色候補一覧。最初は非表示 #}
+  <div
+    id="color-picker-options"
+    style="
+      display: none;
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      width: fit-content;
+    "
+  >
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+      {% for value, hex in form.fields.color_code.choices %}
+        {% if value != "" %}
+          <button
+            type="button"
+            class="color-option-button"
+            data-value="{{ value }}"
+            data-hex="{{ hex }}"
+            style="
+              width: 24px;
+              height: 24px;
+              border: 1px solid #ccc;
+              background-color: {{ hex }};
+              cursor: pointer;
+            "
+            aria-label="色 {{ value }} を選択"
+          ></button>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {# color_code のエラー表示 #}
+  {{ form.color_code.errors }}
+
+  <div style="margin-top: 20px;">
+    <button type="submit">保存</button>
+  </div>   
 </form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // hidden input（実際にサーバーへ送る color_code）
+    const colorInput = document.getElementById("id_color_code");
+
+    // 色選択ボタン
+    const toggleButton = document.getElementById("color-picker-toggle");
+
+    // 色候補一覧
+    const optionsBox = document.getElementById("color-picker-options");
+
+    // 選択中の色を表示する四角
+    const previewBox = document.getElementById("selected-color-preview");
+
+    // 色候補ボタン全部
+    const optionButtons = document.querySelectorAll(".color-option-button");
+
+    /*
+    hidden input に入っている値を見て、
+    それに対応する色をプレビューに表示する関数
+    */
+    function updatePreviewFromValue() {
+        const currentValue = colorInput.value;
+        let found = false;
+
+        optionButtons.forEach(function (button) {
+            if (button.dataset.value === currentValue) {
+                previewBox.style.backgroundColor = button.dataset.hex;
+                found = true;
+            }
+        });
+
+        // 該当がなければ透明にする
+        if (!found) {
+            previewBox.style.backgroundColor = "transparent";
+        }
+    }
+
+    /*
+    色選択ボタンを押したら、
+    候補一覧を開いたり閉じたりする
+    */
+    toggleButton.addEventListener("click", function () {
+        if (optionsBox.style.display === "none") {
+            optionsBox.style.display = "block";
+        } else {
+            optionsBox.style.display = "none";
+        }
+    });
+
+    /*
+    色候補を押したときの処理
+    */
+    optionButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            const selectedValue = button.dataset.value;
+            const selectedHex = button.dataset.hex;
+
+            // hidden input に値を入れる
+            colorInput.value = selectedValue;
+
+            // 見た目の色を変更する
+            previewBox.style.backgroundColor = selectedHex;
+
+            // 候補一覧を閉じる
+            optionsBox.style.display = "none";
+        });
+    });
+
+    /*
+    色候補一覧の外をクリックしたら閉じる
+    */
+    document.addEventListener("click", function (event) {
+        const clickedInside =
+            toggleButton.contains(event.target) ||
+            optionsBox.contains(event.target);
+
+        if (!clickedInside) {
+            optionsBox.style.display = "none";
+        }
+    });
+
+    /*
+    ページ表示直後に、
+    今の color_code に合わせて色を表示する
+    */
+    updatePreviewFromValue();
+});
+</script>
 {% endblock %}
