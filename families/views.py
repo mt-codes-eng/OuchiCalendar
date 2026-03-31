@@ -43,6 +43,66 @@ def family_settings_view(request):
         # 色設定があれば HEXカラーに変換して持たせる
         if assignment:
             member.color_hex = COLOR_HEX_MAP.get(assignment.color_code)
+            
+    from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import FamilyProfileForm
+from children.models import Child
+from django.contrib.auth import get_user_model
+from color_assignments.models import FamilyColorAssignment
+from color_assignments.constants import COLOR_HEX_MAP
+
+User = get_user_model()
+
+@login_required
+def family_settings_view(request):
+    # ログインしているユーザー(request.user)の家族を取り出してfamily という変数に入れる
+    family = request.user.family
+    # ログイン中のユーザーの家族に属する大人だけを取得する
+    adult_members = User.objects.filter(family=family).order_by("id")
+    # children_childテーブルからfamily が request.user.family の子どもだけに絞る = ログイン中のユーザーの家族に属する子どもだけを取得する
+    children = Child.objects.filter(family=family).order_by("id")
+    
+    # ① ログイン中ユーザーの個人カラーを取得する
+    my_color_hex = None
+
+    # request.user に対応する色設定を探す
+    my_assignment = FamilyColorAssignment.objects.filter(
+        user=request.user
+    ).first()
+
+    # 色設定が見つかったら、color_code から実際のHEXカラーを取り出す
+    if my_assignment:
+        my_color_hex = COLOR_HEX_MAP.get(my_assignment.color_code)
+
+    # ② 大人メンバー一覧に、表示用の色を付ける
+    # テンプレートで使いやすいように、
+    # 各 user オブジェクトに color_hex という属性を追加する
+    for member in adult_members:
+        member.color_hex = None
+
+        # その大人メンバーの色設定を探す
+        assignment = FamilyColorAssignment.objects.filter(
+            user=member
+        ).first()
+
+        # 色設定があれば HEXカラーに変換して持たせる
+        if assignment:
+            member.color_hex = COLOR_HEX_MAP.get(assignment.color_code)
+
+    # ③ 子どもメンバー一覧にも、表示用の色を付ける
+    for child in children:
+        # まずは未設定にしておく
+        child.color_hex = None
+
+        # その子どもの色設定を探す
+        assignment = FamilyColorAssignment.objects.filter(
+            child=child
+        ).first()
+
+        # 色設定があれば HEXカラーに変換して持たせる
+        if assignment:
+            child.color_hex = COLOR_HEX_MAP.get(assignment.color_code)
 
     context = {
         "family": family,
