@@ -121,6 +121,19 @@
             style="border-radius: 50%; vertical-align: middle;"
           >
           {{ child.name }}
+          {% if child.color_hex %}
+            <span
+              style="
+                display: inline-block;
+                width: 15px;
+                height: 15px;
+                background-color: {{ child.color_hex }};
+                border: 1px solid #ccc;
+                margin-left: 5px;
+                vertical-align: middle;
+            ">
+            </span>
+          {% endif %}
           <a href="{% url 'children:child_edit' child.id %}" aria-label="子どもメンバーを編集">✏️</a>
         </li>
       {% endfor %}
