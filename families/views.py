@@ -29,7 +29,18 @@ def family_settings_view(request):
     # 色設定が見つかったら、color_code から実際のHEXカラーを取り出す
     if my_assignment:
         my_color_hex = COLOR_HEX_MAP.get(my_assignment.color_code)
+    
+    # 家族の合同予定カラーを取得する
+    shared_color_hex = None
+    
+    shared_assignment = FamilyColorAssignment.objects.filter(
+        family=family,
+        assign_type=FamilyColorAssignment.AssignType.SHARED,
+    ).first()
 
+    if shared_assignment:
+        shared_color_hex = COLOR_HEX_MAP.get(shared_assignment.color_code)
+    
     # ② 大人メンバー一覧に、表示用の色を付ける
     # テンプレートで使いやすいように、
     # 各 user オブジェクトに color_hex という属性を追加する
@@ -64,6 +75,7 @@ def family_settings_view(request):
         "adult_members": adult_members,
         "children": children,
         "my_color_hex": my_color_hex,
+        "shared_color_hex": shared_color_hex,
     }
     
     return render(
