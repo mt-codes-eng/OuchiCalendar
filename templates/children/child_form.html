@@ -48,6 +48,83 @@
     </p>
     </div>
 
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+  <label>個人カラー:</label>
+
+  {# 実際にサーバーへ送る値を入れる hidden input #}
+  <input
+    type="hidden"
+    name="color_code"
+    id="id_color_code"
+    value="{{ form.color_code.value|default:form.fields.color_code.initial|default:'' }}"
+  >
+
+  {# 選択中の色を表示するボタン #}
+  <button
+    type="button"
+    id="color-picker-toggle"
+    style="
+      width: 70px;
+      height: 34px;
+      border: 0px solid #ccc;
+      background-color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    "
+    aria-label="個人カラーを選択"
+  >
+    <span
+      id="selected-color-preview"
+      style="
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #ccc;
+        background-color: transparent;
+      "
+    ></span>
+  </button>
+</div>
+
+{# 色候補一覧 #}
+<div
+  id="color-picker-options"
+  style="
+    display: none;
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    width: fit-content;
+  "
+>
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% for value, hex in form.fields.color_code.choices %}
+      {% if value != "" %}
+        <button
+          type="button"
+          class="color-option-button"
+          data-value="{{ value }}"
+          data-hex="{{ hex }}"
+          style="
+            width: 24px;
+            height: 24px;
+            border: 1px solid #ccc;
+            background-color: {{ hex }};
+            cursor: pointer;
+          "
+          aria-label="色 {{ value }} を選択"
+        ></button>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{{ form.color_code.errors }}
+
     <button type="submit">保存</button>
   </form>
 
@@ -56,4 +133,61 @@
       <a href="{% url 'children:child_delete' child.id %}">削除</a>
     </p>
   {% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const colorInput = document.getElementById("id_color_code");
+    const toggleButton = document.getElementById("color-picker-toggle");
+    const optionsBox = document.getElementById("color-picker-options");
+    const previewBox = document.getElementById("selected-color-preview");
+    const optionButtons = document.querySelectorAll(".color-option-button");
+
+    function updatePreviewFromValue() {
+        const currentValue = colorInput.value;
+        let found = false;
+
+        optionButtons.forEach(function (button) {
+            if (button.dataset.value === currentValue) {
+                previewBox.style.backgroundColor = button.dataset.hex;
+                found = true;
+            }
+        });
+
+        if (!found) {
+            previewBox.style.backgroundColor = "transparent";
+        }
+    }
+
+    toggleButton.addEventListener("click", function () {
+        if (optionsBox.style.display === "none") {
+            optionsBox.style.display = "block";
+        } else {
+            optionsBox.style.display = "none";
+        }
+    });
+
+    optionButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            const selectedValue = button.dataset.value;
+            const selectedHex = button.dataset.hex;
+
+            colorInput.value = selectedValue;
+            previewBox.style.backgroundColor = selectedHex;
+            optionsBox.style.display = "none";
+        });
+    });
+
+    document.addEventListener("click", function (event) {
+        const clickedInside =
+            toggleButton.contains(event.target) ||
+            optionsBox.contains(event.target);
+
+        if (!clickedInside) {
+            optionsBox.style.display = "none";
+        }
+    });
+
+    updatePreviewFromValue();
+  }); 
+  </script>
 {% endblock %}
