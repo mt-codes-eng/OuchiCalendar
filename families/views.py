@@ -6,6 +6,7 @@ from children.models import Child
 from django.contrib.auth import get_user_model
 from color_assignments.models import FamilyColorAssignment
 from color_assignments.constants import COLOR_HEX_MAP
+from .utils import is_initial_setup_completed
 
 User = get_user_model()
 
@@ -146,4 +147,36 @@ def family_profile_edit_view(request):
         request,
         "families/family_profile_edit.html",
         {"form": form, "family": family},
-    )          
+    )
+    
+@login_required
+def setup_completed_view(request):
+    """
+    家族設定登録完了画面
+
+    条件
+    - 初期設定が完了していること
+    - そのユーザーがまだこの画面を見ていないこと
+
+    この画面を表示したら、
+    「見た」というフラグを True にする
+    """
+
+    user = request.user
+
+    # 初期設定が未完了なら、この画面は表示しない
+    # 苗字の設定画面へ戻す
+    if not is_initial_setup_completed(user):
+        return redirect("families:family_profile_edit")
+
+    # すでに完了画面を見たユーザーなら、
+    # 何度も表示せず、家族設定画面へ戻す
+    if user.has_seen_family_setup_completed:
+        return redirect("families:family_settings")
+
+    # ここまで来たら、初めて完了画面を表示してよいユーザー
+    # 「もう見た」に更新して保存する
+    user.has_seen_family_setup_completed = True
+    user.save(update_fields=["has_seen_family_setup_completed"])
+
+    return render(request, "families/setup_completed.html")          
