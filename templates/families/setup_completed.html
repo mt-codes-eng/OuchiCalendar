@@ -1,0 +1,33 @@
+<!-- templates/families/setup_completed.html -->
+ {% extends "base_flow.html" %}
+
+{% block title %}家族設定登録完了 | おうちカレンダー{% endblock %}
+
+{% block content %}
+<section>
+  <p>
+    家族設定が完了しました！
+  </p>
+
+  <p>
+    次はカレンダーから<br>
+    予定や記録を作成してみましょう
+  </p>
+
+  <div>
+    {# はい → カレンダー画面へ #}
+    <a
+      href="{% url 'schedule:month_view' %}"
+    >
+      はい
+    </a>
+
+    {# いいえ → 家族設定画面へ戻る #}
+    <a
+      href="{% url 'families:family_settings' %}"
+    >
+      いいえ
+    </a>
+  </div>
+</section>
+{% endblock %}
