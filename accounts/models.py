@@ -36,6 +36,13 @@ class User(AbstractUser):
         auto_now=True,
     )
     
+    # 家族設定登録完了画面を、すでに見たかどうか
+    # False = まだ見ていない
+    # True = もう見た
+    has_seen_family_setup_completed = models.BooleanField(
+        default=False,
+    )
+    
     # Djangoに「ログインIDはemailだよ」と教える
     USERNAME_FIELD = "email"
     # createsuperuser を作るときに USERNAME_FIELD 以外で「必須として聞く項目」を指定するリスト。createsuperuser 実行時に Email と Passwordだけ聞かれる 
