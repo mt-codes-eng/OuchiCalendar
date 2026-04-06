@@ -14,20 +14,27 @@
     予定や記録を作成してみましょう
   </p>
 
-  <div>
-    {# はい → カレンダー画面へ #}
-    <a
-      href="{% url 'schedule:month_view' %}"
-    >
-      はい
-    </a>
+  {# 「はい」「いいえ」を押したときにフラグを True にしてから遷移したいので、aタグではなく form + button にする #}
+  <form method="post" action="{% url 'families:finish_setup_completed' %}">
+    {% csrf_token %}
 
-    {# いいえ → 家族設定画面へ戻る #}
-    <a
-      href="{% url 'families:family_settings' %}"
-    >
-      いいえ
-    </a>
-  </div>
+    <div>
+    {# はい → カレンダー画面へ #}
+      <button
+        type="submit"
+        name="action"
+        value="go_calendar"
+      >
+       はい
+      </button>
+    {# いいえ → 家族設定画面へ #}
+      <button
+        type="submit"
+        name="action"
+        value="back_settings"
+      >
+        いいえ
+      </button>
+    </div>
 </section>
 {% endblock %}
