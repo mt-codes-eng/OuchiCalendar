@@ -127,6 +127,15 @@ def family_profile_edit_view(request):
                 if new_image and old_image and old_image != family.image:
                     old_image.delete(save=False)
                 
+                # 初期設定完了 かつ まだ完了画面を見ていないなら
+                #  家族設定登録完了画面へ進める
+                if (
+                    is_initial_setup_completed(request.user)
+                    and not request.user.has_seen_family_setup_completed
+                ):
+                    return redirect("families:setup_completed")
+
+                # それ以外は家族設定画面へ戻る
                 return redirect("families:family_settings")
     
             except IntegrityError:
@@ -154,14 +163,14 @@ def setup_completed_view(request):
     """
     家族設定登録完了画面
 
-    条件
-    - 初期設定が完了していること
-    - そのユーザーがまだこの画面を見ていないこと
+    この画面は、
+    - 初期設定が完了している
+    - まだ完了画面を見終わっていない
+    ユーザーだけが表示できる
 
-    この画面を表示したら、
-    「見た」というフラグを True にする
+    ここではまだ「見た」にはしない
+    「はい」「いいえ」を押したときにだけ見たことにする
     """
-
     user = request.user
 
     # 初期設定が未完了なら、この画面は表示しない
@@ -174,9 +183,43 @@ def setup_completed_view(request):
     if user.has_seen_family_setup_completed:
         return redirect("families:family_settings")
 
-    # ここまで来たら、初めて完了画面を表示してよいユーザー
-    # 「もう見た」に更新して保存する
+    # まだ見ていないユーザーだけ、家族設定登録完了画面を表示する
+    return render(request, "families/setup_completed.html")
+
+@login_required
+def finish_setup_completed_view(request):
+    """
+    家族設定登録完了画面のボタン押下後の処理
+
+    POSTで送られてきた action を見て、
+    - 「はい」→ カレンダーへ
+    - 「いいえ」→ 家族設定画面へ
+    に分岐する
+
+    このタイミングで、
+    「完了画面を見終わった」としてフラグを True にする
+    """
+    user = request.user
+
+    # この画面は POST 送信専用にしたいので、
+    # POST 以外で来たら家族設定画面へ戻す
+    if request.method != "POST":
+        return redirect("families:family_settings")
+
+    # 念のため、未完了なら家族設定登録完了画面を使わせない
+    if not is_initial_setup_completed(user):
+        return redirect("families:family_profile_edit")
+
+    # ここで初めて「見た」にする
     user.has_seen_family_setup_completed = True
     user.save(update_fields=["has_seen_family_setup_completed"])
 
-    return render(request, "families/setup_completed.html")          
+    # どのボタンが押されたかを取得する
+    action = request.POST.get("action")
+
+    # 「はい」ならカレンダー画面へ
+    if action == "go_calendar":
+        return redirect("schedule:month")
+
+    # 「いいえ」や想定外の値なら家族設定画面へ
+    return redirect("families:family_settings")
