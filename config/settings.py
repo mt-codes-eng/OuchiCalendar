@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'core',
     'invitations',
     'color_assignments',
+    'attachments', 
 ]
 
 MIDDLEWARE = [
