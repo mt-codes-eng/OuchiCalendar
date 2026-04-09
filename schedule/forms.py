@@ -8,6 +8,35 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+class MultipleFileInput(forms.ClearableFileInput):
+    """
+    複数ファイル選択に対応したファイル入力ウィジェット
+    """
+    allow_multiple_selected = True
+  
+class MultipleFileField(forms.FileField):
+    """
+    複数ファイルを受け取るためのフォームフィールド
+    """
+    widget = MultipleFileInput
+
+    def clean(self, data, initial=None):
+        """
+        1件だけでも複数件でも受け取れるようにする
+        """
+        single_file_clean = super().clean
+
+        # data がリストやタプルなら、1件ずつ通常の FileField のチェックをかける
+        if isinstance(data, (list, tuple)):
+            result = []
+            for uploaded_file in data:
+                result.append(single_file_clean(uploaded_file, initial))
+            return result
+
+        # 1件だけなら通常通り
+        return single_file_clean(data, initial)
+
+
 class ScheduleForm(forms.ModelForm):
     # 画面設計図に合わせて「日付」と「時間」を別フィールドで用意する（DBには保存しない）
     date = forms.DateField(
@@ -44,6 +73,16 @@ class ScheduleForm(forms.ModelForm):
         required=False,
         widget=forms.CheckboxSelectMultiple,
         label="子どもメンバー",
+    )
+    
+    attachments = MultipleFileField(
+        required=False,
+        widget=MultipleFileInput(
+        attrs={
+                'accept': 'image/*,.pdf',  # 画像とPDFを選びやすくする
+            }
+        ),
+        label='添付ファイル',
     )
     
     # どのモデルの、どの項目をフォームに出すか。フォームに表示するフィールドはこのリストのものだけ        
@@ -242,6 +281,28 @@ class ScheduleForm(forms.ModelForm):
 
         # Djangoに「チェック済みのデータ」を返す
         return cleaned
+    
+    def clean_attachments(self):
+        """
+        添付ファイルの拡張子チェック
+        画像とPDFのみ許可
+        """
+        files = self.files.getlist('attachments')
+
+        # 許可する拡張子
+        allowed_extensions = (
+            '.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf'
+        )
+
+        for file in files:
+            lower_name = file.name.lower()
+
+            if not lower_name.endswith(allowed_extensions):
+                raise forms.ValidationError(
+                  '添付できるのは画像ファイル（jpg, png など）またはPDFファイルのみです'
+                )
+
+        return files
     
     # transaction.atomic を付けることで、途中で失敗したらまとめて元に戻せる
     @transaction.atomic
