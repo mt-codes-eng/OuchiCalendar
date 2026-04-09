@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime, date, time, timedelta
 from django.utils import timezone
 from .models import Schedule
+from attachments.models import ScheduleAttachment
 from .forms import ScheduleForm
 
 import calendar
@@ -207,14 +208,26 @@ def schedule_create_view(request):
     if request.method == "POST":
         form = ScheduleForm(
             request.POST,
+            request.FILES, 
             target_date=date_str,
             family=request.user.family,
         )
+            
         if form.is_valid():
             # form.instance：そのフォームが今保存対象として持っているモデルインスタンス
             # このフォームで保存する予定の family を、ログイン中ユーザーの family にする
             form.instance.family = request.user.family
             schedule = form.save()
+            
+            # 複数ファイルをまとめて取得
+            uploaded_files = request.FILES.getlist('attachments')
+
+            for uploaded_file in uploaded_files:
+                ScheduleAttachment.objects.create(
+                    schedule=schedule,
+                    file=uploaded_file,
+                    file_name=uploaded_file.name,
+                )
 
             day_str = schedule.start_at.date().isoformat() # 予定・記録概要画面のURLに渡すには 文字列 が必要だから、.isoformat()
             return redirect("schedule:day", date=day_str)
@@ -231,7 +244,6 @@ def schedule_create_view(request):
     }
     
     return render(request, "schedule/schedule_form.html", context)
-    
     
 @login_required
 def schedule_detail_view(request, pk):
