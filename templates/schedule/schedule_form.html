@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block content %}
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     
     {# 特定の項目ではなく、フォーム全体のエラーを表示 例：「開始時刻は終了時刻より前にしてください」など #}
@@ -103,6 +103,13 @@
         {{ form.memo.label_tag }}
         {{ form.memo }}
         {{ form.memo.errors }}
+    </p>
+
+    {# 添付ファイル #}
+    <p>
+        {{ form.attachments.label_tag }}
+        {{ form.attachments }}
+        {{ form.attachments.errors }}
     </p>
 
     {# 対応/調整要否 #}
