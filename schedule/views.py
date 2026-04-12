@@ -249,7 +249,7 @@ def schedule_create_view(request):
 def schedule_detail_view(request, pk):
     # ログイン中ユーザーの家族に属する予定だけ取得する
     schedule = get_object_or_404(
-        Schedule,
+        Schedule.objects.prefetch_related("attachments"),
         pk=pk,
         family=request.user.family
     )
@@ -291,6 +291,9 @@ def schedule_detail_view(request, pk):
     # 予定メンバー（子ども）を取得
     child_memberships = schedule.child_memberships.select_related("child").all()
     
+    # 添付ファイルを取得
+    attachments = schedule.attachments.all()
+    
     context = {
         "schedule": schedule,
         "day_str": day_str,  # day画面へ戻るために使う
@@ -299,6 +302,7 @@ def schedule_detail_view(request, pk):
         "status_message": status_message,  # ステータスの補助文
         "user_memberships": user_memberships,
         "child_memberships": child_memberships,
+        "attachments": attachments,
     }
     
     return render(request, "schedule/schedule_detail.html", context)
