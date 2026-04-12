@@ -115,8 +115,6 @@
     {# 編集画面のときだけ、登録済み添付を表示する #}
     {% if mode == "edit" %}
     <div>
-        <p>登録済みの添付ファイル：</p>
-
         {% if attachments %}
             {% for attachment in attachments %}
                 <div style="margin-bottom: 12px;">
