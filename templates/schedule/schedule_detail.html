@@ -50,7 +50,35 @@
         <p>メモ：{{ schedule.memo }}</p>
     {% endif %}
 
-    <p>添付ファイル:未実装</p>
+    {% if attachments %}
+    <div>
+        <p>添付ファイル：</p>
+
+        {% for attachment in attachments %}
+            <div style="margin-bottom: 12px;">
+                {% if attachment.is_image %}
+                    <div>
+                        {# alt="{{…}}"は画像が表示できないときの代替テキスト #}
+                        {# object-fit: cover; 画像をトリミングして枠に収める #}
+                        <img
+                            src="{{ attachment.file.url }}"
+                            alt="{{ attachment.file_name }}"
+                            style="width: 80px; height: 80px; object-fit: cover;"
+                        >
+                    </div>
+                {% else %}
+                    <div>
+                        {# target="_blank"：別タブで開く #}
+                        {# rel="noopener"：セキュリティ対策 #}
+                        <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
+                            {{ attachment.file_name }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     {# 対応・調整が必要な予定のときだけ表示するブロック #}
     {% if schedule.requires_coordination %}
