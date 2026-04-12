@@ -329,6 +329,7 @@ def schedule_edit_view(request, pk):
         # 「新規作成」ではなく「この予定を更新する」動きになる。「この schedule の内容を使ってフォームを作ってください」という意味
         form = ScheduleForm(
             request.POST,
+            request.FILES,
             instance=schedule,
             family=request.user.family,
         )
@@ -339,6 +340,33 @@ def schedule_edit_view(request, pk):
             # 念のためログイン中ユーザーの家族をセットしておく
             form.instance.family = request.user.family
             updated_schedule = form.save()
+            
+            # ① 削除チェックされた既存添付を削除
+            # テンプレートの checkbox にチェックされた添付ID一覧を取得
+            delete_attachment_ids = request.POST.getlist("delete_attachments")
+
+            attachments_to_delete = ScheduleAttachment.objects.filter(
+                id__in=delete_attachment_ids,
+                schedule=updated_schedule,  # 削除はこの予定の添付だけに限定する
+            )
+
+            for attachment in attachments_to_delete:
+                # 先に media 内のファイル本体を削除
+                if attachment.file:
+                    attachment.file.delete(save=False)
+
+                # 次にDBレコードを削除
+                attachment.delete()
+
+            # ② 新しく選んだ添付ファイルを追加保存
+            uploaded_files = request.FILES.getlist("attachments")
+
+            for uploaded_file in uploaded_files:
+                ScheduleAttachment.objects.create(
+                    schedule=updated_schedule,
+                    file=uploaded_file,
+                    file_name=uploaded_file.name,
+                )
 
             # 保存後は、その予定が属する day画面 に戻る
             day_str = updated_schedule.start_at.date().isoformat()
@@ -359,6 +387,7 @@ def schedule_edit_view(request, pk):
         "date": date_str,
         "form": form,
         "schedule": schedule,
+        "attachments": schedule.attachments.all(),
     }
     
     return render(request, "schedule/schedule_form.html", context)
