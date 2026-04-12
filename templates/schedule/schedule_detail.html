@@ -4,7 +4,7 @@
 
 {% block flow_left %}
     {# この予定が属している日付の day画面 に戻る。day_str は view から渡された "YYYY-MM-DD" 文字列 #}
-    <a href="{% url 'schedule:day' day_str %}" aria-label="予定・記録概要へ戻る">× (仮)</a>
+    <a href="{% url 'schedule:day' day_str %}" aria-label="予定・記録概要へ戻る">× </a>
 {% endblock %}
 
 {% block page_title %}
@@ -63,7 +63,9 @@
                         <img
                             src="{{ attachment.file.url }}"
                             alt="{{ attachment.file_name }}"
-                            style="width: 80px; height: 80px; object-fit: cover;"
+                            class="attachment-thumbnail"
+                            data-image-url="{{ attachment.file.url }}"
+                            style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
                         >
                     </div>
                 {% else %}
@@ -124,5 +126,104 @@
     {% endif %}
  
     {% endif %}
+
+    {# 画像拡大表示用モーダル #}
+    {# display: none;は最初は非表示 #}
+    <div id="image-modal" style="display: none;">
+        <div
+            id="image-modal-overlay"
+            style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            "
+        >
+            <div
+                style="
+                    position: relative;
+                    background: #fff;
+                    padding: 16px;
+                    max-width: 90%;
+                    max-height: 90%;
+                    overflow: auto;
+                "
+            >
+                <button
+                    type="button"
+                    id="modal-close"
+                    aria-label="拡大画像を閉じる"
+                    style="
+                        position: absolute;
+                        top: 8px;
+                        right: 8px;
+                        font-size: 40px;
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+                    "
+                >
+                    ×
+                </button>
+
+                <img
+                    id="modal-image"
+                    src=""
+                    alt="拡大画像"
+                    style="
+                        display: block;
+                        max-width: 100%;
+                        max-height: 80vh;
+                        object-fit: contain;
+                    "
+                >
+            </div>
+        </div>
+    </div>
     
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // サムネイル画像を全部取得
+    const thumbnails = document.querySelectorAll(".attachment-thumbnail");
+
+    // モーダル関連の部品を取得
+    const modal = document.getElementById("image-modal");
+    const modalImage = document.getElementById("modal-image");
+    const closeButton = document.getElementById("modal-close");
+    const overlay = document.getElementById("image-modal-overlay");
+
+    // サムネイルをクリックしたらモーダルを開く
+    thumbnails.forEach(function (thumbnail) {
+        thumbnail.addEventListener("click", function () {
+            const imageUrl = thumbnail.dataset.imageUrl;
+            modalImage.src = imageUrl;
+            modal.style.display = "block";
+        });
+    });
+
+    // ×ボタンで閉じる
+    closeButton.addEventListener("click", function () {
+        modal.style.display = "none";
+        modalImage.src = "";
+    });
+
+    // 背景クリックで閉じる
+    overlay.addEventListener("click", function (event) {
+        if (event.target === overlay) {
+            modal.style.display = "none";
+            modalImage.src = "";
+        }
+    });
+});
+</script>
 {% endblock %}
