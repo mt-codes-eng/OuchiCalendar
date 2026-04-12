@@ -112,6 +112,44 @@
         {{ form.attachments.errors }}
     </p>
 
+    {# 編集画面のときだけ、登録済み添付を表示する #}
+    {% if mode == "edit" %}
+    <div>
+        <p>登録済みの添付ファイル：</p>
+
+        {% if attachments %}
+            {% for attachment in attachments %}
+                <div style="margin-bottom: 12px;">
+                    {% if attachment.is_image %}
+                        <div>
+                            <img
+                                src="{{ attachment.file.url }}"
+                                alt="{{ attachment.file_name }}"
+                                style="width: 80px; height: 80px; object-fit: cover;"
+                            >
+                        </div>
+                    {% else %}
+                        <div>
+                            <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
+                                {{ attachment.file_name }}
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="delete_attachments"
+                            value="{{ attachment.id }}"
+                        >
+                        この添付ファイルを削除する
+                    </label>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% endif %}
+
     {# 対応/調整要否 #}
     <p>
         {{ form.requires_coordination }}
