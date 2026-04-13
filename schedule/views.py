@@ -4,6 +4,8 @@ from datetime import datetime, date, time, timedelta
 from django.utils import timezone
 from .models import Schedule
 from attachments.models import ScheduleAttachment
+from comments.forms import ScheduleCommentForm
+from comments.models import ScheduleComment
 from .forms import ScheduleForm
 
 import calendar
@@ -203,7 +205,8 @@ def create_choice_view(request, date):
 
 @login_required
 def schedule_create_view(request):
-    date_str = request.GET.get("date")  # create-choice から ?date= で渡す想定
+    # create-choice 画面から ?date=2026-04-10 のように受け取る想定
+    date_str = request.GET.get("date") 
     
     if request.method == "POST":
         form = ScheduleForm(
@@ -212,8 +215,15 @@ def schedule_create_view(request):
             target_date=date_str,
             family=request.user.family,
         )
+        
+        # 予定新規作成時は、まだ schedule が保存前なので
+        # user=request.user を渡して宛先候補を出す
+        comment_form = ScheduleCommentForm(
+            request.POST,
+            user=request.user,
+        )
             
-        if form.is_valid():
+        if form.is_valid() and comment_form.is_valid():
             # form.instance：そのフォームが今保存対象として持っているモデルインスタンス
             # このフォームで保存する予定の family を、ログイン中ユーザーの family にする
             form.instance.family = request.user.family
@@ -228,19 +238,39 @@ def schedule_create_view(request):
                     file=uploaded_file,
                     file_name=uploaded_file.name,
                 )
+                
+            # コメント本文が入っているときだけ保存する
+            body = comment_form.cleaned_data.get("body")
+            to_user = comment_form.cleaned_data.get("to_user")
+
+            # body が空文字でなければコメント作成
+            if body:
+                ScheduleComment.objects.create(
+                    schedule=schedule,                              # どの予定へのコメントか
+                    from_user=request.user,                         # 投稿者はログイン中ユーザー
+                    to_user=to_user,                                # 宛先
+                    comment_type=ScheduleComment.COMMENT_TYPE_USER, # 通常のユーザーコメント
+                    body=body,                                      # コメント本文
+                )
 
             day_str = schedule.start_at.date().isoformat() # 予定・記録概要画面のURLに渡すには 文字列 が必要だから、.isoformat()
             return redirect("schedule:day", date=day_str)
+    
     else:
         form = ScheduleForm(
             target_date=date_str,
             family=request.user.family, 
         )
         
+        comment_form = ScheduleCommentForm(
+            user=request.user,
+        )
+        
     context = {
         "mode": "create", # 作成/編集表示
         "date": date_str,  # 戻るリンク用
         "form": form, # 入力フォーム
+        "comment_form": comment_form,
     }
     
     return render(request, "schedule/schedule_form.html", context)
