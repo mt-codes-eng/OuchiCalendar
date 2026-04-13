@@ -59,7 +59,7 @@ class ScheduleCommentForm(forms.ModelForm):
         # ① schedule が渡されている場合
         #    → その予定の family に所属するユーザーだけ宛先候補にする
         if schedule and schedule.family_id:
-            family_users = schedule.family.user_set.all()
+            family_users = schedule.family.users.all()
             self.fields["to_user"].queryset = family_users
 
             # 担当者が設定されていれば、宛先の初期値にする
@@ -69,7 +69,7 @@ class ScheduleCommentForm(forms.ModelForm):
         # ② まだ schedule から family が取れない場合
         #    → ログイン中ユーザーの family に所属するユーザーを候補にする
         elif user and getattr(user, "family_id", None):
-            family_users = user.family.user_set.all()
+            family_users = user.family.users.all()
             self.fields["to_user"].queryset = family_users
 
     def clean_body(self):
