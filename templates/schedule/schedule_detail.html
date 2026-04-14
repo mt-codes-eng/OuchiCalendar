@@ -124,7 +124,27 @@
         終了 ： {{ coordination_end_date_display }}
       </p>
     {% endif %}
- 
+
+    {# コメント一覧 #}
+    <div>
+    {% if comments %}
+        {% for comment in comments %}
+            <div style="margin-bottom: 12px;">
+                <p style="margin: 0 0 4px 0; font-size: 12px;">
+                    {{ comment.created_at|date:"H:i" }}
+                    To: {{ comment.to_user.name|default:comment.to_user.email }}
+                    From: {{ comment.from_user.name|default:comment.from_user.email }}
+                </p>
+
+                <p style="margin: 0;">
+                    {{ comment.body|linebreaksbr }}
+                </p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>コメント：なし</p>
+    {% endif %}
+    </div>
     {% endif %}
 
     {# 画像拡大表示用モーダル #}
