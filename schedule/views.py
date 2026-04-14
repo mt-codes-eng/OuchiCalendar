@@ -368,9 +368,17 @@ def schedule_edit_view(request, pk):
             instance=schedule,
             family=request.user.family,
         )
+        
+        # コメント追加用フォーム
+        comment_form = ScheduleCommentForm(
+            request.POST,
+            schedule=schedule,
+            user=request.user,
+        )
+
     
         # 入力チェックOKなら保存する
-        if form.is_valid():
+        if form.is_valid() and comment_form.is_valid():
             # family は元の予定に入っているが、
             # 念のためログイン中ユーザーの家族をセットしておく
             form.instance.family = request.user.family
@@ -403,6 +411,20 @@ def schedule_edit_view(request, pk):
                     file_name=uploaded_file.name,
                 )
 
+            # ③ コメントを新規追加
+            # コメント本文が入力されているときだけ保存する
+            body = comment_form.cleaned_data.get("body")
+            to_user = comment_form.cleaned_data.get("to_user")
+
+            if body:
+                ScheduleComment.objects.create(
+                    schedule=updated_schedule,
+                    from_user=request.user,
+                    to_user=to_user,
+                    comment_type=ScheduleComment.COMMENT_TYPE_USER,
+                    body=body,
+                ) 
+             
             # 保存後は、その予定が属する day画面 に戻る
             day_str = updated_schedule.start_at.date().isoformat()
             return redirect("schedule:day", date=day_str)
@@ -414,15 +436,24 @@ def schedule_edit_view(request, pk):
         form = ScheduleForm(
             instance=schedule,
             family=request.user.family,
-        )    
+        ) 
+        
+        # コメント追加用フォーム
+        # 初期値として担当者を入れたいので schedule を渡す
+        comment_form = ScheduleCommentForm(
+            schedule=schedule,
+            user=request.user,
+        )   
     
     # 4. template に渡す    
     context = {
         "mode": "edit",
         "date": date_str,
         "form": form,
+        "comment_form": comment_form,
         "schedule": schedule,
         "attachments": schedule.attachments.all(),
+        "comments": schedule.comments.select_related("from_user", "to_user").all(),
     }
     
     return render(request, "schedule/schedule_form.html", context)
