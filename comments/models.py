@@ -34,7 +34,6 @@ class ScheduleComment(models.Model):
     )
 
     # コメントの宛先
-    # 今回は「宛先あり」前提で必須にしている
     to_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -77,36 +76,14 @@ class ScheduleComment(models.Model):
         """
         モデル全体のバリデーション
 
-        ここでは業務ルールをチェックする
-        1. 対応・調整が必要な予定だけコメント可能
-        2. 本文が空欄だけにならないようにする
-        3. ユーザーコメントなのに投稿者・宛先がない、を防ぐ
+        ここでは「関連オブジェクトが入ったあとにだけ確認したい業務ルール」をチェックする
         """
-
         errors = {}
 
-        # 1. requires_coordination=True の予定だけコメント可能
-        if self.schedule and not self.schedule.requires_coordination:
+        # schedule が入っているときだけ、
+        # 「対応・調整が必要な予定だけコメント可能」をチェックする
+        if self.schedule_id and not self.schedule.requires_coordination:
             errors["schedule"] = "対応・調整が必要な予定だけコメントできます"
-
-        # 2. 空文字や空白だけのコメントを防ぐ
-        if not self.body or not self.body.strip():
-            errors["body"] = "コメントを入力してください"
-
-        # 3. ユーザーコメントの場合は投稿者と宛先が必要
-        if self.comment_type == self.COMMENT_TYPE_USER:
-            if not self.from_user:
-                errors["from_user"] = "投稿者は必須です"
-            if not self.to_user:
-                errors["to_user"] = "宛先は必須です"
 
         if errors:
             raise ValidationError(errors)
-
-    def save(self, *args, **kwargs):
-        """
-        save時にも clean を呼ぶようにしておくと、
-        フォーム経由以外で保存したときもバリデーションしやすい
-        """
-        self.full_clean()
-        super().save(*args, **kwargs)
