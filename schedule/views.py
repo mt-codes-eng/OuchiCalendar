@@ -324,6 +324,10 @@ def schedule_detail_view(request, pk):
     # 添付ファイルを取得
     attachments = schedule.attachments.all()
     
+    # コメントを取得
+    # テンプレートで表示しやすいように、from_user と to_user も一緒に取っておく
+    comments = schedule.comments.select_related("from_user", "to_user").all()
+    
     context = {
         "schedule": schedule,
         "day_str": day_str,  # day画面へ戻るために使う
@@ -333,6 +337,7 @@ def schedule_detail_view(request, pk):
         "user_memberships": user_memberships,
         "child_memberships": child_memberships,
         "attachments": attachments,
+        "comments": comments, 
     }
     
     return render(request, "schedule/schedule_detail.html", context)
