@@ -31,6 +31,7 @@ urlpatterns = [
         "ouchi-calendar/family/children/",
         include(("children.urls", "children"), namespace="children"),
     ),
+    path("ouchi-calendar/comments/", include("comments.urls")),
 ]
 
 if settings.DEBUG:
