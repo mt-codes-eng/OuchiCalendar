@@ -1,0 +1,56 @@
+<!-- templates/comments/comment_recent.html -->
+{% extends "base_app.html" %}
+{% block title %}コメント新着 | おうちカレンダー{% endblock %}
+
+{% block content %}
+    <h1>コメント＆対応・調整 新着一覧</h1>
+
+    {% if comments %}
+        {# border="1"→表に細い枠線をつける。border="0"→枠線はなし。#}
+        {# border-collapse: collapse;→枠線1本にする #}
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+            <thead>
+                {# tr→行。th→見出し。td→データ #}
+                <tr>
+                    <th>予定日付</th>
+                    <th>対応内容</th>
+                    <th>担当者</th>
+                    <th>コメント者</th>
+                    <th>コメント投稿日時</th>
+                    <th>コメント内容</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in comments %}
+                    <tr onclick="location.href='{% url 'schedule:schedule_detail' comment.schedule.id %}'" style="cursor: pointer;">
+                        <td>
+                            {{ comment.schedule.start_at|date:"n/j" }}
+                            （{{ comment.schedule.start_at|date:"D" }}）
+                        </td>
+                        <td>
+                            {{ comment.schedule.get_status_display }}{{ comment.schedule.get_coordination_type_display }}
+                        </td>
+                        <td>
+                            {% if comment.schedule.user %}
+                                {{ comment.schedule.user.name|default:comment.schedule.user.email }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ comment.from_user.name|default:comment.from_user.email }}
+                        </td>
+                        <td>
+                            {{ comment.created_at|date:"n/j H:i" }}
+                        </td>
+                        <td>
+                            {{ comment.body|truncatechars:20 }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>コメントがありません</p>
+    {% endif %}
+{% endblock %}
