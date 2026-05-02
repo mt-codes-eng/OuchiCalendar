@@ -24,12 +24,10 @@
                 {% for comment in comments %}
                     <tr onclick="location.href='{% url 'schedule:schedule_detail' comment.schedule.id %}'" style="cursor: pointer;">
                         <td>
-                            {{ comment.schedule.start_at|date:"n/j" }}
-                            （{{ comment.schedule.start_at|date:"D" }}）
+                            {{ comment.schedule_date_display }}
                         </td>
                         <td>
-                            {{ comment.schedule.get_status_display }}{{ comment.schedule.get_coordination_type_display }}
-                        </td>
+                            {{ comment.schedule.display_coordination }}
                         <td>
                             {% if comment.schedule.user %}
                                 {{ comment.schedule.user.name|default:comment.schedule.user.email }}
@@ -41,7 +39,7 @@
                             {{ comment.from_user.name|default:comment.from_user.email }}
                         </td>
                         <td>
-                            {{ comment.created_at|date:"n/j H:i" }}
+                            {{ comment.created_at_display }}
                         </td>
                         <td>
                             {{ comment.body|truncatechars:20 }}
