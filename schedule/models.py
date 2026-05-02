@@ -63,6 +63,34 @@ class Schedule(models.Model):
     def __str__(self):
         return self.title
     
+    @property
+    def status_symbol(self):
+        """
+        ステータスの記号だけ返す
+        確定 → "〇"
+        調整中 → "△"
+        不可 → "✕"
+        """
+        if self.status == self.Status.CONFIRMED:
+            return "〇"
+        elif self.status == self.Status.ADJUSTING:
+            return "△"
+        elif self.status == self.Status.IMPOSSIBLE:
+            return "✕"
+        # 想定外の値が入った場合は空文字
+        return ""
+
+    @property
+    def display_coordination(self):
+        """
+        画面表示用の「対応内容」をまとめて返す
+        例：
+        "△送迎"
+        "〇サポート"
+        """
+        # status_symbol（〇△✕） + 対応内容（送迎など）
+        return f"{self.status_symbol}{self.get_coordination_type_display()}"
+
 
 class ScheduleUserMember(models.Model):
     """
