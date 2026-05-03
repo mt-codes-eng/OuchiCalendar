@@ -5,6 +5,20 @@
 {% block content %}
     <h1>コメント＆対応・調整 新着一覧</h1>
 
+    {# 選択された並び順をGETでサーバーに送り直す #}
+    <form method="get">
+        {# name="sort" → この値がURLの /comments/recent/?sort=〇〇 という形で送られる #}
+        {# onchange="this.form.submit()" → 選択を変えた瞬間に自動で送信される #}
+        <select name="sort" onchange="this.form.submit()">
+            <option value="comment" {% if sort == "comment" %}selected{% endif %}>
+                コメント投稿日順
+            </option>
+            <option value="schedule" {% if sort == "schedule" %}selected{% endif %}>
+                予定日が早い順
+            </option>
+        </select>
+    </form>
+
     {% if rows %}
         {# border="1"→表に細い枠線をつける。border="0"→枠線はなし。#}
         {# border-collapse: collapse;→枠線1本にする #}
