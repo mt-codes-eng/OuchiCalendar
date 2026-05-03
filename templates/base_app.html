@@ -20,7 +20,7 @@
   {# nav：「ナビゲーション（メニューやページ移動リンクのまとまり）」を表すタグ #}
   <nav>
     <a href="{% url 'schedule:month' %}">カレンダー</a> |
-    <a href="#">コメント新着</a> |
+    <a href="{% url 'comments:recent' %}">コメント新着</a> |
     <a href="{% url 'schedule:day_create_choice' '2026-02-23' %}?next={% url 'schedule:month' %}">追加（仮）</a> |
     <a href="#">集計</a> |
     <a href="#">検索</a>
