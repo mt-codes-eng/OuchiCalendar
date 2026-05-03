@@ -5,7 +5,7 @@
 {% block content %}
     <h1>コメント＆対応・調整 新着一覧</h1>
 
-    {% if comments %}
+    {% if rows %}
         {# border="1"→表に細い枠線をつける。border="0"→枠線はなし。#}
         {# border-collapse: collapse;→枠線1本にする #}
         <table border="1" style="border-collapse: collapse; width: 100%;">
@@ -21,28 +21,33 @@
                 </tr>
             </thead>
             <tbody>
-                {% for comment in comments %}
-                    <tr onclick="location.href='{% url 'schedule:schedule_detail' comment.schedule.id %}'" style="cursor: pointer;">
+                {% for row in rows %}
+                    <tr onclick="location.href='{% url 'schedule:schedule_detail' row.schedule.id %}'" style="cursor: pointer;">
                         <td>
-                            {{ comment.schedule_date_display }}
+                            {{ row.schedule_date_display }}
                         </td>
                         <td>
-                            {{ comment.schedule.display_coordination }}
+                            {{ row.coordination_display }}
+                        </td>
                         <td>
-                            {% if comment.schedule.user %}
-                                {{ comment.schedule.user.name|default:comment.schedule.user.email }}
+                            {% if row.assigned_user %}
+                                {{ row.assigned_user.name|default:row.assigned_user.email }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                         <td>
-                            {{ comment.from_user.name|default:comment.from_user.email }}
+                            {% if row.comment_user %}
+                                {{ row.comment_user.name|default:row.comment_user.email }}
+                            {% else %}
+                                -
+                            {% endif %}
                         </td>
                         <td>
-                            {{ comment.created_at_display }}
+                            {{ row.created_at_display }}
                         </td>
                         <td>
-                            {{ comment.body|truncatechars:20 }}
+                            {{ row.body|truncatechars:20 }}
                         </td>
                     </tr>
                 {% endfor %}
