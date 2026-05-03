@@ -85,7 +85,7 @@ def comment_recent_view(request):
             f"{created_at.hour}:{created_at.minute:02}"
         )
 
-        # 表示用データを1件分まとめる-
+        # 表示用データを1件分まとめる
         rows.append({
             "schedule": schedule,
             "schedule_date_display": schedule_date_display,
@@ -97,16 +97,30 @@ def comment_recent_view(request):
             "body": "【対応依頼】担当者に選ばれました。",
         })
         
-    # ③ 新しい順に並び替え
-    rows = sorted(
-        rows,
-        key=lambda row: row["created_at"],
-        reverse=True
-    )[:20]
+    # ③ 予定が早い順 or コメント投稿日順（新着順）で並び替え(デフォルトは新着順)
+    # 並び替え種類取得 予定が早い順URL：/comments/recent/?sort=schedule or コメント投稿日順（新着順）URL：/comments/recent/?sort=comment
+    sort = request.GET.get("sort", "comment")
+    
+    # 並び替え
+    if sort == "schedule":
+        # 予定日が早い順
+        # sorted()：sorted(リスト, key=基準, reverse=並び順)
+        rows = sorted(
+        rows, # 並び替え対象（リスト）
+        key=lambda row: row["schedule"].start_at # 予定開始日時で比較
+        )
+    else:
+        # コメント投稿日順（新着順）（デフォルト）
+        rows = sorted(
+            rows,
+            key=lambda row: row["created_at"],
+            reverse=True
+        )
         
     # ④ テンプレートへ
     context = {
         "rows": rows,
+        "sort": sort,
     }
 
     return render(request, "comments/comment_recent.html", context)
