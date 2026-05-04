@@ -15,9 +15,34 @@ def month_view(request):
     # ---表示する「年」と「月」を決める---
     # 今日の日付を取得
     today = timezone.localdate()
-    # まずは今月を表示
-    year = today.year
-    month = today.month
+    
+    # URLから year と month を取得
+    # 例：/schedule/month/?year=2026&month=5
+    selected_year = request.GET.get("year")
+    selected_month = request.GET.get("month")
+
+    # year / month がURLにある場合は、その年月を表示する
+    # ない場合や変な値の場合は、今日の年月を表示する
+    try:
+        if selected_year and selected_month:
+            year = int(selected_year)
+            month = int(selected_month)
+        else:
+            year = today.year
+            month = today.month
+        
+        # month が 1〜12 以外ならエラーにする
+        if month < 1 or month > 12:
+            raise ValueError
+
+    except ValueError:
+        year = today.year
+        month = today.month
+    
+    # --- 年月プルダウン用 ---
+    # 例：今年の前後3年分を選べるようにする
+    years = range(today.year - 3, today.year + 4)
+    months = range(1, 13)
 
     # ---その月のカレンダーの形を作る---
     # 月曜始まりのカレンダーを作る
@@ -98,6 +123,8 @@ def month_view(request):
     context = {
         "year": year,
         "month": month,
+        "years": years,
+        "months": months,
         "week_names": ["月", "火", "水", "木", "金", "土", "日"],
         "calendar_rows": calendar_rows,
         "family": request.user.family,
