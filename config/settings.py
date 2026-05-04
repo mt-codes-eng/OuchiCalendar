@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'color_assignments',
     'attachments', 
     'comments',
+    'records',
 ]
 
 MIDDLEWARE = [
