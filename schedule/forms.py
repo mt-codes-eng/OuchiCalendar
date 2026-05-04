@@ -262,13 +262,13 @@ class ScheduleForm(forms.ModelForm):
             return cleaned
         
         # --- 調整ONなら必須チェック ---
-        if not coordination_type:
+        if coordination_type in [None, ""]:
             self.add_error("coordination_type", "対応・調整が必要な場合は対応内容を選択してください。")
 
         if not user:
             self.add_error("user", "対応・調整が必要な場合は担当者（大人）を選択してください。")
 
-        if not status:
+        if status in [None, ""]:
             self.add_error("status", "対応・調整が必要な場合はステータスを選択してください。")
 
         # 対応内容が「その他」なら詳細必須
