@@ -4,7 +4,23 @@
 {% block title %}スケジュール | おうちカレンダー{% endblock %}
 
 {% block page_title %}
-    {{ year }}年{{ month }}月
+    <form method="get" style="display: inline;">
+        <select name="year" onchange="this.form.submit()">
+            {% for y in years %}
+                <option value="{{ y }}" {% if y == year %}selected{% endif %}>
+                    {{ y }}年
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="month" onchange="this.form.submit()">
+            {% for m in months %}
+                <option value="{{ m }}" {% if m == month %}selected{% endif %}>
+                    {{ m }}月
+                </option>
+            {% endfor %}
+        </select>
+    </form>
 {% endblock %}
 
 {% block header_right %}
