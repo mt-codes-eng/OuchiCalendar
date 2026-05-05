@@ -1,0 +1,129 @@
+<!-- templates/records/record_form.html -->
+{% extends "base_flow.html" %}
+{% block title %}記録 | おうちカレンダー{% endblock %}
+
+{% block flow_left %}
+    <a href="#">×</a>
+{% endblock %}
+
+{% block page_title %}
+    {% if mode == "edit" %}
+        <p style="display: inline;">記録を編集</p>
+    {% else %}
+        <p style="display: inline;">記録を作成</p>
+    {% endif %}
+{% endblock %}
+
+{% block flow_right %}
+    {% if mode == "edit" %}
+        <a href="#">削除</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<!-- 日付と子ども表示 -->
+<p>日付：{{ record_date }}</p>
+
+<p>
+    記録する子ども：
+    {% if child %}
+        {{ child.name }}
+    {% else %}
+        未選択
+    {% endif %}
+</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <!-- ----------------------------- -->
+    <!-- 記録の種類（排便 or 欠席） -->
+    <!-- ----------------------------- -->
+    <p>
+        記録の種類：
+
+        <label>
+            <input type="radio" name="record_type" value="bowel" checked>
+            排便
+        </label>
+
+        <label>
+            <input type="radio" name="record_type" value="absence">
+            欠席
+        </label>
+    </p>
+
+    <!-- ----------------------------- -->
+    <!-- 排便フォーム -->
+    <!-- ----------------------------- -->
+    <div id="bowel-fields">
+        <h3>排便</h3>
+
+        <p>
+            {{ bowel_form.has_bowel_movement }}
+            {{ bowel_form.has_bowel_movement.label }}
+        </p>
+
+        <p>
+            {{ bowel_form.memo }}
+        </p>
+
+        <p>
+            {{ bowel_form.has_concern }}
+            {{ bowel_form.has_concern.label }}
+        </p>
+
+        <p>
+            {{ bowel_form.concern_memo }}
+        </p>
+    </div>
+
+    <!-- ----------------------------- -->
+    <!-- 欠席フォーム -->
+    <!-- ----------------------------- -->
+    <div id="absence-fields" style="display: none;">
+        <h3>欠席</h3>
+
+        <p>
+            {{ absence_form.is_absent }}
+            {{ absence_form.is_absent.label }}
+        </p>
+
+        <p>
+            {{ absence_form.memo }}
+        </p>
+    </div>
+
+    <button type="submit">保存</button>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const radios = document.querySelectorAll('input[name="record_type"]');
+
+    const bowelFields = document.getElementById("bowel-fields");
+    const absenceFields = document.getElementById("absence-fields");
+
+    function toggleFields() {
+        const selected = document.querySelector('input[name="record_type"]:checked').value;
+
+        if (selected === "bowel") {
+            bowelFields.style.display = "block";
+            absenceFields.style.display = "none";
+        } else {
+            bowelFields.style.display = "none";
+            absenceFields.style.display = "block";
+        }
+    }
+
+    // radio変更時に切り替え
+    radios.forEach(radio => {
+        radio.addEventListener("change", toggleFields);
+    });
+
+    // 初期表示
+    toggleFields();
+</script>
+{% endblock %}
