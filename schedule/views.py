@@ -128,6 +128,7 @@ def month_view(request):
         "week_names": ["月", "火", "水", "木", "金", "土", "日"],
         "calendar_rows": calendar_rows,
         "family": request.user.family,
+        "today_str": today.isoformat(),
     }
 
     return render(request, "schedule/month.html", context)
