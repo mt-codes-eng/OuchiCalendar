@@ -21,33 +21,35 @@
 {% endblock %}
 
 {% block content %}
-
-<!-- 日付と子ども表示 -->
-<p>
-    <label for="id_record_date">日付：</label>
-    <input
-        type="date"
-        id="id_record_date"
-        name="record_date"
-        value="{{ date }}"
-    >
-</p>
-
-<p>
-    記録する子ども：
-    {% if child %}
-        {{ child.name }}
-    {% else %}
-        未選択
-    {% endif %}
-</p>
-
 <form method="post">
     {% csrf_token %}
 
-    <!-- ----------------------------- -->
+    <!-- 日付 -->
+    <p>
+        <label for="id_record_date">日付：</label>
+        <input
+            type="date"
+            id="id_record_date"
+            name="record_date"
+            value="{{ date }}"
+            required
+        >
+    </p>
+
+    <!-- 子ども -->
+    <p>
+        <label for="id_child_id">記録する子ども：</label>
+        <select id="id_child_id" name="child_id" required>
+            <option value="">子どもを選択</option>
+            {% for child in children %}
+                <option value="{{ child.id }}">
+                    {{ child.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+
     <!-- 記録の種類（排便 or 欠席） -->
-    <!-- ----------------------------- -->
     <p>
         記録の種類：
 
@@ -62,9 +64,7 @@
         </label>
     </p>
 
-    <!-- ----------------------------- -->
     <!-- 排便フォーム -->
-    <!-- ----------------------------- -->
     <div id="bowel-fields">
         <h3>排便</h3>
 
@@ -87,9 +87,7 @@
         </p>
     </div>
 
-    <!-- ----------------------------- -->
     <!-- 欠席フォーム -->
-    <!-- ----------------------------- -->
     <div id="absence-fields" style="display: none;">
         <h3>欠席</h3>
 
