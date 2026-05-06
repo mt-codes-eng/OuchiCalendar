@@ -3,7 +3,7 @@
 {% block title %}記録 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
-    <a href="#">×</a>
+    <a href="{% url 'schedule:day' date=today_str %}" aria-label="予定・記録概要へ戻る">×</a>
 {% endblock %}
 
 {% block page_title %}
@@ -23,7 +23,15 @@
 {% block content %}
 
 <!-- 日付と子ども表示 -->
-<p>日付：{{ record_date }}</p>
+<p>
+    <label for="id_record_date">日付：</label>
+    <input
+        type="date"
+        id="id_record_date"
+        name="record_date"
+        value="{{ date }}"
+    >
+</p>
 
 <p>
     記録する子ども：
