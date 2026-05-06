@@ -20,8 +20,7 @@
     </div>
 </div>
 <div>
-    <!-- 記録は records アプリ作成後にリンクを付ける -->
-    <span>＋ 記録を作成（未実装）（排便・欠席）</span>
+    <a href="{% url 'records:create' %}?date={{ date }}">＋ 記録を作成（排便・欠席）</a>
     <div>
         すでに起きた子どもの出来事を記録します
     </div>
