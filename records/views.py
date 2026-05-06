@@ -54,18 +54,11 @@ def record_create_view(request):
     date_for_url = target_date.isoformat()
 
     # -----------------------------
-    # ② 子ども（今回はGETから受け取る想定）
-    # 例：?child_id=1
+    # ② 子ども一覧を取得
     # -----------------------------
-    child_id = request.GET.get("child_id")
-
-    child = None
-    if child_id:
-        child = get_object_or_404(
-            Child,
-            id=child_id,
-            family=request.user.family,
-        )
+    children = Child.objects.filter(
+        family=request.user.family
+    ).order_by("id")
 
     # -----------------------------
     # ③ POST（保存処理）
@@ -76,6 +69,14 @@ def record_create_view(request):
         # "bowel" or "absence"
         
         record_type = request.POST.get("record_type")
+        
+        child_id = request.POST.get("child_id")
+        child = get_object_or_404(
+            Child,
+            id=child_id,
+            family=request.user.family,
+        )
+        
         # POSTでも日付を受け取る
         posted_date = _parse_date(request.POST.get("record_date"))
         if posted_date is None:
@@ -131,7 +132,7 @@ def record_create_view(request):
         "bowel_form": bowel_form,
         "absence_form": absence_form,
         "date": date_for_url,
-        "child": child,
+        "children": children,
         "today_str": today_str,
     }
 
