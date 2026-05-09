@@ -1,0 +1,82 @@
+<!-- templates/records/record_detail.html -->
+{% extends "base_flow.html" %}
+{% block title %}記録詳細 | おうちカレンダー{% endblock %}
+
+{% block flow_left %}
+    <a href="{% url 'schedule:day' date=day_str %}" aria-label="予定・記録概要へ戻る">×</a>
+{% endblock %}
+
+{% block page_title %}
+        <p style="display: inline;">記録</p>
+{% endblock %}
+
+{% block flow_right %}
+    <a href="#" aria-label="記録を編集">✏️</a>
+{% endblock %}
+
+{% block content %}
+<p>日付：{{ page_date }}</p>
+<p>記録した子ども：{{ record.child.name }}</p>
+
+<p>記録の種類：</p>
+<div>
+    {% if bowel_record %}
+        <a href="{% url 'records:bowel_detail' pk=bowel_record.id %}">
+            {% if record_type == "bowel" %}
+                <strong>排便</strong>
+            {% else %}
+                排便
+            {% endif %}
+        </a>
+    {% endif %}
+
+    {% if absence_record %}
+        <a href="{% url 'records:absence_detail' pk=absence_record.id %}">
+            {% if record_type == "absence" %}
+                <strong>欠席</strong>
+            {% else %}
+                欠席
+            {% endif %}
+        </a>
+    {% endif %}
+</div>
+
+{% if record_type == "bowel" %}
+        {% if record.has_bowel_movement %}
+            <p>☑ 排便があった 💩</p>
+
+            {% if record.memo %}
+                <p>{{ record.memo }}</p>
+            {% endif %}
+        {% endif %}
+
+        {% if record.has_concern %}
+            <p>☑ 気になることがある ⚠️</p>
+
+            {% if record.concern_memo %}
+                <p>{{ record.concern_memo }}</p>
+            {% endif %}
+        {% endif %}
+{% endif %}
+
+{% if record_type == "absence" %}
+        {% if record.is_absent %}
+            <p>☑ 欠席した 🏠</p>
+
+            {% if record.memo %}
+                <p>{{ record.memo }}</p>
+            {% endif %}
+        {% endif %}
+{% endif %}
+
+<p>
+    何か対応・調整が必要ですか？<br>
+    必要な場合はこちらから！
+</p>
+<p>
+    <a href="{% url 'schedule:schedule_create' %}?date={{ record.record_date|date:'Y-m-d' }}">
+        ＋予定を作成（行事・勤務・通院など）
+    </a>
+</p>
+
+{% endblock %}
