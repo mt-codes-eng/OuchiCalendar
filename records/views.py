@@ -26,6 +26,15 @@ def _parse_date(date_str: str):
     except(ValueError,TypeError):
         return None
     
+def _format_japanese_date(target_date):
+    """
+    date型を画面表示用の文字列にする
+    例：date(2026, 5, 6) → "2026/5/6（水）"
+    """
+    week_map = ["月", "火", "水", "木", "金", "土", "日"]
+    weekday = week_map[target_date.weekday()]
+    return f"{target_date.year}/{target_date.month}/{target_date.day}（{weekday}）"    
+
 @login_required
 def record_create_view(request):
     """
@@ -137,3 +146,83 @@ def record_create_view(request):
     }
 
     return render(request, "records/record_form.html", context)
+
+@login_required
+def bowel_record_detail_view(request, pk):
+    """
+    排便記録の詳細画面
+
+    URL例：
+    /ouchi-calendar/records/bowel/1/
+
+    pk は BowelMovementRecord の id
+    """
+
+    # ログイン中ユーザーの家族に属する子どもの記録だけ取得する
+    # 他の家族の記録を見られないようにするため
+    record = get_object_or_404(
+        BowelMovementRecord.objects.select_related("child"),
+        pk=pk,
+        child__family=request.user.family,
+    )
+    
+    # 同じ子ども・同じ日付の欠席記録を探す
+    absence_record = AbsenceRecord.objects.filter(
+        child=record.child,
+        record_date=record.record_date,
+    ).first()
+
+    # 日付を 2026/5/6（水）形式にする
+    page_date = _format_japanese_date(record.record_date)
+    day_str = record.record_date.isoformat()
+    
+    context = {
+        "record": record,
+        "record_type": "bowel",
+        "page_date": page_date,
+        "day_str": day_str,
+        "bowel_record": record,
+        "absence_record": absence_record,
+    }
+
+    return render(request, "records/record_detail.html", context)
+
+
+@login_required
+def absence_record_detail_view(request, pk):
+    """
+    欠席記録の詳細画面
+
+    URL例：
+    /ouchi-calendar/records/absence/1/
+
+    pk は AbsenceRecord の id
+    """
+
+    # ログイン中ユーザーの家族に属する子どもの記録だけ取得する
+    record = get_object_or_404(
+        AbsenceRecord.objects.select_related("child"),
+        pk=pk,
+        child__family=request.user.family,
+    )
+    
+    # 同じ子ども・同じ日付の排便記録を探す
+    bowel_record = BowelMovementRecord.objects.filter(
+        child=record.child,
+        record_date=record.record_date,
+    ).first()
+
+    # 日付を 2026/5/6（水）形式にする
+    page_date = _format_japanese_date(record.record_date)
+    day_str = record.record_date.isoformat()
+    
+    context = {
+        "record": record,
+        "record_type": "absence",
+        "page_date": page_date,
+        "day_str": day_str,
+        "bowel_record": bowel_record,
+        "absence_record": record,
+    }
+
+    return render(request, "records/record_detail.html", context)
