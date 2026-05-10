@@ -71,3 +71,88 @@ class ScheduleAttachment(models.Model):
 
         # ファイル名が .pdf で終わるか
         return self.file.name.lower().endswith('.pdf')
+    
+class BowelMovementAttachment(models.Model):
+    """
+    排便記録に紐づく添付ファイル
+    """
+
+    bowel_movement_record = models.ForeignKey(
+        "records.BowelMovementRecord",
+        on_delete=models.CASCADE,
+        related_name="attachments",
+    )
+
+    file = models.FileField(
+        upload_to="bowel_movement_attachments/"
+    )
+
+    file_name = models.CharField(
+        max_length=300,
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.file_name or self.file.name
+
+    @property
+    def is_image(self):
+        if not self.file:
+            return False
+
+        return self.file.name.lower().endswith(
+            (".jpg", ".jpeg", ".png", ".gif", ".webp")
+        )
+
+    @property
+    def is_pdf(self):
+        if not self.file:
+            return False
+
+        return self.file.name.lower().endswith(".pdf")
+
+
+class AbsenceAttachment(models.Model):
+    """
+    欠席記録に紐づく添付ファイル
+    """
+
+    absence_record = models.ForeignKey(
+        "records.AbsenceRecord",
+        on_delete=models.CASCADE,
+        related_name="attachments",
+    )
+
+    file = models.FileField(
+        upload_to="absence_attachments/"
+    )
+
+    file_name = models.CharField(
+        max_length=300,
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.file_name or self.file.name
+
+    @property
+    def is_image(self):
+        if not self.file:
+            return False
+
+        return self.file.name.lower().endswith(
+            (".jpg", ".jpeg", ".png", ".gif", ".webp")
+        )
+
+    @property
+    def is_pdf(self):
+        if not self.file:
+            return False
+
+        return self.file.name.lower().endswith(".pdf")
