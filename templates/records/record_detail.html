@@ -11,7 +11,11 @@
 {% endblock %}
 
 {% block flow_right %}
-    <a href="#" aria-label="記録を編集">✏️</a>
+    {% if record_type == "bowel" %}
+        <a href="{% url 'records:bowel_edit' pk=record.pk %}" aria-label="排便記録を編集">✏️</a>
+    {% elif record_type == "absence" %}
+        <a href="{% url 'records:absence_edit' pk=record.pk %}" aria-label="欠席記録を編集">✏️</a>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
