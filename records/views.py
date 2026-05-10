@@ -226,3 +226,147 @@ def absence_record_detail_view(request, pk):
     }
 
     return render(request, "records/record_detail.html", context)
+
+@login_required
+def bowel_record_edit_view(request, pk):
+    """
+    排便記録の編集画面
+
+    ・登録済みの排便記録をフォームに表示する
+    ・内容を更新して保存できる
+    """
+
+    # 編集対象の排便記録を取得
+    # child__family=request.user.family により、他の家族の記録は編集できないようにする
+    record = get_object_or_404(
+        BowelMovementRecord.objects.select_related("child"),
+        pk=pk,
+        child__family=request.user.family,
+    )
+
+    # 家族の子ども一覧
+    children = Child.objects.filter(
+        family=request.user.family
+    ).order_by("id")
+
+    if request.method == "POST":
+        # instance=record を指定すると「新規作成」ではなく「既存データの更新」になる
+        bowel_form = BowelMovementRecordForm(
+            request.POST,
+            instance=record,
+        )
+
+        absence_form = AbsenceRecordForm()
+
+        # POSTされた日付
+        posted_date = _parse_date(request.POST.get("record_date"))
+        if posted_date is None:
+            posted_date = record.record_date
+
+        # POSTされた子ども
+        child_id = request.POST.get("child_id")
+        child = get_object_or_404(
+            Child,
+            id=child_id,
+            family=request.user.family,
+        )
+
+        if bowel_form.is_valid():
+            updated_record = bowel_form.save(commit=False)
+
+            # child と record_date はフォームに含めていないので、viewで更新する
+            updated_record.child = child
+            updated_record.record_date = posted_date
+            updated_record.save()
+
+            return redirect("records:bowel_detail", pk=updated_record.pk)
+
+    else:
+        # GET時：既存データをフォームに入れて表示する
+        bowel_form = BowelMovementRecordForm(instance=record)
+        absence_form = AbsenceRecordForm()
+
+    today = timezone.localdate()
+    today_str = today.isoformat()
+
+    context = {
+        "mode": "edit",
+        "record_type": "bowel",
+        "bowel_form": bowel_form,
+        "absence_form": absence_form,
+        "date": record.record_date.isoformat(),
+        "children": children,
+        "selected_child_id": record.child.id,
+        "today_str": today_str,
+        "record": record,
+    }
+
+    return render(request, "records/record_form.html", context)
+
+@login_required
+def absence_record_edit_view(request, pk):
+    """
+    欠席記録の編集画面
+
+    ・登録済みの欠席記録をフォームに表示する
+    ・内容を更新して保存できる
+    """
+
+    record = get_object_or_404(
+        AbsenceRecord.objects.select_related("child"),
+        pk=pk,
+        child__family=request.user.family,
+    )
+
+    children = Child.objects.filter(
+        family=request.user.family
+    ).order_by("id")
+
+    if request.method == "POST":
+        bowel_form = BowelMovementRecordForm()
+
+        # instance=record を指定することで、欠席記録を更新する
+        absence_form = AbsenceRecordForm(
+            request.POST,
+            instance=record,
+        )
+
+        posted_date = _parse_date(request.POST.get("record_date"))
+        if posted_date is None:
+            posted_date = record.record_date
+
+        child_id = request.POST.get("child_id")
+        child = get_object_or_404(
+            Child,
+            id=child_id,
+            family=request.user.family,
+        )
+        
+        if absence_form.is_valid():
+            updated_record = absence_form.save(commit=False)
+            updated_record.child = child
+            updated_record.record_date = posted_date
+            updated_record.save()
+
+            return redirect("records:absence_detail", pk=updated_record.pk)
+        
+    else:
+        bowel_form = BowelMovementRecordForm()
+        absence_form = AbsenceRecordForm(instance=record)
+
+    today = timezone.localdate()
+    today_str = today.isoformat()
+
+    context = {
+        "mode": "edit",
+        "record_type": "absence",
+        "bowel_form": bowel_form,
+        "absence_form": absence_form,
+        "date": record.record_date.isoformat(),
+        "children": children,
+        "selected_child_id": record.child.id,
+        "today_str": today_str,
+        "record": record,
+    }
+
+    return render(request, "records/record_form.html", context)
