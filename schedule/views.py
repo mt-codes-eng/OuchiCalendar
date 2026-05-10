@@ -7,7 +7,7 @@ from attachments.models import ScheduleAttachment
 from comments.forms import ScheduleCommentForm
 from comments.models import ScheduleComment
 from .forms import ScheduleForm
-
+from records.models import BowelMovementRecord, AbsenceRecord
 import calendar
 
 @login_required
@@ -207,6 +207,21 @@ def day_view(request, date):
         "child_memberships__child",
     ).order_by("start_at")
     
+    # その日の記録を取得する
+    bowel_records = BowelMovementRecord.objects.filter(
+        child__family=request.user.family,
+        record_date=target_date,
+    ).select_related(
+        "child",
+    ).order_by("child__id")
+
+    absence_records = AbsenceRecord.objects.filter(
+        child__family=request.user.family,
+        record_date=target_date,
+    ).select_related(
+        "child",
+    ).order_by("child__id")
+    
     # 画面表示用の日付文字列を作る
     week_map = ["月", "火", "水", "木", "金", "土", "日"]
     # weekday()は曜日を数字で返す関数で、weekday() が返した数字をそのままインデックスとして使っている
@@ -217,6 +232,8 @@ def day_view(request, date):
         "date": date, # URL用
         "page_date": page_date, # 画面表示用
         "schedules": schedules,
+        "bowel_records": bowel_records,
+        "absence_records": absence_records,
     }
 
     return render(request, "schedule/day.html", context)
