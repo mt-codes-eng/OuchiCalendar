@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block content %}
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
     <!-- 日付 -->
@@ -91,6 +91,10 @@
         <p>
             {{ bowel_form.concern_memo }}
         </p>
+        <p>
+            <label for="id_bowel_files">添付ファイル：</label>
+            <input type="file" id="id_bowel_files" name="bowel_files" multiple>
+        </p>
     </div>
 
     <!-- 欠席フォーム -->
@@ -101,6 +105,10 @@
         </p>
         <p>
             {{ absence_form.memo }}
+        </p>
+        <p>
+            <label for="id_absence_files">添付ファイル：</label>
+            <input type="file" id="id_absence_files" name="absence_files" multiple>
         </p>
     </div>
 
