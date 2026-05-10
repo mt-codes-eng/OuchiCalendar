@@ -73,6 +73,37 @@
         {% endif %}
 {% endif %}
 
+{% if record.attachments.all %}
+    <div>
+        <p>添付ファイル：</p>
+
+        {% for attachment in record.attachments.all %}
+            {% if attachment.is_image %}
+                <a href="{{ attachment.file.url }}" target="_blank">
+                    <img
+                        src="{{ attachment.file.url }}"
+                        alt="{{ attachment.file_name }}"
+                        width="80"
+                        style="border: 1px solid #ccc;"
+                    >
+                </a>
+            {% elif attachment.is_pdf %}
+                <p>
+                    <a href="{{ attachment.file.url }}" target="_blank">
+                        {{ attachment.file_name }}
+                    </a>
+                </p>
+            {% else %}
+                <p>
+                    <a href="{{ attachment.file.url }}" target="_blank">
+                        {{ attachment.file_name }}
+                    </a>
+                </p>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
 <p>
     何か対応・調整が必要ですか？<br>
     必要な場合はこちらから！
