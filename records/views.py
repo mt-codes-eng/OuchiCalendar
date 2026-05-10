@@ -6,6 +6,7 @@ from django.utils import timezone
 from children.models import Child
 from .forms import BowelMovementRecordForm, AbsenceRecordForm
 from .models import BowelMovementRecord, AbsenceRecord
+from attachments.models import BowelMovementAttachment, AbsenceAttachment
 
 def _parse_date(date_str: str):
     """
@@ -105,6 +106,14 @@ def record_create_view(request):
                 record.child = child
                 record.record_date = posted_date
                 record.save()
+                
+                # 排便記録の添付ファイルを保存する
+                for uploaded_file in request.FILES.getlist("bowel_files"):
+                    BowelMovementAttachment.objects.create(
+                        bowel_movement_record=record,
+                        file=uploaded_file,
+                        file_name=uploaded_file.name,
+                    )
 
                 return redirect("schedule:day", date=posted_date.isoformat())
 
@@ -121,6 +130,14 @@ def record_create_view(request):
                 record.child = child
                 record.record_date = posted_date
                 record.save()
+                
+                # 欠席記録の添付ファイルを保存する
+                for uploaded_file in request.FILES.getlist("absence_files"):
+                    AbsenceAttachment.objects.create(
+                        absence_record=record,
+                        file=uploaded_file,
+                         file_name=uploaded_file.name,
+                    )
 
                 return redirect("schedule:day", date=posted_date.isoformat())
 
@@ -278,6 +295,13 @@ def bowel_record_edit_view(request, pk):
             updated_record.child = child
             updated_record.record_date = posted_date
             updated_record.save()
+            
+            for uploaded_file in request.FILES.getlist("bowel_files"):
+                BowelMovementAttachment.objects.create(
+                    bowel_movement_record=updated_record,
+                    file=uploaded_file,
+                    file_name=uploaded_file.name,
+                )
 
             return redirect("records:bowel_detail", pk=updated_record.pk)
 
@@ -347,6 +371,13 @@ def absence_record_edit_view(request, pk):
             updated_record.child = child
             updated_record.record_date = posted_date
             updated_record.save()
+            
+            for uploaded_file in request.FILES.getlist("absence_files"):
+                AbsenceAttachment.objects.create(
+                    absence_record=updated_record,
+                    file=uploaded_file,
+                    file_name=uploaded_file.name,
+                )
 
             return redirect("records:absence_detail", pk=updated_record.pk)
         
