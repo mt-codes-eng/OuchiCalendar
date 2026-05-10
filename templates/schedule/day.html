@@ -99,8 +99,54 @@
   {% endif %}
 
   {# ------------------------------ #}
-  {# 記録セクション（今は仮置き） #}
+  {# 記録セクション #}
   {# ------------------------------ #}
   <h2>記録</h2>
-  <p>記録機能は今後追加予定です</p>
+  {% if bowel_records or absence_records %}
+    <ul>
+        {% for record in bowel_records %}
+            <li>
+                <a href="{% url 'records:bowel_detail' pk=record.pk %}">
+                    {% if record.child.image %}
+                        <img
+                            src="{{ record.child.image.url }}"
+                            alt="{{ record.child.name }}のアイコン"
+                            width="32"
+                            style="border-radius: 50%; vertical-align: middle;"
+                        >
+                    {% endif %}
+
+                    {% if record.has_bowel_movement %}
+                        💩 排便あり
+                    {% endif %}
+
+                    {% if record.has_concern %}
+                        ⚠️ 気になることあり
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+
+        {% for record in absence_records %}
+            <li>
+                <a href="{% url 'records:absence_detail' pk=record.pk %}">
+                    {% if record.child.image %}
+                        <img
+                            src="{{ record.child.image.url }}"
+                            alt="{{ record.child.name }}のアイコン"
+                            width="32"
+                            style="border-radius: 50%; vertical-align: middle;"
+                        >
+                    {% endif %}
+
+                    {% if record.is_absent %}
+                        🏠 欠席
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>この日の記録はありません</p>
+{% endif %}
 {% endblock %}
