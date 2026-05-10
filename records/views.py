@@ -178,7 +178,7 @@ def bowel_record_detail_view(request, pk):
     # ログイン中ユーザーの家族に属する子どもの記録だけ取得する
     # 他の家族の記録を見られないようにするため
     record = get_object_or_404(
-        BowelMovementRecord.objects.select_related("child"),
+        BowelMovementRecord.objects.select_related("child").prefetch_related("attachments"),
         pk=pk,
         child__family=request.user.family,
     )
@@ -218,7 +218,7 @@ def absence_record_detail_view(request, pk):
 
     # ログイン中ユーザーの家族に属する子どもの記録だけ取得する
     record = get_object_or_404(
-        AbsenceRecord.objects.select_related("child"),
+        AbsenceRecord.objects.select_related("child").prefetch_related("attachments"),
         pk=pk,
         child__family=request.user.family,
     )
