@@ -401,3 +401,73 @@ def absence_record_edit_view(request, pk):
     }
 
     return render(request, "records/record_form.html", context)
+
+@login_required
+def bowel_record_delete_view(request, pk):
+
+    record = get_object_or_404(
+        BowelMovementRecord,
+        pk=pk,
+        child__family=request.user.family,
+    )
+
+    day_str = record.record_date.isoformat()
+
+    # OK押下時
+    if request.method == "POST":
+
+        # 添付ファイル本体削除
+        for attachment in record.attachments.all():
+            if attachment.file:
+                attachment.file.delete(save=False)
+
+        # DBレコード削除
+        record.delete()
+
+        return redirect("schedule:day", date=day_str)
+
+    # GET時は確認画面表示
+    context = {
+        "record": record,
+        "record_type": "bowel",
+        "day_str": day_str,
+    }
+
+    return render(
+        request,
+        "schedule/schedule_confirm_delete.html",
+        context,
+    )
+    
+@login_required
+def absence_record_delete_view(request, pk):
+
+    record = get_object_or_404(
+        AbsenceRecord,
+        pk=pk,
+        child__family=request.user.family,
+    )
+
+    day_str = record.record_date.isoformat()
+
+    if request.method == "POST":
+
+        for attachment in record.attachments.all():
+            if attachment.file:
+                attachment.file.delete(save=False)
+
+        record.delete()
+
+        return redirect("schedule:day", date=day_str)
+
+    context = {
+        "record": record,
+        "record_type": "absence",
+        "day_str": day_str,
+    }
+
+    return render(
+        request,
+        "schedule/schedule_confirm_delete.html",
+        context,
+    )
