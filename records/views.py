@@ -147,9 +147,6 @@ def record_create_view(request):
     else:
         bowel_form = BowelMovementRecordForm()
         absence_form = AbsenceRecordForm()
-
-    today = timezone.localdate()
-    today_str = today.isoformat()
     
     # -----------------------------
     # ⑤ テンプレートへ渡す
@@ -159,7 +156,6 @@ def record_create_view(request):
         "absence_form": absence_form,
         "date": date_for_url,
         "children": children,
-        "today_str": today_str,
     }
 
     return render(request, "records/record_form.html", context)
@@ -250,13 +246,15 @@ def bowel_record_edit_view(request, pk):
     排便記録の編集画面
 
     ・登録済みの排便記録をフォームに表示する
-    ・内容を更新して保存できる
+    ・内容を更新する
+    ・新しい添付ファイルを追加する
+    ・チェックされた既存添付ファイルを削除する
     """
 
     # 編集対象の排便記録を取得
     # child__family=request.user.family により、他の家族の記録は編集できないようにする
     record = get_object_or_404(
-        BowelMovementRecord.objects.select_related("child"),
+        BowelMovementRecord.objects.select_related("child").prefetch_related("attachments"),
         pk=pk,
         child__family=request.user.family,
     )
@@ -272,15 +270,16 @@ def bowel_record_edit_view(request, pk):
             request.POST,
             instance=record,
         )
-
+        
+        # 欠席フォームはこの画面では保存しないので空で用意する
         absence_form = AbsenceRecordForm()
 
-        # POSTされた日付
+        # POSTされた日付を取得する
         posted_date = _parse_date(request.POST.get("record_date"))
         if posted_date is None:
             posted_date = record.record_date
 
-        # POSTされた子ども
+        # POSTされた子どもを取得する
         child_id = request.POST.get("child_id")
         child = get_object_or_404(
             Child,
@@ -291,11 +290,30 @@ def bowel_record_edit_view(request, pk):
         if bowel_form.is_valid():
             updated_record = bowel_form.save(commit=False)
 
-            # child と record_date はフォームに含めていないので、viewで更新する
+            # child と record_date はフォームに含めていないので、viewでセットする
             updated_record.child = child
             updated_record.record_date = posted_date
             updated_record.save()
             
+            # 既存添付ファイルの削除
+            # チェックされた添付ファイルIDを取得する
+            delete_attachment_ids = request.POST.getlist("delete_attachments")
+
+            # この記録に紐づく添付だけ削除対象にする
+            attachments_to_delete = updated_record.attachments.filter(
+                id__in=delete_attachment_ids,
+            )
+
+            for attachment in attachments_to_delete:
+                # media内の実ファイルを削除する
+                if attachment.file:
+                    attachment.file.delete(save=False)
+
+                # DB上の添付レコードを削除する
+                attachment.delete()
+            
+            # 新しい添付ファイルの追加
+            # name="bowel_files" の input から複数ファイルを取得する
             for uploaded_file in request.FILES.getlist("bowel_files"):
                 BowelMovementAttachment.objects.create(
                     bowel_movement_record=updated_record,
@@ -310,9 +328,6 @@ def bowel_record_edit_view(request, pk):
         bowel_form = BowelMovementRecordForm(instance=record)
         absence_form = AbsenceRecordForm()
 
-    today = timezone.localdate()
-    today_str = today.isoformat()
-
     context = {
         "mode": "edit",
         "record_type": "bowel",
@@ -321,8 +336,8 @@ def bowel_record_edit_view(request, pk):
         "date": record.record_date.isoformat(),
         "children": children,
         "selected_child_id": record.child.id,
-        "today_str": today_str,
         "record": record,
+        "attachments": record.attachments.all(),
     }
 
     return render(request, "records/record_form.html", context)
@@ -333,11 +348,13 @@ def absence_record_edit_view(request, pk):
     欠席記録の編集画面
 
     ・登録済みの欠席記録をフォームに表示する
-    ・内容を更新して保存できる
+    ・内容を更新する
+    ・新しい添付ファイルを追加する
+    ・チェックされた既存添付ファイルを削除する
     """
 
     record = get_object_or_404(
-        AbsenceRecord.objects.select_related("child"),
+        AbsenceRecord.objects.select_related("child").prefetch_related("attachments"),
         pk=pk,
         child__family=request.user.family,
     )
@@ -347,6 +364,7 @@ def absence_record_edit_view(request, pk):
     ).order_by("id")
 
     if request.method == "POST":
+        # 排便フォームはこの画面では保存しない
         bowel_form = BowelMovementRecordForm()
 
         # instance=record を指定することで、欠席記録を更新する
@@ -372,6 +390,19 @@ def absence_record_edit_view(request, pk):
             updated_record.record_date = posted_date
             updated_record.save()
             
+            # 既存添付ファイルの削除
+            delete_attachment_ids = request.POST.getlist("delete_attachments")
+
+            attachments_to_delete = updated_record.attachments.filter(
+                id__in=delete_attachment_ids,
+            )
+
+            for attachment in attachments_to_delete:
+                if attachment.file:
+                    attachment.file.delete(save=False)
+                attachment.delete()
+
+            # 新しい添付ファイルの追加
             for uploaded_file in request.FILES.getlist("absence_files"):
                 AbsenceAttachment.objects.create(
                     absence_record=updated_record,
@@ -385,9 +416,6 @@ def absence_record_edit_view(request, pk):
         bowel_form = BowelMovementRecordForm()
         absence_form = AbsenceRecordForm(instance=record)
 
-    today = timezone.localdate()
-    today_str = today.isoformat()
-
     context = {
         "mode": "edit",
         "record_type": "absence",
@@ -396,8 +424,8 @@ def absence_record_edit_view(request, pk):
         "date": record.record_date.isoformat(),
         "children": children,
         "selected_child_id": record.child.id,
-        "today_str": today_str,
         "record": record,
+        "attachments": record.attachments.all(),
     }
 
     return render(request, "records/record_form.html", context)
