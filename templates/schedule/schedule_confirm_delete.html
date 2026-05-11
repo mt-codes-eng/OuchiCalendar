@@ -10,5 +10,14 @@
     {% csrf_token %}
     <button type="submit">OK</button>
 </form>
-<a href="{% url 'schedule:schedule_edit' schedule.id %}">キャンセル</a>
+
+{% if schedule %}
+    <a href="{% url 'schedule:schedule_edit' schedule.id %}">キャンセル</a>
+{% elif record %}
+    {% if record_type == "bowel" %}
+        <a href="{% url 'records:bowel_edit' record.id %}">キャンセル</a>
+    {% elif record_type == "absence" %}
+        <a href="{% url 'records:absence_edit' record.id %}">キャンセル</a>
+    {% endif %}
+{% endif %}
 {% endblock %}
