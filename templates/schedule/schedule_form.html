@@ -4,9 +4,9 @@
 
 {% block flow_left %}
     {% if date %}
-        <a href="{% url 'schedule:day' date %}" aria-label="予定・記録概要へ戻る">× (仮)</a>
+        <a href="{% url 'schedule:day' date %}" aria-label="予定・記録概要へ戻る">× </a>
     {% else %}
-         <a href="{% url 'schedule:month' %}" aria-label="カレンダーへ戻る">× (仮)</a>
+         <a href="{% url 'schedule:month' %}" aria-label="カレンダーへ戻る">× </a>
     {% endif %}
 {% endblock %}
 
