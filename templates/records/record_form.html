@@ -3,7 +3,7 @@
 {% block title %}記録 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
-    <a href="{% url 'schedule:day' date=today_str %}" aria-label="予定・記録概要へ戻る">×</a>
+    <a href="{% url 'schedule:day' date=date %}" aria-label="予定・記録概要へ戻る">×</a>
 {% endblock %}
 
 {% block page_title %}
@@ -16,7 +16,11 @@
 
 {% block flow_right %}
     {% if mode == "edit" %}
-        <a href="#">削除</a>
+        {% if record_type == "bowel" %}
+            <a href="{% url 'records:bowel_delete' pk=record.pk %}">削除</a>
+        {% elif record_type == "absence" %}
+            <a href="{% url 'records:absence_delete' pk=record.pk %}">削除</a>
+        {% endif %}
     {% endif %}
 {% endblock %}
 
@@ -95,6 +99,40 @@
             <label for="id_bowel_files">添付ファイル：</label>
             <input type="file" id="id_bowel_files" name="bowel_files" multiple>
         </p>
+        {% if mode == "edit" %}
+            <div>
+                {% if attachments %}
+                    {% for attachment in attachments %}
+                        <div style="margin-bottom: 12px;">
+                            {% if attachment.is_image %}
+                                <div>
+                                    <img
+                                        src="{{ attachment.file.url }}"
+                                        alt="{{ attachment.file_name }}"
+                                        style="width: 80px; height: 80px; object-fit: cover;"
+                                    >
+                                </div>
+                            {% else %}
+                                <div>
+                                    <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
+                                        {{ attachment.file_name }}
+                                    </a>
+                                </div>
+                            {% endif %}
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="delete_attachments"
+                                    value="{{ attachment.id }}"
+                                >
+                                この添付ファイルを削除する
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 
     <!-- 欠席フォーム -->
@@ -110,6 +148,40 @@
             <label for="id_absence_files">添付ファイル：</label>
             <input type="file" id="id_absence_files" name="absence_files" multiple>
         </p>
+        {% if mode == "edit" %}
+            <div>
+                {% if attachments %}
+                    {% for attachment in attachments %}
+                        <div style="margin-bottom: 12px;">
+                            {% if attachment.is_image %}
+                                <div>
+                                    <img
+                                        src="{{ attachment.file.url }}"
+                                        alt="{{ attachment.file_name }}"
+                                        style="width: 80px; height: 80px; object-fit: cover;"
+                                    >
+                                </div>
+                            {% else %}
+                                <div>
+                                    <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
+                                        {{ attachment.file_name }}
+                                    </a>
+                                </div>
+                            {% endif %}
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="delete_attachments"
+                                    value="{{ attachment.id }}"
+                                >
+                                この添付ファイルを削除する
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 
     {{ bowel_form.errors }}
@@ -127,23 +199,35 @@
 
 {% block extra_js %}
 <script>
+    // name="record_type" の radioボタンを全部取得
+    // 例：排便記録 / 欠席記録 の切り替え用radio
     const radios = document.querySelectorAll('input[name="record_type"]');
 
+    // 排便記録用の入力欄エリアを取得
     const bowelFields = document.getElementById("bowel-fields");
+    // 欠席記録用の入力欄エリアを取得
     const absenceFields = document.getElementById("absence-fields");
 
+    // 入力欄をまとめて disabled にする関数
+    // disabled=true  → 入力できない
+    // disabled=false → 入力できる
     function setDisabled(container, disabled) {
+        // container の中にある input / textarea / select を全部取得
         const inputs = container.querySelectorAll("input, textarea, select");
-
+        // 1つずつ disabled を設定
         inputs.forEach(input => {
             input.disabled = disabled;
         });
     }
 
     function toggleFields() {
+        // 現在チェックされている radio を取得
+        // 例：排便 or 欠席
         const checkedRadio = document.querySelector('input[name="record_type"]:checked');
+        // hidden の record_type を取得
+        // 編集画面などで radio が存在しない場合に使う
         const hiddenRecordType = document.querySelector('input[type="hidden"][name="record_type"]');
-
+        // 現在選択されている record_type を入れる変数
         let selected = null;
 
         if (checkedRadio) {
@@ -152,13 +236,14 @@
             selected = hiddenRecordType.value;
         }
 
+        // 排便記録が選択された場合
         if (selected === "bowel") {
             bowelFields.style.display = "block";
             absenceFields.style.display = "none";
 
             setDisabled(bowelFields, false);
             setDisabled(absenceFields, true);
-
+        // 欠席記録が選択された場合
         } else if (selected === "absence") {
             bowelFields.style.display = "none";
             absenceFields.style.display = "block";
@@ -168,12 +253,14 @@
         }
     }
 
-    // radio変更時に切り替え
+    // radioボタンが変更された時に toggleFields() を実行
     radios.forEach(radio => {
+        // radioの選択が変わったら実行
         radio.addEventListener("change", toggleFields);
     });
 
-    // 初期表示
+    // 画面を開いた直後にも実行
+    // 初期表示を正しくするため
     toggleFields();
 </script>
 {% endblock %}
