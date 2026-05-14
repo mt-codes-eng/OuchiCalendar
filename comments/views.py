@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.utils import timezone
 from schedule.models import Schedule
 from .models import ScheduleComment
 
@@ -121,6 +122,7 @@ def comment_recent_view(request):
     context = {
         "rows": rows,
         "sort": sort,
+        "today_str": timezone.localdate().strftime("%Y-%m-%d"),
     }
 
     return render(request, "comments/comment_recent.html", context)
