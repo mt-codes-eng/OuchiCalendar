@@ -528,3 +528,23 @@ def schedule_delete_view(request, pk):
     }
     
     return render(request, "schedule/schedule_confirm_delete.html", context)
+
+
+@login_required
+def coordination_choice_view(request):
+    """
+    記録保存後に、対応・調整の予定を作成するか確認する画面
+    """
+    date_str = request.GET.get("date")
+    target_date = _parse_date(date_str)
+
+    if target_date is None:
+        target_date = timezone.localdate()
+
+    date_for_url = target_date.isoformat()
+
+    context = {
+        "date": date_for_url,
+    }
+
+    return render(request, "schedule/coordination_choice.html", context)
