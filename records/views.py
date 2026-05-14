@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
 from django.utils import timezone
+from django.urls import reverse
 
 from children.models import Child
 from .forms import BowelMovementRecordForm, AbsenceRecordForm
@@ -115,7 +116,9 @@ def record_create_view(request):
                         file_name=uploaded_file.name,
                     )
 
-                return redirect("schedule:day", date=posted_date.isoformat())
+                return redirect(
+                    f"{reverse('schedule:coordination_choice')}?date={posted_date.isoformat()}"
+                )
 
 
         # -------------------------
@@ -139,8 +142,10 @@ def record_create_view(request):
                          file_name=uploaded_file.name,
                     )
 
-                return redirect("schedule:day", date=posted_date.isoformat())
-
+                return redirect(
+                    f"{reverse('schedule:coordination_choice')}?date={posted_date.isoformat()}"
+                )
+                
     # -----------------------------
     # ④ GET（画面表示）
     # -----------------------------
