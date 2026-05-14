@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'attachments', 
     'comments',
     'records',
+    'search',
 ]
 
 MIDDLEWARE = [
