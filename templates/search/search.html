@@ -1,0 +1,17 @@
+<!-- templates/search/search.html -->
+{% extends "base_app.html" %}
+
+{% block title %}検索 | おうちカレンダー{% endblock %}
+
+{% block page_title %}
+検索
+{% endblock %}
+
+{% block content %}
+<form method="get">
+    <input type="text" name="q" placeholder="キーワード">
+    <button type="submit">検索</button>
+</form>
+
+<p>検索画面です</p>
+{% endblock %}
