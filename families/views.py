@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db import transaction, IntegrityError
+from django.utils import timezone
 from .forms import FamilyProfileForm
 from children.models import Child
 from django.contrib.auth import get_user_model
@@ -77,6 +78,7 @@ def family_settings_view(request):
         "children": children,
         "my_color_hex": my_color_hex,
         "shared_color_hex": shared_color_hex,
+        "today_str": timezone.localdate().strftime("%Y-%m-%d"),
     }
     
     return render(
