@@ -34,6 +34,7 @@ urlpatterns = [
     path("ouchi-calendar/comments/", include("comments.urls")),
     path("ouchi-calendar/records/", include("records.urls")),
     path("ouchi-calendar/search/", include("search.urls")),
+    path("ouchi-calendar/analytics/", include("analytics.urls")),
 ]
 
 if settings.DEBUG:
