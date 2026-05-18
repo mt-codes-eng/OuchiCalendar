@@ -8,10 +8,159 @@
 {% endblock %}
 
 {% block content %}
+{# method="get" にすると、URL に ?q=会議 のように検索キーワードが付く #}
 <form method="get">
-    <input type="text" name="q" placeholder="キーワード">
+    <input 
+        type="text"
+        name="q"
+        value="{{ keyword }}"
+        placeholder="キーワードを入力"
+    >
     <button type="submit">検索</button>
 </form>
 
-<p>検索画面です</p>
+{% if keyword %}
+    {% if results_by_date %}
+
+        {# 日付ごとのグループを1つずつ表示する #}
+        {% for date_group in results_by_date %}
+            <div style="margin-top: 20px;">
+                {# 例：2026/5/15（金）のような日付表示 #}
+                <p>{{ date_group.date_display }}</p>
+
+                <ul>
+                    {# その日付に含まれる予定・記録を1件ずつ表示する #} 
+                    {% for item in date_group.items %}
+
+                        {% if item.type == "schedule" %}
+                            {# item.object を schedule という名前で使えるようにする #}
+                            {% with schedule=item.object %}
+                                <li>
+                                    <a href="{% url 'schedule:schedule_detail' schedule.pk %}">
+                                        <div>
+                                            {# 予定メンバー画像（大人） #}
+                                            {% for membership in schedule.user_memberships.all %}
+                                                {% if membership.user.image %}
+                                                    <img
+                                                        src="{{ membership.user.image.url }}"
+                                                        alt="{{ membership.user.name }}のアイコン"
+                                                        width="32"
+                                                        style="border-radius: 50%; vertical-align: middle;"
+                                                    >
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            {# 予定メンバー画像（子ども） #}
+                                            {% for membership in schedule.child_memberships.all %}
+                                                {% if membership.child.image %}
+                                                    <img
+                                                        src="{{ membership.child.image.url }}"
+                                                        alt="{{ membership.child.name }}のアイコン"
+                                                        width="32"
+                                                        style="border-radius: 50%; vertical-align: middle;"
+                                                    >
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            {% if schedule.is_all_day %}
+                                                終日
+                                            {% else %}
+                                                {# date フィルタで時刻を "09:00" 形式で表示する #}
+                                                {{ schedule.start_at|date:"H:i" }}〜{{ schedule.end_at|date:"H:i" }}
+                                            {% endif %}
+
+                                            /
+
+                                            {{ schedule.title }}
+                                        </div>
+
+                                        {% if schedule.requires_coordination %}
+                                            <div>
+                                                {# ステータスの記号だけ出す #}
+                                                {% if schedule.status == 0 %}
+                                                    〇
+                                                {% elif schedule.status == 1 %}
+                                                    △
+                                                {% elif schedule.status == 2 %}
+                                                    ✕
+                                                {% endif %}
+
+                                                {# 対応内容を表示する #}
+                                                {{ schedule.get_coordination_type_display }}
+
+                                                {# コロンで担当者につなぐ #}
+                                                ：
+
+                                                {# 担当者があれば担当者名、なければ未定 #}
+                                                {% if schedule.user %}
+                                                    {{ schedule.user }}
+                                                {% else %}
+                                                    未定
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endwith %}
+                        {% endif %}
+
+                        {% if item.type == "bowel" %}
+                            {% with record=item.object %}
+                                <li>
+                                    <a href="{% url 'records:bowel_detail' pk=record.pk %}">
+                                        {% if record.child.image %}
+                                            <img
+                                                src="{{ record.child.image.url }}"
+                                                alt="{{ record.child.name }}のアイコン"
+                                                width="32"
+                                                style="border-radius: 50%; vertical-align: middle;"
+                                            >
+                                        {% endif %}
+
+                                        {% if record.has_bowel_movement %}
+                                            💩 排便あり
+                                        {% endif %}
+
+                                        {% if record.has_concern %}
+                                            ⚠️ 気になることあり
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endwith %}
+                        {% endif %}
+
+                        {% if item.type == "absence" %}
+                            {% with record=item.object %}
+                                <li>
+                                    <a href="{% url 'records:absence_detail' pk=record.pk %}">
+                                        {% if record.child.image %}
+                                            <img
+                                                src="{{ record.child.image.url }}"
+                                                alt="{{ record.child.name }}のアイコン"
+                                                width="32"
+                                                style="border-radius: 50%; vertical-align: middle;"
+                                            >
+                                        {% endif %}
+
+                                        {% if record.is_absent %}
+                                            🏠 欠席
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endwith %}
+                        {% endif %}
+
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <p>結果がありません</p>
+    {% endif %}
+{% else %}
+    <p>キーワードを入力して検索してください</p>
+{% endif %}
+
+
 {% endblock %}
