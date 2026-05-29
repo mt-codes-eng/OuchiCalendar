@@ -22,7 +22,7 @@
     <a href="{% url 'schedule:month' %}">カレンダー</a> |
     <a href="{% url 'comments:recent' %}">コメント新着</a> |
     <a href="{% url 'schedule:day_create_choice' today_str %}?next={% url 'schedule:month' %}">追加</a> |
-    <a href="#">集計</a> |
+    <a href="{% url 'analytics:index' %}">集計</a> |
     <a href="{% url 'search:search' %}">検索</a>
   </nav>
 </footer>
