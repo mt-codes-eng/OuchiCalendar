@@ -1,0 +1,230 @@
+<!-- templates/analytics/index.html -->
+{% extends "base_app.html" %}
+
+{% block title %}集計 | おうちカレンダー{% endblock %}
+
+{% block page_title %}
+集計
+{% endblock %}
+
+{% block content %}
+<p>
+    <a href="{% url 'analytics:index' %}?tab=absence&year={{ year }}&month={{ month }}">
+        欠席集計
+    </a>
+
+    |
+
+    <a href="{% url 'analytics:index' %}?tab=coordination&year={{ year }}&month={{ month }}">
+        対応集計
+    </a>
+</p>
+
+{# 年月選択フォーム #}
+<form method="get">
+    {# 年月変更しても tab が消えないようにする。現在のタブを hidden で保持する #}
+    <input type="hidden" name="tab" value="{{ active_tab }}">
+    
+    {# onchange は「選択が変わったら」の意味。this.form.submit() はフォーム送信 #}
+    <select name="year" onchange="this.form.submit()">
+        {% for y in years %}
+            {# 現在選択中の年なら selected を付ける #}
+            <option value="{{ y }}" {% if y == year %}selected{% endif %}>
+                {{ y }}年
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="month" onchange="this.form.submit()">
+        {% for m in months %}
+            <option value="{{ m }}" {% if m == month %}selected{% endif %}>
+                {{ m }}月
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
+{% if active_tab == "absence" %}
+
+    {% if absence_rows %}
+        <table border="1" style="border-collapse: collapse;">
+            <tr>
+                <th>子どもの名前</th>
+                <th>欠席回数</th>
+            </tr>
+
+            {% for row in absence_rows %}
+                 <tr>
+                    <td>
+                        <span style="
+                            display: inline-block;
+                            width: 14px;
+                            height: 14px;
+                            background-color: {{ row.color }};
+                            border-radius: 3px;
+                            vertical-align: middle;
+                        "></span>
+                        {{ row.name }}
+                    </td>
+                    <td>{{ row.count }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        {# 棒グラフ #}
+        <h3>欠席回数</h3>
+        {# 棒グラフ全体 #}
+        <div style="display: flex; max-width: 500px; margin-top: 16px;">
+
+            {# 縦軸の目盛り #}
+            <div style="
+                height: 220px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                margin-right: 8px;
+                font-size: 12px;
+            ">
+                <span>{{ max_absence_count }}</span>
+                {% if half_absence_count != 0 and half_absence_count != max_absence_count %}
+                    <span>{{ half_absence_count }}</span>
+                {% endif %}
+                <span>0</span>
+            </div>
+
+            {# グラフ本体 #}
+            <div style="flex: 1;">
+
+                {# 棒だけのエリア #}
+                <div style="
+                    display: flex;
+                    align-items: flex-end;
+                    gap: 24px;
+                    height: 220px;
+                    border-left: 1px solid #333;
+                    border-bottom: 1px solid #333;
+                    padding: 8px 8px 0 8px;
+                ">
+                    {% for row in absence_rows %}
+                        <div style="
+                            width: 48px;
+                            height: {{ row.percent }}%;
+                            min-height: 4px;
+                            background-color: {{ row.color }};
+                        "></div>
+                    {% endfor %}
+                </div>
+
+                {# 横軸の下に名前・回数を表示 #}
+                <div style="
+                    display: flex;
+                    gap: 24px;
+                    padding-left: 9px;
+                    margin-top: 8px;
+                ">
+                    {% for row in absence_rows %}
+                        <div style="width: 48px; text-align: center;">
+                            <div>{{ row.name }}</div>
+                            <div>{{ row.count }}回</div>
+                        </div>
+                    {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <p>データがありません</p>
+    {% endif %}
+{% endif %}
+
+{% if active_tab == "coordination" %}
+
+    {% if coordination_rows %}
+        <table border="1" style="border-collapse: collapse;">
+            <tr>
+                <th>対応者</th>
+                <th>対応回数</th>
+            </tr>
+
+            {% for row in coordination_rows %}
+                <tr>
+                    <td>
+                        <span style="
+                            display: inline-block;
+                            width: 14px;
+                            height: 14px;
+                            background-color: {{ row.color }};
+                            border-radius: 3px;
+                            vertical-align: middle;
+                        "></span>
+                        {{ row.name }}
+                    </td>
+                    <td>{{ row.count }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        {# 棒グラフ #}
+        <h3>対応回数</h3>
+        <div style="display: flex; max-width: 500px; margin-top: 16px;">
+
+            {# 縦軸の目盛り #}
+            <div style="
+                height: 220px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                margin-right: 8px;
+                font-size: 12px;
+            ">
+                <span>{{ max_coordination_count }}</span>
+                {% if half_coordination_count != 0 and half_coordination_count != max_coordination_count %}
+                    <span>{{ half_coordination_count }}</span>
+                {% endif %}
+                <span>0</span>
+            </div>
+
+            {# グラフ本体 #}
+            <div style="flex: 1;">
+
+                {# 棒だけのエリア #}
+                <div style="
+                    display: flex;
+                    align-items: flex-end;
+                    gap: 24px;
+                    height: 220px;
+                    border-left: 1px solid #333;
+                    border-bottom: 1px solid #333;
+                    padding: 8px 8px 0 8px;
+                ">
+                    {% for row in coordination_rows %}
+                        <div style="
+                            width: 48px;
+                            height: {{ row.percent }}%;
+                            min-height: 4px;
+                            background-color: {{ row.color }};
+                        "></div>
+                    {% endfor %}
+                </div>
+
+                {# 横軸の下に名前・回数を表示 #}
+                <div style="
+                    display: flex;
+                    gap: 24px;
+                    padding-left: 9px;
+                    margin-top: 8px;
+                ">
+                    {% for row in coordination_rows %}
+                        <div style="width: 48px; text-align: center;">
+                            <div>{{ row.name }}</div>
+                            <div>{{ row.count }}回</div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    {% else %}
+        <p>データがありません</p>
+    {% endif %}
+{% endif %}
+
+{% endblock %}
