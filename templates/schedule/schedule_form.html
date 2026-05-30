@@ -1,5 +1,6 @@
 <!-- templates/schedule/schedule_form.html -->
 {% extends "base_flow.html" %}
+{% load static %}
 {% block title %}予定 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
@@ -100,14 +101,14 @@
 
     {# メモ #}
     <p>
-        {{ form.memo.label_tag }}
+        <img src="{% static 'images/icons/memo.svg' %}" alt="メモ" width="20" height="20">
         {{ form.memo }}
         {{ form.memo.errors }}
     </p>
 
     {# 添付ファイル #}
     <p>
-        {{ form.attachments.label_tag }}
+        <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="20" height="20">
         {{ form.attachments }}
         {{ form.attachments.errors }}
     </p>
@@ -150,6 +151,7 @@
 
     {# 対応/調整要否 #}
     <p>
+        <img src="{% static 'images/icons/heart.svg' %}" alt="対応・調整" width="20" height="20">
         {{ form.requires_coordination }}
         {{ form.requires_coordination.label }}
         {{ form.requires_coordination.errors }}
@@ -204,6 +206,7 @@
         {# コメント欄 #}
         <div id="comment-fields">
             <p>
+                <img src="{% static 'images/icons/comment.svg' %}" alt="コメント" width="20" height="20">
                 {{ comment_form.to_user.label_tag }}
                 {{ comment_form.to_user }}
                 {{ comment_form.to_user.errors }}
