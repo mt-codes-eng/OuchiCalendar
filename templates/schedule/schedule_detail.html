@@ -1,5 +1,6 @@
 <!-- templates/schedule/schedule_detail.html -->
 {% extends "base_flow.html" %}
+{% load static %}
 {% block title %}予定詳細 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
@@ -47,14 +48,18 @@
     </p>
     
     {% if schedule.memo %}
-        <p>メモ：{{ schedule.memo }}</p>
+        <p>
+            <img src="{% static 'images/icons/memo.svg' %}" alt="メモ" width="20" height="20">
+            {{ schedule.memo }}
+        </p>
     {% endif %}
 
     {% if attachments %}
-    <div>
-        <p>添付ファイル：</p>
-
-        {% for attachment in attachments %}
+    {# 添付アイコン1つ + 添付ファイル一覧を横並びにする #}
+    <div style="display: flex; align-items: flex-start; gap: 8px;">
+        <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="20" height="20">
+        <div>
+            {% for attachment in attachments %}
             <div style="margin-bottom: 12px;">
                 {% if attachment.is_image %}
                     <div>
@@ -78,13 +83,15 @@
                     </div>
                 {% endif %}
             </div>
-        {% endfor %}
+            {% endfor %}
+        </div>    
     </div>
     {% endif %}
 
     {# 対応・調整が必要な予定のときだけ表示するブロック #}
     {% if schedule.requires_coordination %}
          <p>
+            <img src="{% static 'images/icons/heart.svg' %}" alt="対応・調整" width="20" height="20">
             <input type="checkbox" checked disabled>
             この予定は対応・調整が必要
         </p>
@@ -130,19 +137,27 @@
     {% if comments %}
         {% for comment in comments %}
             <div style="margin-bottom: 12px;">
-                <p style="margin: 0 0 4px 0; font-size: 12px;">
-                    {{ comment.created_at|date:"H:i" }}
-                    To: {{ comment.to_user.name|default:comment.to_user.email }}
-                    From: {{ comment.from_user.name|default:comment.from_user.email }}
-                </p>
-
-                <p style="margin: 0;">
+                {# アイコン + 時間を横並びにする #}
+                {# align-items: center;はflexの中の要素を縦方向中央にそろえる #}
+                {# gap: 6px;はflex内の要素同士の間隔 #}
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="{% static 'images/icons/comment.svg' %}" alt="コメント" width="20" height="20">
+                    <p style="margin: 0 0 4px 0; font-size: 12px;">
+                        {{ comment.created_at|date:"H:i" }}
+                        To: {{ comment.to_user.name|default:comment.to_user.email }}
+                        From: {{ comment.from_user.name|default:comment.from_user.email }}
+                    </p>
+                </div>
+                <p style="margin: 4px 0 0 26px;">
                     {{ comment.body|linebreaksbr }}
                 </p>
             </div>
         {% endfor %}
     {% else %}
-        <p>コメント：なし</p>
+        <p style="display: flex; align-items: center; gap: 6px;">
+            <img src="{% static 'images/icons/comment.svg' %}" alt="コメント" width="20" height="20">
+            なし
+        </p>
     {% endif %}
     </div>
     {% endif %}
