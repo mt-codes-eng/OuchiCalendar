@@ -13,7 +13,9 @@
 {% endblock %}
 
 {% block flow_right %}
-    <a href="{% url 'schedule:schedule_edit' schedule.id %}" aria-label="予定を編集">✏️</a>
+    <a href="{% url 'schedule:schedule_edit' schedule.id %}" aria-label="予定を編集">
+        <img src="{% static 'images/icons/pencil.svg' %}" alt="予定を編集" width="20" height="20">
+    </a>
 {% endblock %}
 
 {% block content %}
