@@ -1,5 +1,6 @@
 <!-- templates/records/record_detail.html -->
 {% extends "base_flow.html" %}
+{% load static %}
 {% block title %}記録詳細 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
@@ -12,9 +13,13 @@
 
 {% block flow_right %}
     {% if record_type == "bowel" %}
-        <a href="{% url 'records:bowel_edit' pk=record.pk %}" aria-label="排便記録を編集">✏️</a>
+        <a href="{% url 'records:bowel_edit' pk=record.pk %}" aria-label="排便記録を編集">
+            <img src="{% static 'images/icons/pencil.svg' %}" alt="排便記録を編集" width="20" height="20">
+        </a>
     {% elif record_type == "absence" %}
-        <a href="{% url 'records:absence_edit' pk=record.pk %}" aria-label="欠席記録を編集">✏️</a>
+        <a href="{% url 'records:absence_edit' pk=record.pk %}" aria-label="欠席記録を編集">
+            <img src="{% static 'images/icons/pencil.svg' %}" alt="欠席記録を編集" width="20" height="20">
+        </a>
     {% endif %}
 {% endblock %}
 
@@ -47,7 +52,10 @@
 
 {% if record_type == "bowel" %}
         {% if record.has_bowel_movement %}
-            <p>☑ 排便があった 💩</p>
+            <p>
+                ☑ 排便があった 
+                <img src="{% static 'images/icons/bowel_movement.svg' %}" alt="排便" width="20" height="20">
+            </p>
 
             {% if record.memo %}
                 <p>{{ record.memo }}</p>
@@ -55,7 +63,10 @@
         {% endif %}
 
         {% if record.has_concern %}
-            <p>☑ 気になることがある ⚠️</p>
+            <p>
+                ☑ 気になることがある
+                <img src="{% static 'images/icons/attention.svg' %}" alt="気になること" width="20" height="20">
+            </p>
 
             {% if record.concern_memo %}
                 <p>{{ record.concern_memo }}</p>
@@ -65,7 +76,10 @@
 
 {% if record_type == "absence" %}
         {% if record.is_absent %}
-            <p>☑ 欠席した 🏠</p>
+            <p>
+                ☑ 欠席した
+                <img src="{% static 'images/icons/house.svg' %}" alt="欠席" width="20" height="20">
+            </p>
 
             {% if record.memo %}
                 <p>{{ record.memo }}</p>
@@ -75,7 +89,7 @@
 
 {% if record.attachments.all %}
     <div>
-        <p>添付ファイル：</p>
+        <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="20" height="20">
 
         {% for attachment in record.attachments.all %}
             {% if attachment.is_image %}
