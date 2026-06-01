@@ -1,11 +1,23 @@
 <!-- templates/base_app.html -->
 {% extends "base.html" %}
+{% load static %}
 
 {% block header %}
 <header>
   <div>
     {# aria-label="メニュー"：画面には表示されないが、読み上げソフト用（視覚障害者向け）にボタンの説明をつけるもの #}
-    <a href="{% url 'core:settings' %}" aria-label="メニュー">☰</a>
+    <a 
+      href="{% url 'core:settings' %}"
+      aria-label="メニュー"
+      style="text-decoration: none;"
+      >
+      <img
+        src="{% static 'images/icons/hamburger_menu.svg' %}"
+        alt="メニュー"
+        width="20"
+        height="20"
+      >
+    </a>
     
     {# spanタグ：文字の一部を囲って、CSSで調整しやすくする #}
     <span>{% block page_title %}{% endblock %}</span>
@@ -18,12 +30,52 @@
 {% block footer %}
 <footer>
   {# nav：「ナビゲーション（メニューやページ移動リンクのまとまり）」を表すタグ #}
-  <nav>
-    <a href="{% url 'schedule:month' %}">カレンダー</a> |
-    <a href="{% url 'comments:recent' %}">コメント新着</a> |
-    <a href="{% url 'schedule:day_create_choice' today_str %}?next={% url 'schedule:month' %}">追加</a> |
-    <a href="{% url 'analytics:index' %}">集計</a> |
-    <a href="{% url 'search:search' %}">検索</a>
+  <nav class="bottom-nav">
+    <a href="{% url 'schedule:month' %}" class="bottom-nav-item">
+      <img
+        src="{% static 'images/icons/schedule.svg' %}"
+        alt="カレンダー"
+        width="24"
+        height="24"
+      >
+      <span>カレンダー</span>
+    </a>
+    <a href="{% url 'comments:recent' %}" class="bottom-nav-item">
+      <img
+        src="{% static 'images/icons/recent_comment.svg' %}"
+        alt="コメント"
+        width="24"
+        height="24"
+      >
+      <span>コメント新着</span>
+    </a>
+    <a href="{% url 'schedule:day_create_choice' today_str %}?next={% url 'schedule:month' %}" class="bottom-nav-item">
+      <img
+        src="{% static 'images/icons/plus.svg' %}"
+        alt="追加"
+        width="24"
+        height="24"
+      >
+      <span>追加</span>
+    </a> 
+    <a href="{% url 'analytics:index' %}"  class="bottom-nav-item">
+      <img
+        src="{% static 'images/icons/bar_graph.svg' %}"
+        alt="集計"
+        width="24"
+        height="24"
+      >
+      <span>集計</span>
+    </a>
+    <a href="{% url 'search:search' %}" class="bottom-nav-item">
+      <img
+        src="{% static 'images/icons/search.svg' %}"
+        alt="検索"
+        width="24"
+        height="24"
+      >
+      <span>検索</span>
+    </a>
   </nav>
 </footer>
 {% endblock %}
