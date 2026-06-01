@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, date, time, timedelta
 from django.utils import timezone
+from django.db.models import Count
 from .models import Schedule
 from attachments.models import ScheduleAttachment
 from comments.forms import ScheduleCommentForm
@@ -205,6 +206,10 @@ def day_view(request, date):
     ).prefetch_related(
         "user_memberships__user",
         "child_memberships__child",
+    ).annotate(
+        # ScheduleComment の related_name="comments" を使ってコメント数を数える
+        comment_count=Count("comments", distinct=True),
+        attachment_count=Count("attachments", distinct=True),
     ).order_by("start_at")
     
     # その日の記録を取得する
@@ -213,6 +218,9 @@ def day_view(request, date):
         record_date=target_date,
     ).select_related(
         "child",
+    ).annotate(
+        # 排便記録に紐づく添付ファイル数
+        attachment_count=Count("attachments", distinct=True),
     ).order_by("child__id")
 
     absence_records = AbsenceRecord.objects.filter(
@@ -220,6 +228,9 @@ def day_view(request, date):
         record_date=target_date,
     ).select_related(
         "child",
+    ).annotate(
+        # 欠席記録に紐づく添付ファイル数
+        attachment_count=Count("attachments", distinct=True),
     ).order_by("child__id")
     
     # 画面表示用の日付文字列を作る
