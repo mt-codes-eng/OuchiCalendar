@@ -1,0 +1,25 @@
+.bottom-nav {
+    display: flex;
+    /* 真ん中寄せ */
+    justify-content: center;
+    /* アイコン同士の間隔 */
+    gap: 32px;
+    /* 上の線 */
+    border-top: 2px solid #ccc;
+    /* 要素の内側の余白 */
+    padding: 8px 0 8px 0;
+}
+
+.bottom-nav-item {
+    display: flex;
+    /* アイコンの下に文字 */
+    flex-direction: column;
+    /* 中央揃え */
+    align-items: center;
+    /* 文字の装飾を消す */
+    text-decoration: none;
+    /* 文字サイズ */
+    font-size: 9px;
+    /* 横幅を56pxに固定する */
+    width: 56px;
+}
