@@ -88,28 +88,36 @@
 {% endif %}
 
 {% if record.attachments.all %}
-    <div>
+    <div style="display: flex; align-items: flex-start; gap: 8px;">
         <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="20" height="20">
-
-        {% for attachment in record.attachments.all %}
-            {% if attachment.is_image %}
-                <img
-                    src="{{ attachment.file.url }}"
-                    alt="{{ attachment.file_name }}"
-                    class="attachment-thumbnail"
-                    data-image-url="{{ attachment.file.url }}"
-                    style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border: 1px solid #ccc;"
-                >
-            {% else %}
-                <p>
-                    {# target="_blank"：別タブで開く #}
-                    {# rel="noopener"：別タブ側から元ページを操作されにくくするセキュリティ対策 #}
-                    <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
-                        {{ attachment.file_name }}
-                    </a>
-                </p>
-            {% endif %}
-        {% endfor %}
+        <div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                {% for attachment in record.attachments.all %}
+                    {% if attachment.is_image %}
+                        <img
+                            src="{{ attachment.file.url }}"
+                            alt="{{ attachment.file_name }}"
+                            class="attachment-thumbnail"
+                            data-image-url="{{ attachment.file.url }}"
+                            style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border: 1px solid #ccc;"
+                        >
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div style="margin-top: 8px;">
+                {% for attachment in record.attachments.all %}
+                    {% if not attachment.is_image %}
+                        <p style="margin: 4px 0;">
+                            {# target="_blank"：別タブで開く #}
+                            {# rel="noopener"：別タブ側から元ページを操作されにくくするセキュリティ対策 #}
+                            <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
+                                {{ attachment.file_name }}
+                            </a>
+                         </p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
     </div>
 {% endif %}
 
