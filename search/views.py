@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils import timezone
 from collections import defaultdict
 
@@ -63,6 +63,11 @@ def search_view(request):
             "child_memberships__child",
             "attachments",
             "comments",
+        ).annotate(
+            # コメント数を数える
+            comment_count=Count("comments", distinct=True),
+            # 添付ファイルが1個以上あるか判定するために数える
+            attachment_count=Count("attachments", distinct=True),
         ).distinct() # 重複削除。添付やコメントが複数あると同じ予定が重複して取得されることがあるため必要
 
         # 取得した予定を日付ごとにまとめる
@@ -87,6 +92,9 @@ def search_view(request):
             "child", # child(ForeignKey)をまとめて取得
         ).prefetch_related(
             "attachments", # 添付をまとめて取得
+        ).annotate(
+            # 排便記録に添付ファイルがあるか判定するために数える
+            attachment_count=Count("attachments", distinct=True),
         ).distinct()
 
         # 排便記録を日付ごとに追加
@@ -108,6 +116,9 @@ def search_view(request):
             "child",
         ).prefetch_related(
             "attachments",
+        ).annotate(
+            # 欠席記録に添付ファイルがあるか判定するために数える
+            attachment_count=Count("attachments", distinct=True),
         ).distinct()
 
         # 欠席記録を日付ごとに追加
