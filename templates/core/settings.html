@@ -1,6 +1,6 @@
 <!-- templates/core/settings.html -->
 {% extends "base_flow.html" %}
-
+{% load static %}
 {% block title %}設定 | おうちカレンダー{% endblock %}
 
 {% block flow_right %}
@@ -21,8 +21,34 @@
     </section>
 
     <section>
-        <div><a href="{% url 'families:family_settings' %}">家族の設定</a></div>
-        <div><a href="{% url 'core:howto' %}">アプリの使い方</a></div>
-        <div><a href="{% url 'core:logout' %}">ログアウト</a></div>
+        <div>
+            <a href="{% url 'families:family_settings' %}">
+                <img
+                    src="{% static 'images/icons/people.svg' %}"
+                    alt="追加"
+                    width="20"
+                    height="20"
+                    style="vertical-align: middle;"
+                >
+                家族の設定
+            </a>
+        </div>
+        <div>
+            <a href="{% url 'core:howto' %}">
+                <img
+                    src="{% static 'images/icons/question.svg' %}"
+                    alt="追加"
+                    width="20"
+                    height="20"
+                    style="vertical-align: middle;"
+                >
+                アプリの使い方
+            </a>
+        </div>
+        <div>
+            <a href="{% url 'core:logout' %}">
+                ログアウト
+            </a>
+        </div>
     </section>
  {% endblock %}
