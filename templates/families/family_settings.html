@@ -1,6 +1,6 @@
 <!-- templates/families/family_settings.html -->
 {% extends "base_app.html" %}
-
+{% load static %}
 {% block title %}家族設定 | おうちカレンダー{% endblock %}
 {% block page_title %}私の家族{% endblock %}
 
@@ -10,7 +10,9 @@
       <h2 style="display: inline;"> {# style="display: inline;"見出しを改行しないで、横並びにしたい #}
       {{ request.user.name}}
       </h2>
-      <a href="{% url 'accounts:user_profile_edit' %}" aria-label="私の設定を編集">✏️</a>
+      <a href="{% url 'accounts:user_profile_edit' %}" aria-label="私の設定を編集">
+        <img src="{% static 'images/icons/pencil.svg' %}" alt="私の設定を編集" width="20" height="20">
+      </a>
     </div>
     <p>Email：{{ request.user.email }}</p>
     <p>パスワード：********</p>
@@ -50,7 +52,9 @@
       <h2 style="display: inline;">
         {{ family.name|default:"未設定(家族名)" }}家
       </h2>
-      <a href="{% url 'families:family_profile_edit' %}" aria-label="苗字の設定を編集">✏️</a>
+      <a href="{% url 'families:family_profile_edit' %}" aria-label="苗字の設定を編集">
+        <img src="{% static 'images/icons/pencil.svg' %}" alt="苗字の設定を編集" width="20" height="20">
+      </a>
     </div>
     <p>家族アイコン：</p>
     {% if family.image %}
@@ -117,7 +121,16 @@
     <p>まだ大人メンバーが登録されていません</p>
   {% endif %}
   <p>
-    <a href="{% url 'invitations:create' %}">家族を招待する ＋</a>
+    <a href="{% url 'invitations:create' %}">
+      家族を招待する
+      <img
+        src="{% static 'images/icons/plus.svg' %}"
+        alt="家族を招待"
+        width="20"
+        height="20"
+        style="vertical-align: middle;"
+      >
+    </a>
   </p>
 </section>
 
@@ -149,7 +162,15 @@
             ">
             </span>
           {% endif %}
-          <a href="{% url 'children:child_edit' child.id %}" aria-label="子どもメンバーを編集">✏️</a>
+          <a href="{% url 'children:child_edit' child.id %}" aria-label="子どもメンバーを編集">
+            <img
+              src="{% static 'images/icons/pencil.svg' %}"
+              alt="子どもメンバーを編集"
+              width="20"
+              height="20"
+              style="vertical-align: middle;"
+            >
+          </a>
         </li>
       {% endfor %}
     </ul>
@@ -157,7 +178,16 @@
     <p>まだメンバーが登録されていません</p>
   {% endif %}
   <p>
-    <a href="{% url 'children:child_create' %}">メンバーを追加する ＋ </a>
+    <a href="{% url 'children:child_create' %}">
+      メンバーを追加する
+      <img
+        src="{% static 'images/icons/plus.svg' %}"
+        alt="子どもメンバーの追加"
+        width="20"
+        height="20"
+        style="vertical-align: middle;"
+      >
+    </a>
   </p>
  </section>
 {% endblock %}
