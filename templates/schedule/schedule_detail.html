@@ -57,14 +57,13 @@
     {% endif %}
 
     {% if attachments %}
-    {# 添付アイコン1つ + 添付ファイル一覧を横並びにする #}
     <div style="display: flex; align-items: flex-start; gap: 8px;">
         <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="20" height="20">
         <div>
-            {% for attachment in attachments %}
-            <div style="margin-bottom: 12px;">
-                {% if attachment.is_image %}
-                    <div>
+            {# 画像だけを横並びで表示 #}
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                {% for attachment in attachments %}
+                    {% if attachment.is_image %}
                         {# alt="{{…}}"は画像が表示できないときの代替テキスト #}
                         {# object-fit: cover; 画像をトリミングして枠に収める #}
                         <img
@@ -74,20 +73,25 @@
                             data-image-url="{{ attachment.file.url }}"
                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
                         >
-                    </div>
-                {% else %}
-                    <div>
-                        {# target="_blank"：別タブで開く #}
-                        {# rel="noopener"：セキュリティ対策 #}
-                        <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
-                            {{ attachment.file_name }}
-                        </a>
-                    </div>
-                {% endif %}
+                    {% endif %}
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>    
-    </div>
+            {# PDFなど画像以外は縦並びで表示 #}
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                {% for attachment in attachments %}
+                    {% if not attachment.is_image %}
+                        <p style="margin: 4px 0;">
+                            {# target="_blank"：別タブで開く #}
+                            {# rel="noopener"：セキュリティ対策 #}
+                            <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
+                                {{ attachment.file_name }}
+                            </a>
+                        </p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>    
     {% endif %}
 
     {# 対応・調整が必要な予定のときだけ表示するブロック #}
