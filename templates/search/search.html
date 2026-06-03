@@ -1,5 +1,6 @@
 <!-- templates/search/search.html -->
 {% extends "base_app.html" %}
+{% load static %}
 
 {% block title %}検索 | おうちカレンダー{% endblock %}
 
@@ -72,6 +73,23 @@
                                             /
 
                                             {{ schedule.title }}
+
+                                            {% if schedule.memo %}
+                                                <img src="{% static 'images/icons/memo.svg' %}" alt="メモ" width="15" height="15">
+                                            {% endif %}
+
+                                            {% if schedule.attachment_count > 0 %}
+                                                <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="15" height="15">
+                                            {% endif %}
+
+                                            {% if schedule.requires_coordination %}
+                                                <img src="{% static 'images/icons/heart.svg' %}" alt="対応・調整" width="15" height="15">
+                                            {% endif %}
+
+                                            {% if schedule.comment_count > 0 %}
+                                                <img src="{% static 'images/icons/comment.svg' %}" alt="コメント" width="15" height="15">
+                                                {{ schedule.comment_count }}
+                                            {% endif %}
                                         </div>
 
                                         {% if schedule.requires_coordination %}
@@ -118,11 +136,21 @@
                                         {% endif %}
 
                                         {% if record.has_bowel_movement %}
-                                            💩 排便あり
+                                            <img src="{% static 'images/icons/bowel_movement.svg' %}" alt="排便" width="15" height="15">
+                                            排便あり
                                         {% endif %}
 
                                         {% if record.has_concern %}
-                                            ⚠️ 気になることあり
+                                            <img src="{% static 'images/icons/attention.svg' %}" alt="気になること" width="15" height="15">
+                                            気になることあり
+                                        {% endif %}
+
+                                        {% if record.memo or record.concern_memo %}
+                                            <img src="{% static 'images/icons/memo.svg' %}" alt="メモ" width="15" height="15">
+                                        {% endif %}
+
+                                        {% if record.attachment_count > 0 %}
+                                            <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="15" height="15">
                                         {% endif %}
                                     </a>
                                 </li>
@@ -143,7 +171,16 @@
                                         {% endif %}
 
                                         {% if record.is_absent %}
-                                            🏠 欠席
+                                            <img src="{% static 'images/icons/house.svg' %}" alt="15" width="20" height="15">
+                                            欠席
+                                        {% endif %}
+
+                                        {% if record.memo %}
+                                            <img src="{% static 'images/icons/memo.svg' %}" alt="メモ" width="15" height="15">
+                                        {% endif %}
+
+                                        {% if record.attachment_count > 0 %}
+                                            <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="15" height="15">
                                         {% endif %}
                                     </a>
                                 </li>
