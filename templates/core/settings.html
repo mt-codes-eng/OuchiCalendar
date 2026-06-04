@@ -4,7 +4,11 @@
 {% block title %}設定 | おうちカレンダー{% endblock %}
 
 {% block flow_right %}
- <a href="#" aria-label="設定画面を閉じる">×</a>
+    {% if next_url %}
+        <a href="{{ next_url }}" aria-label="設定画面を閉じる">×</a>
+    {% else %}
+        <a href="{% url 'schedule:month' %}" aria-label="設定画面を閉じる">×</a>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
