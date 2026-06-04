@@ -6,11 +6,15 @@ from django.contrib.auth.decorators import login_required
 def settings_view(request):
     family = request.user.family
     
-    return render(
-        request,
-        "core/settings.html",
-        {"family": family},
-    )
+    # どこから来たか取得
+    next_url = request.GET.get("next")
+    
+    context = {
+        "family": family,
+        "next_url": next_url,
+    }
+
+    return render(request, "core/settings.html", context,)
 
 @login_required
 def logout_view(request):
