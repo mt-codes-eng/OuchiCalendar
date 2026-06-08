@@ -28,9 +28,23 @@
 
   {% if schedules %}
     {# 予定があるときは一覧表示する #}
-    <ul>
+    <ul class="summary-list">
       {% for schedule in schedules %}
-        <li>
+        {% if schedule.requires_coordination %}
+          {# 対応・調整が必要な予定：カラーバーなし #}
+          <li>
+            <div style="display: flex; align-items: flex-start;">
+              {# 左側：対応・調整が必要な予定だけ表示する「・」 #}
+              <span style="margin-right: 4px;">・</span>
+              {# 右側：予定本体 + 対応・調整情報 #}
+              <div>
+        {% else %}
+          {# 対応・調整が不要な予定：予定メンバーまたは合同予定カラーのカラーバーを表示 #}
+          <li class="color-bar" style="border-left-color: {{ schedule.display_color }};">
+            {# 対応・調整が不要な予定も、閉じタグの数をそろえるために箱を作る #}
+            <div>
+        {% endif %}
+
           {# 予定をクリックすると予定詳細画面へ移動する。schedule.pk はその予定のID#}
           <a href="{% url 'schedule:schedule_detail' schedule.pk %}">
             <div>
@@ -62,7 +76,7 @@
               {% if schedule.is_all_day %}
                 終日
               {% else %}
-              {# date フィルタで時刻を "09:00" 形式で表示する #}
+                {# date フィルタで時刻を "09:00" 形式で表示する #}
                 {{ schedule.start_at|date:"H:i" }}〜{{ schedule.end_at|date:"H:i" }}
               {% endif %}
 
@@ -92,7 +106,13 @@
 
           {# 対応・調整が必要な予定だけ表示する #}
           {% if schedule.requires_coordination %}
-            <div>
+            <div style="display:flex; margin-left:-20px;">
+              <span style="margin-right:10px;">└─</span>
+              {# 担当者カラーの背景を付けて、ステータス・対応内容・担当者を表示 #}
+              <span
+                class="coordination-badge"
+                style="background-color: {{ schedule.display_color }};"
+              >
                 {# ステータスの記号だけ出す #}
                 {% if schedule.status == 0 %}
                   〇
@@ -114,8 +134,17 @@
                 {% else %}
                   未定
                 {% endif %}
+              </span>
             </div>
           {% endif %}
+
+          {# 右側の箱を閉じる #}
+          </div>
+          {% if schedule.requires_coordination %}
+            {# 「・」と予定内容を横並びにしていた箱を閉じる #}
+            </div>
+          {% endif %}
+
         </li>
       {% endfor %}
     </ul>
@@ -128,9 +157,9 @@
   {# ------------------------------ #}
   <h2>記録</h2>
   {% if bowel_records or absence_records %}
-    <ul>
+    <ul class="summary-list">
         {% for record in bowel_records %}
-            <li>
+            <li class="color-bar" style="border-left-color: {{ record.display_color }};">
                 <a href="{% url 'records:bowel_detail' pk=record.pk %}">
                     {% if record.child.image %}
                         <img
@@ -163,7 +192,7 @@
         {% endfor %}
 
         {% for record in absence_records %}
-            <li>
+            <li class="color-bar" style="border-left-color: {{ record.display_color }};">
                 <a href="{% url 'records:absence_detail' pk=record.pk %}">
                     {% if record.child.image %}
                         <img
