@@ -23,3 +23,29 @@
     /* 横幅を56pxに固定する */
     width: 56px;
 }
+
+.color-bar {
+    /* 左側に6px幅の線を表示する
+       色はテンプレートから
+       border-left-color で上書きする */
+    border-left: 6px solid #cccccc;
+    /* カラーバーと文字の間を少し空ける */
+    padding-left: 8px;
+    /* 下の予定・記録との間隔を空ける */
+    margin-bottom: 12px;
+}
+
+.coordination-badge {
+    /* 文字の背景だけに色を付ける */
+    display: inline;
+    /* 文字のまわりに少し余白を作る */
+    padding: 1px 4px 1px 4px;
+     /* マーカーっぽく少し角を丸める */
+    border-radius: 2px;
+}
+
+/* 予定・記録概要画面などの「・」を消す */
+.summary-list {
+    list-style: none;
+    padding-left: 0;
+}
