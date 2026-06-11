@@ -49,3 +49,9 @@
     list-style: none;
     padding-left: 0;
 }
+
+/* リンクのデフォルト装飾を消す */
+.link-reset {
+    text-decoration: none; /* 下線を消す */
+    color: inherit;        /* 親要素の文字色を使う */
+}
