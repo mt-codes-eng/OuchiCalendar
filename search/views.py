@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from schedule.models import Schedule
 from records.models import BowelMovementRecord, AbsenceRecord
+from color_assignments.models import FamilyColorAssignment
 
 def _format_japanese_date(target_date):
     """
@@ -15,6 +16,53 @@ def _format_japanese_date(target_date):
     week_map = ["月", "火", "水", "木", "金", "土", "日"]
     weekday = week_map[target_date.weekday()]
     return f"{target_date.year}/{target_date.month}/{target_date.day}（{weekday}）"
+
+def _get_color_map(family):
+    """
+    家族ごとの色設定を、画面で使いやすい形にまとめる関数
+
+    戻り値のイメージ：
+    {
+        "shared": "#c2bbb2",
+        "users": {
+            1: "#ff7f7f",
+            2: "#7fbfff",
+        },
+        "children": {
+            3: "#7fff7f",
+        },
+    }
+    """
+
+    # 色が未設定だったときの初期値
+    color_map = {
+        "shared": "#cccccc",   # 合同予定カラー
+        "users": {},           # 大人メンバー用カラー
+        "children": {},        # 子ども用カラー
+    }
+
+    # この家族に設定されている色を全部取得
+    assignments = FamilyColorAssignment.objects.filter(
+        family=family
+    )
+
+    for assignment in assignments:
+        # color_code から "#ff7f7f" のような色コードに変換
+        hex_color = assignment.get_hex_color()
+
+        # 合同予定カラー
+        if assignment.assign_type == FamilyColorAssignment.AssignType.SHARED:
+            color_map["shared"] = hex_color
+
+        # 大人メンバーの個人カラー
+        elif assignment.assign_type == FamilyColorAssignment.AssignType.USER:
+            color_map["users"][assignment.user_id] = hex_color
+
+        # 子どもの個人カラー
+        elif assignment.assign_type == FamilyColorAssignment.AssignType.CHILD:
+            color_map["children"][assignment.child_id] = hex_color
+
+    return color_map
 
 @login_required
 def search_view(request):
@@ -37,6 +85,10 @@ def search_view(request):
     # request.GET → URLの ?q=会議 のような値が入っている
     # strip() は前後の空白を消す
     keyword = request.GET.get("q", "").strip()
+    
+    # 家族の色設定をまとめて取得する
+    # 予定・記録に display_color を付けるために使う
+    color_map = _get_color_map(request.user.family)
 
     # 日付ごとに検索結果を入れる箱
     # 普通の辞書: grouped_results["2026-05-15"] = []
@@ -72,6 +124,51 @@ def search_view(request):
 
         # 取得した予定を日付ごとにまとめる
         for schedule in schedules:
+             # 大人メンバー一覧をリストにする
+            user_memberships = list(schedule.user_memberships.all())
+
+            # 子どもメンバー一覧をリストにする
+            child_memberships = list(schedule.child_memberships.all())
+
+            # 予定メンバーの人数を数える
+            member_count = len(user_memberships) + len(child_memberships)
+
+            # 対応・調整が必要な予定の場合
+            if schedule.requires_coordination:
+                # 担当者がいる場合は担当者カラーを使う
+                if schedule.user_id:
+                    schedule.display_color = color_map["users"].get(
+                        schedule.user_id,
+                        "#cccccc"
+                    )
+                # 担当者が未定ならグレー
+                else:
+                    schedule.display_color = "#cccccc"
+
+            # 対応・調整が不要な通常予定の場合
+            else:
+                # 予定メンバーが1人だけの場合
+                if member_count == 1:
+                    # 大人メンバー1人の予定
+                    if user_memberships:
+                        user_id = user_memberships[0].user_id
+                        schedule.display_color = color_map["users"].get(
+                            user_id,
+                            "#cccccc"
+                        )
+
+                    # 子どもメンバー1人の予定
+                    else:
+                        child_id = child_memberships[0].child_id
+                        schedule.display_color = color_map["children"].get(
+                            child_id,
+                            "#cccccc"
+                        )
+
+                # 予定メンバーが複数人、または0人の場合は合同予定カラー
+                else:
+                    schedule.display_color = color_map["shared"]
+                    
             result_date = schedule.start_at.date()
 
             grouped_results[result_date].append({
@@ -99,6 +196,11 @@ def search_view(request):
 
         # 排便記録を日付ごとに追加
         for record in bowel_records:
+            # 記録は子どものカラーを使う
+            record.display_color = color_map["children"].get(
+                record.child_id,
+                "#cccccc"
+            )
             grouped_results[record.record_date].append({
                 "type": "bowel",
                 "object": record,
@@ -123,6 +225,12 @@ def search_view(request):
 
         # 欠席記録を日付ごとに追加
         for record in absence_records:
+            # 記録は子どものカラーを使う
+            record.display_color = color_map["children"].get(
+                record.child_id,
+                "#cccccc"
+            )
+
             grouped_results[record.record_date].append({
                 "type": "absence",
                 "object": record,
