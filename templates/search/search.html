@@ -29,15 +29,31 @@
                 {# 例：2026/5/15（金）のような日付表示 #}
                 <p>{{ date_group.date_display }}</p>
 
-                <ul>
+                <ul class="summary-list">
                     {# その日付に含まれる予定・記録を1件ずつ表示する #} 
                     {% for item in date_group.items %}
 
                         {% if item.type == "schedule" %}
                             {# item.object を schedule という名前で使えるようにする #}
                             {% with schedule=item.object %}
-                                <li>
-                                    <a href="{% url 'schedule:schedule_detail' schedule.pk %}">
+                                {% if schedule.requires_coordination %}
+                                    {# 対応・調整あり #}
+                                    <li>
+                                        <div style="display: flex; align-items: flex-start;">
+                                            <span style="margin-right: 4px;">・</span>
+                                            <div>
+                                {% else %}
+                                    {# 対応・調整なし #}
+                                    <li
+                                        class="color-bar"
+                                        style="border-left-color: {{ schedule.display_color }};"
+                                    >
+                                        <div>
+                                {% endif %}
+                                    <a 
+                                        href="{% url 'schedule:schedule_detail' schedule.pk %}"
+                                        class="search-result-link"
+                                    >
                                         <div>
                                             {# 予定メンバー画像（大人） #}
                                             {% for membership in schedule.user_memberships.all %}
@@ -93,7 +109,12 @@
                                         </div>
 
                                         {% if schedule.requires_coordination %}
-                                            <div>
+                                            <div style="display:flex; margin-left:-20px;">
+                                              <span style="margin-right:10px;">└─</span>
+                                              <span
+                                                class="coordination-badge"
+                                                style="background-color: {{ schedule.display_color }};"
+                                              >
                                                 {# ステータスの記号だけ出す #}
                                                 {% if schedule.status == 0 %}
                                                     〇
@@ -115,17 +136,30 @@
                                                 {% else %}
                                                     未定
                                                 {% endif %}
+                                              </span>
                                             </div>
                                         {% endif %}
                                     </a>
+                                
+                                </div>
+                                {% if schedule.requires_coordination %}
+                                    {# 「・」と予定内容を横並びにしていた箱を閉じる #}
+                                    </div>
+                                {% endif %}
                                 </li>
                             {% endwith %}
                         {% endif %}
 
                         {% if item.type == "bowel" %}
                             {% with record=item.object %}
-                                <li>
-                                    <a href="{% url 'records:bowel_detail' pk=record.pk %}">
+                                <li
+                                  class="color-bar"
+                                  style="border-left-color: {{ record.display_color }};"
+                                >    
+                                    <a 
+                                      href="{% url 'records:bowel_detail' pk=record.pk %}"
+                                      class="search-result-link"
+                                    >
                                         {% if record.child.image %}
                                             <img
                                                 src="{{ record.child.image.url }}"
@@ -159,8 +193,14 @@
 
                         {% if item.type == "absence" %}
                             {% with record=item.object %}
-                                <li>
-                                    <a href="{% url 'records:absence_detail' pk=record.pk %}">
+                                <li
+                                  class="color-bar"
+                                  style="border-left-color: {{ record.display_color }};"
+                                >
+                                    <a
+                                      href="{% url 'records:absence_detail' pk=record.pk %}"
+                                      class="search-result-link"
+                                    >
                                         {% if record.child.image %}
                                             <img
                                                 src="{{ record.child.image.url }}"
