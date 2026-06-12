@@ -55,3 +55,34 @@
     text-decoration: none; /* 下線を消す */
     color: inherit;        /* 親要素の文字色を使う */
 }
+
+.month-schedule-item {
+    font-size: 12px;
+    margin-top: 2px;
+    padding-left: 3px;
+}
+
+.month-record-item {
+    margin-top: 2px;
+    padding-left: 3px;
+}
+
+.schedule-saturday {
+    color: blue;
+}
+
+.schedule-sunday {
+    color: red;
+}
+
+/* 今月以外の日付セル */
+.schedule-outside-month {
+    background-color: #f5f5f5;
+    opacity: 0.5;
+}
+
+/* 今日の日付セル */
+.schedule-today {
+    background-color: #e8fff0;
+    outline: 2px solid #99ccaa;
+}
