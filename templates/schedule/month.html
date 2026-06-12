@@ -1,6 +1,6 @@
 <!-- templates/schedule/month.html -->
 {% extends "base_app.html" %}
-
+{% load static %}
 {% block title %}スケジュール | おうちカレンダー{% endblock %}
 
 {% block page_title %}
@@ -40,7 +40,14 @@
       <tr>
         {# 曜日を表示 #}
         {% for week_name in week_names %}
-          <th>{{ week_name }}</th>
+          <th
+             class="
+              {% if week_name == '土' %}schedule-saturday{% endif %}
+              {% if week_name == '日' %}schedule-sunday{% endif %}
+            "
+          >
+            {{ week_name }}
+        </th>
         {% endfor %}
       </tr>
     </thead>
@@ -51,35 +58,92 @@
         <tr>
           {# その週の1日ずつを表示 #}
           {% for cell in week %}
-            <td valign="top" width="120" height="100">
+            <td 
+              valign="top"
+              width="120"
+              height="100"
+              class="
+                {% if not cell.is_current_month %}schedule-outside-month{% endif %}
+                {% if cell.is_today %}schedule-today{% endif %}
+              "
+            >
               <div>
                 {# 日付を押すとその日の概要画面へ移動 #}
-                <a href="{% url 'schedule:day' cell.date_str %}">
+                <a 
+                  href="{% url 'schedule:day' cell.date_str %}"
+                  class="
+                    link-reset
+                    {% if cell.date.weekday == 5 %}schedule-saturday{% endif %}
+                    {% if cell.date.weekday == 6 %}schedule-sunday{% endif %}
+                "  
+                >
                   {{ cell.date.day }}
                 </a>
-
-                {# 今日なら目印をつける（仮） #}
-                {% if cell.is_today %}
-                  <strong>今日</strong>
-                {% endif %}
               </div>
-
-              {# 今月以外の日付は薄く扱うための仮表示 #}
-              {% if not cell.is_current_month %}
-                <div>
-                  <small>今月外</small>
-                </div>
-              {% endif %}
 
               {# その日の予定一覧を表示 #}
               {% if cell.schedules %}
-                <ul>
+                <div>
                   {% for schedule in cell.schedules %}
-                    <li>
-                      {{ schedule.title }}
-                    </li>
+                    {% if schedule.requires_coordination %}
+                      {# 対応・調整が必要な予定：担当者カラーを背景にする #}
+                      <div
+                        class="month-schedule-item"
+                        style="background-color: {{ schedule.display_color }};"
+                      >
+                        {# ステータス記号 #}
+                        {% if schedule.status == 0 %}
+                          〇
+                        {% elif schedule.status == 1 %}
+                          △
+                        {% elif schedule.status == 2 %}
+                          ✕
+                        {% endif %}
+                        {{ schedule.get_coordination_type_display }}
+                      </div>
+
+                    {% else %}
+                      {# 対応・調整が不要な予定：左にカラーバー + タイトル #}
+                      <div
+                        class="month-schedule-item color-bar"
+                        style="border-left-color: {{ schedule.display_color }};"
+                      >
+                        {{ schedule.title }}
+                      </div>
+                    {% endif %}
                   {% endfor %}
-                </ul>
+                </div>
+              {% endif %}
+
+              {# その日の記録アイコンを表示 #}
+              {% if cell.bowel_records or cell.absence_records %}
+                <div>
+                  {% for record in cell.bowel_records %}
+                    <div
+                      class="month-record-item color-bar"
+                      style="border-left-color: {{ record.display_color }};"
+                    >
+                      {% if record.has_bowel_movement %}
+                        <img src="{% static 'images/icons/bowel_movement.svg' %}" alt="排便" width="15" height="15">
+                      {% endif %}
+
+                      {% if record.has_concern %}
+                        <img src="{% static 'images/icons/attention.svg' %}" alt="気になること" width="15" height="15">
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+
+                  {% for record in cell.absence_records %}
+                    <div
+                      class="month-record-item color-bar"
+                      style="border-left-color: {{ record.display_color }};"
+                    >
+                      {% if record.is_absent %}
+                        <img src="{% static 'images/icons/house.svg' %}" alt="欠席" width="15" height="15">
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
               {% endif %}
             </td>
           {% endfor %}
