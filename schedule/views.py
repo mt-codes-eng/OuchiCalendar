@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime, date, time, timedelta
 from django.utils import timezone
 from django.db.models import Count
+from collections import defaultdict
 from .models import Schedule
 from attachments.models import ScheduleAttachment
 from comments.forms import ScheduleCommentForm
@@ -69,8 +70,75 @@ def month_view(request):
         family=request.user.family,
         start_at__date__gte=month_start,
         start_at__date__lt=next_month_start,
+    ).select_related(
+        "user"
+    ).prefetch_related(
+        "user_memberships__user",
+        "child_memberships__child",
     ).order_by("start_at")
+    
+    # ---その月の排便記録を取得する---
+    bowel_records = BowelMovementRecord.objects.filter(
+        child__family=request.user.family,
+        record_date__gte=month_start,
+        record_date__lt=next_month_start,
+    ).select_related(
+        "child"
+    ).order_by("record_date")
 
+    # ---その月の欠席記録を取得する---
+    absence_records = AbsenceRecord.objects.filter(
+        child__family=request.user.family,
+        record_date__gte=month_start,
+        record_date__lt=next_month_start,
+    ).select_related(
+        "child"
+    ).order_by("record_date")
+    
+    # ---家族の色設定を取得する---
+    color_map = _get_color_map(request.user.family)
+
+    # 予定に表示用カラーを追加する
+    for schedule in schedules:
+        user_memberships = list(schedule.user_memberships.all())
+        child_memberships = list(schedule.child_memberships.all())
+
+        member_count = len(user_memberships) + len(child_memberships)
+
+        # 対応・調整が必要な予定は担当者カラー
+        if schedule.requires_coordination:
+            if schedule.user_id:
+                schedule.display_color = color_map["users"].get(schedule.user_id, "#cccccc")
+            else:
+                schedule.display_color = "#cccccc"
+
+        # 対応・調整が不要な予定
+        else:
+            if member_count == 1:
+                if user_memberships:
+                    schedule.display_color = color_map["users"].get(
+                        user_memberships[0].user_id,
+                        "#cccccc"
+                    )
+                else:
+                    if child_memberships:
+                        schedule.display_color = color_map["children"].get(
+                            child_memberships[0].child_id,
+                            "#cccccc"
+                        )
+                    else:
+                        schedule.display_color = color_map["shared"]
+            else:
+                schedule.display_color = color_map["shared"]
+                
+    # 排便記録は子どものカラー
+    for record in bowel_records:
+        record.display_color = color_map["children"].get(record.child_id, "#cccccc")
+
+    # 欠席記録も子どものカラー
+    for record in absence_records:
+        record.display_color = color_map["children"].get(record.child_id, "#cccccc")
+                
     # ---日付ごとに予定をまとめる---
     # 日付ごとに予定をまとめる辞書（「この日にはこの予定たちがある」と取り出しやすくするための辞書）を作る
     # 例：template で使いやすいように、{"2026-03-09": [schedule1, schedule2],"2026-03-10": [schedule3],}の形にする
@@ -86,7 +154,27 @@ def month_view(request):
 
         # その日付のリストに予定を追加
         schedules_by_date[day_key].append(schedule)
+        
+    # ---日付ごとに記録をまとめる---
+    bowel_records_by_date = {}
+    absence_records_by_date = {}
 
+    for record in bowel_records:
+        day_key = record.record_date.isoformat()
+
+        if day_key not in bowel_records_by_date:
+            bowel_records_by_date[day_key] = []
+
+        bowel_records_by_date[day_key].append(record)
+
+    for record in absence_records:
+        day_key = record.record_date.isoformat()
+
+        if day_key not in absence_records_by_date:
+            absence_records_by_date[day_key] = []
+
+        absence_records_by_date[day_key].append(record)
+        
     #---templateで使いやすい「カレンダー表示用データ」を作る---
     # 1日ごとに、
     # {
@@ -118,6 +206,8 @@ def month_view(request):
                 "is_current_month": (day.month == month),
                 "is_today": (day == today),
                 "schedules": schedules_by_date.get(day_str, []),
+                "bowel_records": bowel_records_by_date.get(day_str, []),
+                "absence_records": absence_records_by_date.get(day_str, []), 
             })
 
         calendar_rows.append(week_data)
