@@ -3,40 +3,88 @@
 
 {% block title %}ログイン | おうちカレンダー{% endblock %}
 
-{% block page_title %}おうちカレンダー{% endblock %}
+{% block page_title %}
+<div 
+  style="
+    background-color: #8e95b8;
+    color:black;
+    padding: 14px 16px 14px 16px; /* 内側の余白 */
+  "
+>
+  おうちカレンダー
+</div>
+{% endblock %}
 
 {% block content %}
-{% if error %}
-  <p style="color:red;">{{ error }}</p>
-{% endif %}
+<div
+  style="
+    margin-top: 80px; /* 外側の上余白 */
+    display: flex; /* Flexboレイアウト。子要素の並び方を調整できるモード */
+    flex-direction: column; /* 子要素を縦並び */ 
+    align-items: center; /*  子要素を中央揃え */
+  "
+>
+  {% if error %}
+    <p style="color:red;">{{ error }}</p>
+  {% endif %}
 
-<form method="post">
-  {% csrf_token %}
+  <form method="post">
+    {% csrf_token %}
 
-  <div>
-    <label for="email">メールアドレス</label>
-    <input type="email" name="email" id="email" required>
-  </div>
-  {% comment %}
-  label：input が「何の入力欄か」を説明する項目名 
-  input：ユーザーが文字を入力する欄
-  div：枠・区切り。input と label を ひとかたまりとしてまとめる箱
+    <div style="margin-bottom: 10px;">
+      <label 
+        for="email"
+        style="display: block;" /* 要素が横までいっぱいに広がり、縦に並んでいく */
+      >
+        メールアドレス
+      </label>
+      <input 
+        type="email"
+        name="email"
+        id="email"
+        required
+      >
+    </div>
+    {% comment %}
+    label：input が「何の入力欄か」を説明する項目名 
+    input：ユーザーが文字を入力する欄（閉じタグなし）
+    div：枠・区切り。input と label を ひとかたまりとしてまとめる箱
 
-  input：入力する箱（閉じタグなし）
-  type：何を書く箱か。「この箱にはメールアドレスを書いてほしい」という指定
-  name：サーバに送るときの名前。「この箱の中身は、email という名前で送る」。Django には「request.POST["email"] == "test@example.com"」で届く
-  id：目印（labelやCSS用）。「この箱にID（名前札）をつける」
-  required：空欄NG（ブラウザチェック）。「ここは空欄のまま送信できません」というブラウザへのお願い
-  →「メールアドレスを書くための箱を1つ作る。その中身は email という名前で送る。何も書いてないと送信させない。この箱のIDは email」という意味
-  {% endcomment %}
+    type：何を書く箱か。「この箱にはメールアドレスを書いてほしい」という指定
+    name：サーバに送るときの名前。「この箱の中身は、email という名前で送る」。Django には「request.POST["email"] == "test@example.com"」で届く
+    id：目印（labelやCSS用）。「この箱にID（名前札）をつける」
+    required：空欄NG（ブラウザチェック）。「ここは空欄のまま送信できません」というブラウザへのお願い
+    {% endcomment %}
 
-  <div>
-    <label for="password">パスワード</label>
-    <input type="password" name="password" id="password" required>
-  </div>
+    <div style="margin-bottom: 10px;">
+      <label
+        for="password"
+        style="display: block;"
+      >
+        パスワード
+      </label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        required
+      >
+    </div>
 
-  <button type="submit">ログイン</button>
-</form>
+    <div
+      style="
+        margin-top: 10px;
+        text-align: center; /* ボタンを中央揃え */
+      "
+    >
+      <button type="submit">ログイン</button>
+    </div>
+  </form>
 
-<a href="{% url 'accounts:signup' %}">アカウント登録</a>
+  <p style="margin-top: 10px;">
+    <a href="{% url 'accounts:signup' %}">
+      アカウント登録
+    </a>
+  </p>
+</div>
 {% endblock %}
