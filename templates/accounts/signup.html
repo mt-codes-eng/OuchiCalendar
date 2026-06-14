@@ -2,25 +2,58 @@
 {% extends "base_auth.html" %}
 
 {% block title %}新規アカウント登録 | おうちカレンダー{% endblock %}
-{% block page_title %}新規アカウント登録{% endblock %}
+{% block page_title %}
+  <div
+    style="
+      text-align: center;
+    "
+  >
+    新規アカウント登録
+  </div>
+{% endblock %}
 
 {% block auth_left %}
   {% if not invitation_token %}
     <a href="{% url 'accounts:login' %}" aria-label="ログイン画面へ戻る">×</a>
   {% endif %}
-    {% endblock %}
+{% endblock %}
 
 {% block content %}
+<style>
+/* signup.html専用 */
+
+/* ラベル部分 */
+.form-label {
+    display: inline-block;
+    width: 140px; /* ラベルの横幅を固定 */
+}
+</style>
+
 <form method="post" enctype="multipart/form-data"> {# 「登録ボタンを押したら、POSTという方法でサーバに送る」宣言 #}{# ファイルを含むフォーム送信をするときには enctype の追加が必須#}
   {% csrf_token %} {# Djangoの“なりすまし防止”の安全装置。POSTフォームには必須 #}
   
   {# 招待URL経由で来たときだけ、招待トークンをhiddenで一緒に送る #}
   {% if invitation_token %}
-    <input type="hidden" name="invitation_token" value="{{ invitation_token }}">
-    <p>
-      この画面は、家族からの招待を受けた方専用のアカウント登録画面です。<br>
-      登録が完了すると、この家族グループのおうちカレンダーを共有できます。
-    </p>
+    <div
+      style="
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      "
+    >
+      <input type="hidden" name="invitation_token" value="{{ invitation_token }}">
+      <p
+        style="
+          display: inline-block;
+          text-align: left;
+          margin: 0;
+          font-size: 13px;
+        "
+      >
+        この画面は、家族からの招待を受けた方専用のアカウント登録画面です<br>
+        登録が完了すると、この家族グループのおうちカレンダーを共有できます
+      </p>
+    </div>
   {% endif %}
   
   {# フォーム全体に関わるエラーを表示する場所 #}
@@ -29,138 +62,194 @@
       {{ form.non_field_errors }}
     </div>
   {% endif %}
-
-  <p>
-    {{ form.name.label_tag }}
-    {{ form.name }}
-    {{ form.name.errors }}
-  </p>
-
-  <p>
-    {{ form.email.label_tag }}
-    {{ form.email }}
-    {{ form.email.errors }}
-  </p>
-
-  <p>
-    {{ form.password1.label_tag }}
-    {{ form.password1 }}
-    {{ form.password1.errors }}
-  </p>
-
-  <p>
-    {{ form.password2.label_tag }}
-    {{ form.password2 }}
-    {{ form.password2.errors }}
-  </p>
-
-  <p>
-    {{ form.image.label_tag }}
-    {{ form.image }}
-    {{ form.image.errors }}
-  </p>
-
-  <div style="display: flex; align-items: center; gap: 10px;">
-    <label>個人カラー：</label>
-
-    {# 実際にサーバーへ送る値を入れる。hidden inputは画面には見えないが、フォーム送信時に color_code として送られる #}
-    {# [input] 実際の値を送信 #}
-    <input
-      type="hidden"
-      name="color_code"
-      id="id_color_code"
-      value="{{ form.color_code.value|default:'' }}"
-    >
-    {# いま選択中の色を表示するボタン。ここを押すと、下の色候補一覧を開いたり閉じたりする #}
-    {# [button] 押す。操作する（クリック）#}
-    {# border → 枠線。1px → 太さ。solid → 実線。#ccc → 薄いグレー#}
-    {# background-color → 背景色 #}
-    {# cursor: pointer → マウス乗せたら指になる（クリックできる）#}
-    {# display: inline-flex →  中の要素を中央揃えする準備 #}
-    {# align-items: center → 縦方向の中央揃え #}
-    {# justify-content: center → 横方向の中央揃え #}
-    {# padding: 0 → 内側の余白をなくす #}
-    <button
-      type="button"
-      id="color-picker-toggle"
+  
+  {# 入力項目を囲う枠 #}
+  <div
+    style="
+      border: 1px solid #35322E; /* 枠線の太さ・線の種類・色 */
+      border-radius: 15px; /* 角を丸くする */
+      padding: 24px;
+      width: fit-content; /* 横幅を中身の幅に合わせる */
+      margin: 20px auto 0 auto; /* 左右は自動計算。結果的に中央に配置 */
+    "
+  >
+    <p>
+      <label
+        for="{{ form.name.id_for_label }}"
+        class="form-label"
+      >
+        {{ form.name.label }}
+      </label>
+      {{ form.name }}
+      {{ form.name.errors }}
+    </p>
+    <p>
+      <label
+        for="{{ form.name.id_for_label }}"
+        class="form-label"
+      >
+        {{ form.email.label }}
+      </label>
+      {{ form.email }}
+      {{ form.email.errors }}
+    </p>
+    <p>
+      <label
+        for="{{ form.name.id_for_label }}"
+        class="form-label"
+      >
+        {{ form.password1.label }}
+      </label>
+      {{ form.password1 }}
+      {{ form.password1.errors }}
+    </p>
+    <p>
+      <label
+        for="{{ form.name.id_for_label }}"
+        class="form-label"
+      >
+        {{ form.password2.label }}
+      </label>
+      {{ form.password2 }}
+      {{ form.password2.errors }}
+    </p>
+    <p>
+      <label
+        for="{{ form.name.id_for_label }}"
+        class="form-label"
+      >
+        {{ form.image.label }}
+      </label>
+      {{ form.image }}
+      {{ form.image.errors }}
+    </p>
+    <div 
       style="
-        width: 70px;
-        height: 34px;
-        border: 0px solid #ccc;
-        background-color: #fff;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
+        display: flex;
+        align-items: center; 
+        gap: 10px;
       "
-      aria-label="個人カラーを選択"
     >
+      <label class="form-label">
+        個人カラー
+      </label>
+      
+      {# 実際にサーバーへ送る値を入れる。hidden inputは画面には見えないが、フォーム送信時に color_code として送られる #}
+      {# [input] 実際の値を送信 #}
+      <input
+        type="hidden"
+        name="color_code"
+        id="id_color_code"
+        value="{{ form.color_code.value|default:'' }}"
+      >
+      {# いま選択中の色を表示するボタン。ここを押すと、下の色候補一覧を開いたり閉じたりする #}
+      {# [button] 押す。操作する（クリック）#}
+      {# border → 枠線。1px → 太さ。solid → 実線。#ccc → 薄いグレー#}
+      {# background-color → 背景色 #}
+      {# cursor: pointer → マウス乗せたら指になる（クリックできる）#}
+      {# display: inline-flex →  中の要素を中央揃えする準備 #}
+      {# align-items: center → 縦方向の中央揃え #}
+      {# justify-content: center → 横方向の中央揃え #}
+      {# padding: 0 → 内側の余白をなくす #}
+      <button
+        type="button"
+        id="color-picker-toggle"
+        style="
+          width: 70px;
+          height: 34px;
+          border: none;
+          background-color: #F3F3F3;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+        "
+        aria-label="個人カラーを選択"
+      >
       {# 選択中の色を表示する四角 #}
       {# [span] 色を表示。見た目（表示）#}
       {# display: inline-block; → spanは普通だとサイズ指定できないがこれでwidth / height が効くように #}
-      {# transparent → 透明 #}
-      <span
-        id="selected-color-preview"
+        <span
+          id="selected-color-preview"
+          style="
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 1px solid #ccc;
+            background-color: white;
+          "
+        ></span>
+      </button>
+    </div>
+    {# 色候補一覧。最初は非表示。ボタンを押すと表示される #}
+    <div
+      id="color-picker-options"
+      style="
+        display: none;
+        margin-top: 8px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        background-color: white;
+        width: fit-content;
+      "
+    >
+      {# 色を横並び＋折り返しで表示 #}
+      <div
         style="
-          display: inline-block;
-          width: 18px;
-          height: 18px;
-          border: 1px solid #ccc;
-          background-color: transparent;
+          display: flex;
+          flex-wrap: wrap; /* 自動的に次の行へ折り返す */
+          gap: 10px;
         "
-      ></span>
-    </button>
-  </div>
-  {# 色候補一覧。最初は非表示。ボタンを押すと表示される #}
-  {# width: fit-content; → 中身の大きさピッタリにする #}
-  <div
-    id="color-picker-options"
-    style="
-      display: none;
-      margin-top: 8px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      width: fit-content;
-    "
-  >
-    {# 色を横並び＋折り返しで表示 #}
-    {# display: flex; → 横並び。flex-wrap: wrap; → はみ出したら折り返しOK。gap: 10px; → 余白つける。要素同士のすき間。#}
-    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-      {# formに設定した選択肢を1つずつ取り出す #}
-      {# value = 0,1,2... の数字 #}
-      {# hex = "#ff7f7f" などの色コード #}
-      {% for value, hex in form.fields.color_code.choices %}
-        {# 最初の「選択してください」は表示しない #}
-        {% if value != "" %}
-          <button
-            type="button"
-            class="color-option-button"
-            data-value="{{ value }}"
-            data-hex="{{ hex }}"
-            style="
-              width: 24px;
-              height: 24px;
-              border: 1px solid #ccc;
-              background-color: {{ hex }};
-              cursor: pointer;
-            "
-            aria-label="色 {{ value }} を選択"
-          ></button>
-        {% endif %}
-      {% endfor %}
+      >
+        {# formに設定した選択肢を1つずつ取り出す #}
+        {# value = 0,1,2... の数字 #}
+        {# hex = "#ff7f7f" などの色コード #}
+        {% for value, hex in form.fields.color_code.choices %}
+          {# 最初の「選択してください」は表示しない #}
+          {% if value != "" %}
+            <button
+              type="button"
+              class="color-option-button"
+              data-value="{{ value }}"
+              data-hex="{{ hex }}"
+              style="
+                width: 24px;
+                height: 24px;
+                padding: 0; /* 共通ボタンCSSの padding を打ち消す */
+                border: 1px solid #ccc;
+                background-color: {{ hex }};
+                cursor: pointer;
+              "
+              aria-label="色 {{ value }} を選択"
+            ></button>
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
   </div>
 
   {{ form.color_code.errors }}
 
-  <p style="font-size: 13px;">
-    ＊すべて必須項目です<br>
-    項目をすべて入力し、登録ボタンを押してください
-  </p>
+  <div
+    style="
+      margin-top: 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
+    "
+  >
+    <p
+      style="
+        display: inline-block; /* 文章の幅だけを使う */
+        text-align: left; /* 文章は左揃え */
+        font-size: 13px;
+      "
+    >
+      ＊すべて必須項目です<br>
+      項目をすべて入力し、登録ボタンを押してください
+    </p>
 
-  <div style="margin-top: 20px;">
     <button type="submit">登録</button> {# type="submit" があるとこのボタンを押した瞬間に、form の中身を送信するという特別な役割 #}
   </div>
 </form>{# 送信先は、form タグで決まっている。action がない場合「今表示しているURL（住所）」に送信。実際に受け取るのは「URLを処理する関数：signup_view（人）」。#}
@@ -210,9 +299,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // 該当がなければ色を透明にする
+        // 該当がなければ白色にする
         if (!found) {
-            previewBox.style.backgroundColor = "transparent";
+            previewBox.style.backgroundColor = "white";
         }
     }
 
