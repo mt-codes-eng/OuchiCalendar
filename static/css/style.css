@@ -1,3 +1,39 @@
+/* =======================
+   アプリ全体の基本色
+======================= */
+
+body {
+    background-color: #F3F3F3;
+    color: #35322E;
+}
+
+/* リンクも基本の文字色に近づける */
+a {
+    color: #35322E;
+}
+
+/* =======================
+   ボタン共通のデザイン
+======================= */
+
+button,
+input[type="submit"],
+.button-primary {
+    background-color: #6F789D;
+    color: #ffffff;
+    border: none;/* 枠線を消す */
+    border-radius: 1px;/* 角を少し丸くする */
+    padding: 4px 20px 4px 20px;
+    cursor: pointer;/* マウスを乗せた時に指マークにする */
+}
+
+/* ボタンにマウスを乗せたとき */
+button:hover,/* hover「マウスカーソルが上に乗った時」 */
+input[type="submit"]:hover,
+.button-primary:hover {
+    opacity: 0.85; /* 透明度　85%表示 */
+}
+
 .bottom-nav {
     display: flex;
     /* 真ん中寄せ */
@@ -44,8 +80,8 @@
     border-radius: 2px;
 }
 
-/* 予定・記録概要画面などの「・」を消す */
-.summary-list {
+/* ulの「・」を消す */
+.list-reset {
     list-style: none;
     padding-left: 0;
 }
