@@ -28,7 +28,7 @@
 
   {% if schedules %}
     {# 予定があるときは一覧表示する #}
-    <ul class="summary-list">
+    <ul class="list-reset">
       {% for schedule in schedules %}
         {% if schedule.requires_coordination %}
           {# 対応・調整が必要な予定：カラーバーなし #}
@@ -157,7 +157,7 @@
   {# ------------------------------ #}
   <h2>記録</h2>
   {% if bowel_records or absence_records %}
-    <ul class="summary-list">
+    <ul class="list-reset">
         {% for record in bowel_records %}
             <li class="color-bar" style="border-left-color: {{ record.display_color }};">
                 <a href="{% url 'records:bowel_detail' pk=record.pk %}">
