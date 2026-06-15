@@ -5,19 +5,42 @@
 {% block page_title %}私の家族{% endblock %}
 
 {% block content %}
- <section> {# 意味づけ用の区切りタグ。見出しごとの箱。1つのまとまり（セクション）#}
-    <div>
-      <h2 style="display: inline;"> {# style="display: inline;"見出しを改行しないで、横並びにしたい #}
+  <style>
+  /* family_settings.html専用 */
+
+  /* 家族設定画面の角丸カード */
+  .family-card {
+    border: 1px solid #35322E; 
+    border-radius: 15px;
+    padding: 0px 16px 0px 16px;
+    margin: 0px 8px 15px 8px;
+    background-color: white;
+  }
+  </style>
+
+  <div>
+    <h3 style="
+      display: inline;
+      margin: 0px 8px 0px 8px;
+      "
+    >
       {{ request.user.name}}
-      </h2>
-      <a href="{% url 'accounts:user_profile_edit' %}" aria-label="私の設定を編集">
-        <img src="{% static 'images/icons/pencil.svg' %}" alt="私の設定を編集" width="20" height="20">
-      </a>
-    </div>
+    </h3>
+    <a href="{% url 'accounts:user_profile_edit' %}" aria-label="私の設定を編集">
+      <img src="{% static 'images/icons/pencil.svg' %}" alt="私の設定を編集" width="20" height="20">
+    </a>
+  </div>
+  <section class="family-card"> {# 意味づけ用の区切りタグ。見出しごとの箱。1つのまとまり（セクション）#}
     <p>Email：{{ request.user.email }}</p>
     <p>パスワード：********</p>
-    <p>個人アイコン：</p>
-    <p>
+    <p
+      style="
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      "
+    >
+      <span>個人アイコン：</span>
       <img
         src="{{ request.user.image.url }}"
         alt="{{ request.user.name }}の個人アイコン"
@@ -39,35 +62,42 @@
         </span>
       {% endif %}
     </p>
- </section>
+  </section>
+  <p style="margin: 0px 8px 20px 8px;">
+    <a href="{% url 'accounts:password_change' %}">※パスワードの変更はこちら</a>
+  </p>
 
- <p>
-  <a href="{% url 'accounts:password_change' %}">※パスワードの変更はこちら</a>
- </p>
- 
- <hr> {# Horizontal Rule（水平線）の略。「横線（区切り線）」を入れるタグ #}
-
- <section>
-    <div>
-      <h2 style="display: inline;">
-        {{ family.name|default:"未設定(家族名)" }}家
-      </h2>
-      <a href="{% url 'families:family_profile_edit' %}" aria-label="苗字の設定を編集">
-        <img src="{% static 'images/icons/pencil.svg' %}" alt="苗字の設定を編集" width="20" height="20">
-      </a>
-    </div>
-    <p>家族アイコン：</p>
-    {% if family.image %}
-      <p>
+  <div>
+    <h3 style="
+      display: inline;
+      margin: 0px 8px 0px 8px;
+      "
+    >
+      {{ family.name|default:"未設定(家族名)" }}家
+    </h3>
+    <a href="{% url 'families:family_profile_edit' %}" aria-label="苗字の設定を編集">
+      <img src="{% static 'images/icons/pencil.svg' %}" alt="苗字の設定を編集" width="20" height="20">
+    </a>
+  </div>
+  <section class="family-card">
+    <p
+      style="
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      "
+    >
+      <span>家族アイコン：</span>
+      {% if family.image %}
         <img
           src="{{ family.image.url }}"
           alt="{{ family.name }}家の家族アイコン"
           width="40"
         >
-      </p>
-    {% else %}
-     <p>未設定</p>
-    {% endif %}
+      {% else %}
+        <span>未設定</span>
+      {% endif %}
+    </p>
     <p>合同予定カラー：
       {% if shared_color_hex %}
         <span
@@ -86,12 +116,12 @@
     </p>
   </section>
 
- <hr>
-
- <section>
-  <h2>大人メンバー</h2>
+  <h3 style="margin: 0px 8px 0px 8px;">
+    大人メンバー
+  </h3>
+  <section class="family-card">
   {% if adult_members %}
-    <ul>
+    <ul class="list-reset">
       {% for member in adult_members %}
         <li>
           <img
@@ -121,7 +151,7 @@
     <p>まだ大人メンバーが登録されていません</p>
   {% endif %}
   <p>
-    <a href="{% url 'invitations:create' %}">
+    <a href="{% url 'invitations:create' %}" class=link-reset>
       家族を招待する
       <img
         src="{% static 'images/icons/plus.svg' %}"
@@ -132,14 +162,14 @@
       >
     </a>
   </p>
-</section>
+  </section>
 
- <hr>
-
- <section>
-  <h2>子どもメンバー</h2>
+  <h3 style="margin: 0px 8px 0px 8px;">
+    子どもメンバー
+  </h3>
+  <section class="family-card">
   {% if children %}
-    <ul>
+    <ul class="list-reset">
       {% for child in children %}
         <li>
           <img
@@ -178,7 +208,7 @@
     <p>まだメンバーが登録されていません</p>
   {% endif %}
   <p>
-    <a href="{% url 'children:child_create' %}">
+    <a href="{% url 'children:child_create' %}" class=link-reset>
       メンバーを追加する
       <img
         src="{% static 'images/icons/plus.svg' %}"
