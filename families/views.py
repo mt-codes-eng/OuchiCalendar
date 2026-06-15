@@ -16,7 +16,12 @@ def family_settings_view(request):
     # ログインしているユーザー(request.user)の家族を取り出してfamily という変数に入れる
     family = request.user.family
     # ログイン中のユーザーの家族に属する大人だけを取得する
-    adult_members = User.objects.filter(family=family).order_by("id")
+    # ただしログイン中の自分は除外する
+    adult_members = User.objects.filter(
+        family=family
+    ).exclude(
+        id=request.user.id
+    ).order_by("id")
     # children_childテーブルからfamily が request.user.family の子どもだけに絞る = ログイン中のユーザーの家族に属する子どもだけを取得する
     children = Child.objects.filter(family=family).order_by("id")
     
