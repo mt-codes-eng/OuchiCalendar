@@ -2,21 +2,55 @@
 {% extends "base_flow.html" %}
 
 {% block title %}家族の招待 | おうちカレンダー{% endblock %}
-{% block page_title %}家族を招待する{% endblock %}
 
 {% block flow_left %}
-<a href="{% url 'families:family_settings' %}" aria-label="家族設定へ戻る">×</a>
+    <a href="{% url 'families:family_settings' %}" aria-label="家族設定へ戻る">×</a>
+{% endblock %}
+
+{% block page_title %}
+    <div
+        style="
+            text-align: center;
+        "
+    >
+        家族を招待する
+    </div>
 {% endblock %}
 
 {% block content %}
-<p>
-以下のURLを家族に共有してください。<br>
-相手のアカウント登録が完了するとおうちカレンダーを共有できます。<br>
-発行したURLは一度利用した時点で無効になります。<br>
-また、利用されなかった場合は72時間後に無効になります。
-</p>
+    <div
+        style="
+            border: 1px solid #35322E; 
+            border-radius: 15px; 
+            padding: 10px 24px 10px 24px;
+            width: fit-content; 
+            margin: 20px auto 0 auto; 
+        "
+    >
+        <p>
+            以下のURLを家族に共有してください。<br>
+            相手のアカウント登録が完了するとおうちカレンダーを共有できます。<br>
+            発行したURLは一度利用した時点で無効になります。<br>
+            また、招待URLの有効期限は発行から72時間です。
+        </p>
 
-<p>{{ invite_url }}</p>
+        <p style="
+                border: 1px solid #ccc;
+                padding: 10px;
+                background-color: white;
+            "
+        >
+            {{ invite_url }}
+        </p>
+    </div>
 
-<p>有効期限：{{ invitation.expires_at }}</p>
+    <div
+        style="
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        "
+    >
+        ＊有効期限：{{ expires_at_display }}
+    </div>
 {% endblock %}
