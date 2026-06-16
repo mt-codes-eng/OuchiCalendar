@@ -15,6 +15,7 @@ def invitation_create_view(request):
     ・ログイン中ユーザーの家族に対する招待URLを作る
     ・すでに有効な未使用招待があればそれを再利用する
     ・なければ新しくトークンを発行する
+    ・招待URLの有効期限は「発行から72時間」
     """
 
     # ----------------------------------------
@@ -36,13 +37,13 @@ def invitation_create_view(request):
     ).order_by("-created_at").first()
 
     # ----------------------------------------
-    # ③ なければ新しく招待を作る
+    # ③ 有効な招待がない場合だけ新しく作る
     # ----------------------------------------
     if not invitation:
         # ランダムな安全なトークンを生成
         token = secrets.token_urlsafe(32)
 
-        # 有効期限（72時間後）を作る
+        # 有効期限は「発行した時点から72時間後」
         expires_at = timezone.now() + timedelta(hours=72)
 
         # 招待レコードを作成
@@ -64,13 +65,32 @@ def invitation_create_view(request):
 
     # 絶対URLにする（http://localhost:8000/～）
     invite_url = request.build_absolute_uri(invite_path)
+    
+    # ----------------------------------------
+    # ⑤ 有効期限を日本語表示用に整える
+    # ----------------------------------------
+    # 曜日表示用
+    week_map = ["月", "火", "水", "木", "金", "土", "日"]
+
+    # expires_at の曜日番号を取得
+    weekday = week_map[invitation.expires_at.weekday()]
+
+    # 日本語表示用文字列を作る
+    expires_at_display = (
+        f"{invitation.expires_at.year}/"
+        f"{invitation.expires_at.month}/"
+        f"{invitation.expires_at.day}"
+        f"({weekday}) "
+        f"{invitation.expires_at.strftime('%H:%M')}"
+    )
 
     # ----------------------------------------
-    # ⑤ templateに渡す
+    # ⑥ templateに渡す
     # ----------------------------------------
     context = {
         "invite_url": invite_url,
         "invitation": invitation,
+        "expires_at_display": expires_at_display,
     }
 
     return render(
