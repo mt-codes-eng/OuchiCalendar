@@ -132,4 +132,5 @@ def child_delete_view(request, pk):
         child.delete()
         return redirect("families:family_settings")
     
-    return render(request, "children/child_confirm_delete.html", {"child":child})
+    # GETで直接このURLに来た場合は、削除確認画面を出さず編集画面へ戻す
+    return redirect("children:child_edit", pk=child.pk)
