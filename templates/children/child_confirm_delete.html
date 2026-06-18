@@ -6,12 +6,39 @@
 {% block content %}
  <p>本当に{{ child.name }}を削除しますか？</p>
 
- <div>
-    <form method="post" style="display: inline;">
+ <div
+    style="
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    "
+  >
+    <form method="post">
         {% csrf_token %}
-        <button type="submit">OK</button>
+        <button
+            type="submit"
+            style="
+                background-color: #c85a5a;
+                color: #35322E;
+            "
+        >
+            OK
+        </button>
     </form>
 
-    <a href="{% url 'children:child_edit' child.id %}" >キャンセル</a>
+    <a 
+        href="{% url 'children:child_edit' child.id %}"
+        style="
+            display: inline-block;
+            padding: 2px 20px;
+            background-color: rgba(111, 120, 157, 0.5);
+            color: #35322E;
+            font-size: 13px;
+            border-radius: 1px;
+            text-decoration: none;
+          "
+    >
+        キャンセル
+    </a>
  </div>
 {% endblock %}
