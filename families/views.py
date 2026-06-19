@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db import transaction, IntegrityError
 from django.utils import timezone
+from django.urls import reverse
+
 from .forms import FamilyProfileForm
 from children.models import Child
 from django.contrib.auth import get_user_model
@@ -77,6 +79,12 @@ def family_settings_view(request):
         if assignment:
             child.color_hex = COLOR_HEX_MAP.get(assignment.color_code)
 
+    show_setup_completed_modal = (
+        request.GET.get("setup_completed") == "1"
+        and is_initial_setup_completed(request.user)
+        and not request.user.has_seen_family_setup_completed
+    )
+    
     context = {
         "family": family,
         "adult_members": adult_members,
@@ -84,6 +92,7 @@ def family_settings_view(request):
         "my_color_hex": my_color_hex,
         "shared_color_hex": shared_color_hex,
         "today_str": timezone.localdate().strftime("%Y-%m-%d"),
+        "show_setup_completed_modal": show_setup_completed_modal,
     }
     
     return render(
@@ -140,7 +149,9 @@ def family_profile_edit_view(request):
                     is_initial_setup_completed(request.user)
                     and not request.user.has_seen_family_setup_completed
                 ):
-                    return redirect("families:setup_completed")
+                    return redirect(
+                        reverse("families:family_settings") + "?setup_completed=1"
+                    )
 
                 # それ以外は家族設定画面へ戻る
                 return redirect("families:family_settings")
@@ -164,34 +175,6 @@ def family_profile_edit_view(request):
         "families/family_profile_edit.html",
         {"form": form, "family": family},
     )
-    
-@login_required
-def setup_completed_view(request):
-    """
-    家族設定登録完了画面
-
-    この画面は、
-    - 初期設定が完了している
-    - まだ完了画面を見終わっていない
-    ユーザーだけが表示できる
-
-    ここではまだ「見た」にはしない
-    「はい」「いいえ」を押したときにだけ見たことにする
-    """
-    user = request.user
-
-    # 初期設定が未完了なら、この画面は表示しない
-    # 苗字の設定画面へ戻す
-    if not is_initial_setup_completed(user):
-        return redirect("families:family_profile_edit")
-
-    # すでに完了画面を見たユーザーなら、
-    # 何度も表示せず、家族設定画面へ戻す
-    if user.has_seen_family_setup_completed:
-        return redirect("families:family_settings")
-
-    # まだ見ていないユーザーだけ、家族設定登録完了画面を表示する
-    return render(request, "families/setup_completed.html")
 
 @login_required
 def finish_setup_completed_view(request):
