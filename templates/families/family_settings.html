@@ -16,6 +16,54 @@
     margin: 0px 8px 15px 8px;
     background-color: white;
   }
+
+  /* 家族設定完了モーダルの背景 */
+  .setup-completed-modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  /* モーダル本体 */
+  .setup-completed-dialog {
+    width: 85%; /* 横幅。親要素の幅の85%を使う */
+    max-width: 320px;
+    background-color: #F3F3F3;
+    border-top: 1px solid #35322E;
+    border-bottom: 1px solid #35322E;
+    padding: 28px 20px;
+    text-align: center;
+    color: #35322E;
+  }
+
+  /* はい・いいえボタンの並び */
+  .setup-completed-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 24px;
+  }
+
+  /* はいボタン */
+  .setup-completed-yes-button {
+    background-color: #f47a4d;
+    color: #35322E;
+    padding: 4px 18px;
+  }
+
+  /* いいえボタン */
+  .setup-completed-no-button {
+    background-color: rgba(111, 120, 157, 0.5);
+    color: #35322E;
+    padding: 4px 18px;
+  }
   </style>
 
   <div>
@@ -219,5 +267,45 @@
       >
     </a>
   </p>
- </section>
+  </section>
+
+  {% if show_setup_completed_modal %}
+  <div class="setup-completed-modal">
+    <div class="setup-completed-dialog">
+      <p>
+        家族設定が完了しました！
+      </p>
+
+      <p>
+        次はカレンダーから<br>
+        予定や記録を作成してみましょう
+      </p>
+
+      {# 「はい」「いいえ」を押したときにフラグを True にしてから遷移したいので、aタグではなく form + button にする #}
+      <form method="post" action="{% url 'families:finish_setup_completed' %}">
+        {% csrf_token %}
+
+        <div class="setup-completed-buttons">
+          <button
+            type="submit"
+            name="action"
+            value="go_calendar"
+            class="setup-completed-yes-button"
+          >
+            はい
+          </button>
+
+          <button
+            type="submit"
+            name="action"
+            value="back_settings"
+            class="setup-completed-no-button"
+          >
+            いいえ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}
