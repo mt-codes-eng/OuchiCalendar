@@ -6,10 +6,15 @@
 <header>
   <div>
     {# aria-label="メニュー"：画面には表示されないが、読み上げソフト用（視覚障害者向け）にボタンの説明をつけるもの #}
-    <a 
-      href="{% url 'core:settings' %}?next={{ request.get_full_path|urlencode }}"
+    <button
+      type="button"
+      onclick="openSideMenu()"
       aria-label="メニュー"
-      style="text-decoration: none;"
+      style="
+        border: none;
+        background: none;
+        padding: 0;
+      "
       >
       <img
         src="{% static 'images/icons/hamburger_menu.svg' %}"
@@ -17,7 +22,7 @@
         width="20"
         height="20"
       >
-    </a>
+    </button>
     
     {# spanタグ：文字の一部を囲って、CSSで調整しやすくする #}
     <span>{% block page_title %}{% endblock %}</span>
@@ -25,6 +30,121 @@
     <span>{% block header_right %}{% endblock %}</span>
   </div>
 </header>
+
+<div
+  id="side-menu-overlay"
+  style="
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    z-index: 1000;
+  "
+>
+  <nav
+    style="
+      width: 60%;
+      max-width: 220px;
+      height: 100%;
+      background-color: #F3F3F3;
+      border-right: 1px solid #35322E;
+      padding: 16px;
+      box-sizing: border-box; /* padding と border を含めて幅を計算する */
+      position: relative; /* 基準作りのための設定。position: absolute;とセットでの利用が多い */
+    "
+  >
+    <button
+      type="button"
+      onclick="closeSideMenu()"
+      aria-label="メニューを閉じる"
+      style="
+        position: absolute; /* 基準からの距離で位置を指定 */
+        top: 8px;
+        right: 8px;
+        border: none;
+        background: none;
+        font-size: 28px;
+        color: #35322E;
+      "
+    >
+      ×
+    </button>
+
+    {% if request.user.family.image %}
+      <div>
+        <img
+          src="{{ request.user.family.image.url }}"
+          alt="{{ request.user.family.name }}家の家族アイコン"
+          width="120"
+        >
+      </div>
+    {% endif %}
+
+    <div>
+      <a 
+        href="{% url 'families:family_settings' %}"
+        class="link-reset"  
+      >
+        <img
+          src="{% static 'images/icons/people.svg' %}"
+          alt="家族の設定"
+          width="24"
+          height="24"
+          style="vertical-align: middle;"
+        >
+        家族の設定
+      </a>
+    </div>
+
+    <div>
+      <a 
+        href="{% url 'core:howto' %}"
+        class="link-reset"  
+      >
+        <img
+          src="{% static 'images/icons/question.svg' %}"
+          alt="アプリの使い方"
+          width="24"
+          height="24"
+          style="vertical-align: middle;"
+        >
+        アプリの使い方
+      </a>
+    </div>
+
+    <div
+      class="danger-button"
+      style="
+        display: inline-block;
+        padding: 4px 16px;
+        margin-top: 24px;
+        border-radius: 1px;
+        background-color:#c85a5a;
+        color: white;
+      "
+    >
+      <a 
+        href="{% url 'core:logout' %}"
+        class="link-reset"
+      >
+        ログアウト
+      </a>
+    </div>
+  </nav>
+</div>
+
+<script>
+function openSideMenu() {
+    document.getElementById("side-menu-overlay").style.display = "block";
+}
+
+function closeSideMenu() {
+    document.getElementById("side-menu-overlay").style.display = "none";
+}
+</script>
 {% endblock %}
 
 {% block footer %}
