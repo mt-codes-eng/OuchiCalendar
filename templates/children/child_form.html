@@ -204,30 +204,11 @@
   {# 削除確認ダイアログ #}
     <div
       id="delete-dialog"
-      style="
-        display: none; /* 要素を完全になくす。最初は非表示 */
-        position: fixed; /* 要素の位置を固定。画面全体に固定*/
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        background-color: rgba(0, 0, 0, 0.35);
-        z-index: 1000;  /* 要素の重なる順序を指定。一番前に表示 */
-        justify-content: center;
-        align-items: center;
-      "
+      class="modal-overlay"
     >
     {# ダイアログ本体 #}
       <div
-        style="
-          width: 85%; 
-          max-width: 320px;
-          background-color: #F3F3F3;
-          border-top: 1px solid #35322E;
-          border-bottom: 1px solid #35322E;
-          padding: 28px 20px;
-          text-align: center;
-        "
+        class="modal-dialog"
       >
         <p>本当に{{ child.name }}を削除しますか？</p>
 
@@ -334,8 +315,7 @@ document.addEventListener("DOMContentLoaded", function () {
 削除確認ダイアログを開く関数
 */
 function openDeleteDialog() {
-    const modal = document.getElementById("delete-dialog");
-    modal.style.display = "flex";
+    document.getElementById("delete-dialog").classList.add("is-active");
 }
 
 
@@ -343,8 +323,7 @@ function openDeleteDialog() {
 削除確認ダイアログを閉じる関数
 */
 function closeDeleteDialog() {
-    const modal = document.getElementById("delete-dialog");
-    modal.style.display = "none";
+    document.getElementById("delete-dialog").classList.remove("is-active");
 }
 </script>
 {% endblock %}
