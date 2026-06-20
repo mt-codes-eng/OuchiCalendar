@@ -17,32 +17,6 @@
     background-color: white;
   }
 
-  /* 家族設定完了モーダルの背景 */
-  .setup-completed-modal {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-
-  /* モーダル本体 */
-  .setup-completed-dialog {
-    width: 85%; /* 横幅。親要素の幅の85%を使う */
-    max-width: 320px;
-    background-color: #F3F3F3;
-    border-top: 1px solid #35322E;
-    border-bottom: 1px solid #35322E;
-    padding: 28px 20px;
-    text-align: center;
-    color: #35322E;
-  }
-
   /* はい・いいえボタンの並び */
   .setup-completed-buttons {
     display: flex;
@@ -270,8 +244,8 @@
   </section>
 
   {% if show_setup_completed_modal %}
-  <div class="setup-completed-modal">
-    <div class="setup-completed-dialog">
+  <div class="modal-overlay is-active">
+    <div class="modal-dialog">
       <p>
         家族設定が完了しました！
       </p>
