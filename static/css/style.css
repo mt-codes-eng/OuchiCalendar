@@ -34,6 +34,40 @@ input[type="submit"]:hover,
     opacity: 0.85; /* 透明度　85%表示 */
 }
 
+/* =======================
+   モーダルダイアログのデザイン
+======================= */
+
+/* モーダル背景 */
+.modal-overlay {
+    display: none; /* 要素を完全になくす。最初は非表示 */
+    position: fixed; /* 要素の位置を固定。画面全体に固定*/
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    z-index: 1000;  /* 要素の重なる順序を指定。一番前に表示 */
+    justify-content: center;
+    align-items: center;
+}
+
+/* 最初から表示するモーダル用 */
+.modal-overlay.is-active {
+    display: flex;
+}
+
+/* モーダル本体 */
+.modal-dialog {
+    width: 85%; /* 横幅。親要素の幅の85%を使う */
+    max-width: 320px;
+    background-color: #F3F3F3;
+    border: 1px solid #35322E;
+    padding: 28px 20px;
+    text-align: center;
+    color: #35322E;
+}
+
 .bottom-nav {
     display: flex;
     /* 真ん中寄せ */
