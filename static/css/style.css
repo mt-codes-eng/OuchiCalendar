@@ -15,27 +15,70 @@ a {
 /* =======================
    ボタン共通のデザイン
 ======================= */
-
+/* ボタンの基本形 */
+.button-primary,
+.button-danger,
+.button-secondary,
+.button-danger-text,
+.button-accent,
 button,
-input[type="submit"],
-.button-primary {
-    background-color: #6F789D;
-    color: #ffffff;
+input[type="submit"] {
     border: none;/* 枠線を消す */
     border-radius: 1px;/* 角を少し丸くする */
     padding: 4px 20px 4px 20px;
     cursor: pointer;/* マウスを乗せた時に指マークにする */
 }
 
-/* ボタンにマウスを乗せたとき */
-button:hover,/* hover「マウスカーソルが上に乗った時」 */
-input[type="submit"]:hover,
-.button-primary:hover {
-    opacity: 0.85; /* 透明度　85%表示 */
+/* ホバー時(ボタンにマウスを乗せたとき ) */
+.button-primary:hover,
+.button-danger:hover,
+.button-secondary:hover,
+.button-danger-text:hover,
+.button-accent:hover,
+button:hover,
+input[type="submit"]:hover {
+    opacity: 0.85;/* 透明度　85%表示 */
 }
 
-.danger-button:hover {
-    opacity: 0.85;
+/* ① ログイン・登録・保存・更新・検索 */
+.button-primary,
+button,
+input[type="submit"] {
+    background-color: #6F789D;
+    color: white;
+}
+
+.button-danger {
+    background-color: #c85a5a;
+    color: white;
+    border: none;
+    border-radius: 1px;
+    padding: 4px 20px;
+    cursor: pointer;
+}
+
+/* ② 削除・ログアウト */
+.button-danger {
+    background-color: #c85a5a;
+    color: white;
+}
+
+/* ③ キャンセル・いいえ */
+.button-secondary {
+    background-color: rgba(111, 120, 157, 0.5);
+    color: #35322E;
+}
+
+/* ④ 削除確認の「はい」など */
+.button-danger-text {
+    background-color: #c85a5a;
+    color: #35322E;
+}
+
+/* ⑤ オレンジの「はい」 */
+.button-accent {
+    background-color: #f47a4d;
+    color: #35322E;
 }
 
 /* =======================
@@ -72,6 +115,17 @@ input[type="submit"]:hover,
     color: #35322E;
 }
 
+.modal-button-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 16px;
+}
+
+/* =======================
+   ボトムナビゲーションバーのデザイン
+======================= */
 .bottom-nav {
     display: flex;
     /* 真ん中寄せ */
@@ -97,6 +151,7 @@ input[type="submit"]:hover,
     /* 横幅を56pxに固定する */
     width: 56px;
 }
+
 
 .color-bar {
     /* 左側に6px幅の線を表示する
