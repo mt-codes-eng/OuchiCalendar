@@ -44,6 +44,35 @@
     z-index: 1000;
   "
 >
+  <div
+    id="logout-dialog"
+    class="modal-overlay"
+  >
+    <div class="modal-dialog">
+      <p>本当にログアウトしますか？</p>
+
+      <div class="modal-button-row">
+        <form method="post" action="{% url 'core:logout' %}">
+          {% csrf_token %}
+          <button
+            type="submit"
+            class="button-danger-text"
+          >
+            はい
+          </button>
+        </form>
+
+        <button
+          type="button"
+          onclick="closeLogoutDialog()"
+          class="button-secondary"
+        >
+          いいえ
+        </button>
+      </div>
+    </div>
+  </div>
+
   <nav
     style="
       width: 60%;
@@ -115,23 +144,15 @@
       </a>
     </div>
 
-    <div
-      class="danger-button"
-      style="
-        display: inline-block;
-        padding: 4px 16px;
-        margin-top: 24px;
-        border-radius: 1px;
-        background-color:#c85a5a;
-        color: white;
-      "
-    >
-      <a 
-        href="{% url 'core:logout' %}"
-        class="link-reset"
+    <div>
+      <button
+        type="button"
+        onclick="openLogoutDialog()"
+        class="button-danger"
+        style="margin-top: 24px;"
       >
         ログアウト
-      </a>
+      </button>
     </div>
   </nav>
 </div>
@@ -143,6 +164,14 @@ function openSideMenu() {
 
 function closeSideMenu() {
     document.getElementById("side-menu-overlay").style.display = "none";
+}
+
+function openLogoutDialog() {
+    document.getElementById("logout-dialog").style.display = "flex";
+}
+
+function closeLogoutDialog() {
+    document.getElementById("logout-dialog").style.display = "none";
 }
 </script>
 {% endblock %}
