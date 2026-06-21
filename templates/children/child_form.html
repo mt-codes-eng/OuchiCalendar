@@ -184,15 +184,7 @@
         <button
           type="button"
           onclick="openDeleteDialog()"
-          style="
-            display: inline-block;
-            padding: 4px 20px;
-            background-color: #c85a5a;
-            color: white;
-            font-size: 13px;
-            border-radius: 1px;
-            text-decoration: none;
-          "
+          class="button-danger"
         >
           削除
         </button>
@@ -229,10 +221,7 @@
             {% csrf_token %}
             <button
               type="submit"
-              style="
-                background-color: #c85a5a;
-                color: #35322E;
-              "
+              class="button-danger-text"
             >
               OK
             </button>
@@ -242,11 +231,7 @@
           <button
             type="button"
             onclick="closeDeleteDialog()"
-            style="
-              padding: 2px 20px;
-              background-color: rgba(111, 120, 157, 0.5);
-              color: #35322E;
-            "
+            class="button-secondary"
           >
             キャンセル
           </button>
