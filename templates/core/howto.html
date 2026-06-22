@@ -4,15 +4,22 @@
 {% block title %}アプリの使い方 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
- <a href="{% url 'core:settings'%}">←</a>
+ <a
+    href="{% url 'core:settings'%}"
+    class="link-reset"
+ >
+    ←
+ </a>
 {% endblock %}
 
 {% block page_title %}アプリの使い方{% endblock %}
 
 
 {% block content %}
- <h2>①このアプリでできること</h2>
- <ul>
+ <h3 class="title">
+    ①このアプリでできること
+ </h3>
+ <ul class="content">
     <li>
         家族の予定、記録をまとめて管理できます
         <ul class="sub">
@@ -28,9 +35,10 @@
     </li>
  </ul>
 
-
- <h2>②表示のルールについて</h2>
- <ul>
+ <h3 class="title">
+    ②表示のルールについて
+ </h3>
+ <ul class="content">
     <li>
         対応/調整が不要な予定(予定メンバーが一人)
         <ul class="sub">
@@ -57,8 +65,10 @@
     </li>
  </ul>
 
- <h2>③よく迷いそうな点</h2>
- <ul>
+ <h3 class="title">
+    ③よく迷いそうな点
+ </h3>
+ <ul class="content">
     <li>
         予定と記録の違い
         <ul class="sub">
@@ -83,5 +93,17 @@
  {# margin-top: 0px; 親の文章と、補足のリストの間隔をなくす #}
  <style>
     ul.sub { list-style: none; padding-left: 0; margin-top: 0px; }
+
+    .title{
+        display: inline-block;
+        background-color: #8e95b8;
+        color: white;
+        padding: 2px 4px;
+        margin-bottom: 8px;
+    }
+
+    .content{
+        margin-top: 0;
+    }
  </style>
 {% endblock %}
