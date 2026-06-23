@@ -274,6 +274,30 @@
 
 </form>
 
+{% if show_coordination_choice %}
+    <div class="modal-overlay is-active">
+        <div class="modal-dialog">
+            <p>何か対応・調整が必要ですか？</p>
+
+            <div class="modal-button-row">
+                <a
+                    href="{% url 'schedule:schedule_create' %}?date={{ date }}"
+                    class="button-accent"
+                >
+                    はい
+                </a>
+
+                <a
+                    href="{% url 'schedule:day' date=date %}"
+                    class="button-secondary"
+                >
+                    いいえ
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 {% if mode == "edit" %}
     <div id="delete-dialog" class="modal-overlay">
         <div class="modal-dialog">
