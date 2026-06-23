@@ -23,10 +23,16 @@ a {
 .button-accent,
 button,
 input[type="submit"] {
+    display: inline-block;
     border: none;/* 枠線を消す */
     border-radius: 1px;/* 角を少し丸くする */
     padding: 4px 20px 4px 20px;
     cursor: pointer;/* マウスを乗せた時に指マークにする */
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 1.2;/* 文字サイズ14px × 1.2倍 */
+    height: 28px;
+    box-sizing: border-box;
 }
 
 /* ホバー時(ボタンにマウスを乗せたとき ) */
@@ -46,15 +52,6 @@ button,
 input[type="submit"] {
     background-color: #6F789D;
     color: white;
-}
-
-.button-danger {
-    background-color: #c85a5a;
-    color: white;
-    border: none;
-    border-radius: 1px;
-    padding: 4px 20px;
-    cursor: pointer;
 }
 
 /* ② 削除・ログアウト */
