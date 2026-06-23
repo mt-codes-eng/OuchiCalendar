@@ -63,6 +63,11 @@ def record_create_view(request):
 
     # URL用の日付文字列
     date_for_url = target_date.isoformat()
+    
+    # 対応・調整確認ダイアログを表示するか
+    show_coordination_choice = (
+        request.GET.get("show_coordination_choice") == "1"
+    )
 
     # -----------------------------
     # ② 子ども一覧を取得
@@ -106,20 +111,29 @@ def record_create_view(request):
                 # child と 日付はここでセット
                 record.child = child
                 record.record_date = posted_date
-                record.save()
                 
-                # 排便記録の添付ファイルを保存する
-                for uploaded_file in request.FILES.getlist("bowel_files"):
-                    BowelMovementAttachment.objects.create(
-                        bowel_movement_record=record,
-                        file=uploaded_file,
-                        file_name=uploaded_file.name,
+                if BowelMovementRecord.objects.filter(
+                    child=child,
+                    record_date=posted_date,
+                ).exists():
+                    bowel_form.add_error(
+                        None,
+                        "この子どものこの日の排便記録はすでに登録されています。登録済みの記録を編集してください"
                     )
+                else:
+                    record.save()
+                
+                    # 排便記録の添付ファイルを保存する
+                    for uploaded_file in request.FILES.getlist("bowel_files"):
+                        BowelMovementAttachment.objects.create(
+                            bowel_movement_record=record,
+                            file=uploaded_file,
+                            file_name=uploaded_file.name,
+                        )
 
-                return redirect(
-                    f"{reverse('schedule:coordination_choice')}?date={posted_date.isoformat()}"
-                )
-
+                    return redirect(
+                        f"{reverse('records:create')}?date={posted_date.isoformat()}&show_coordination_choice=1"
+                    )
 
         # -------------------------
         # 欠席記録の場合
@@ -132,19 +146,29 @@ def record_create_view(request):
                 record = absence_form.save(commit=False)
                 record.child = child
                 record.record_date = posted_date
-                record.save()
                 
-                # 欠席記録の添付ファイルを保存する
-                for uploaded_file in request.FILES.getlist("absence_files"):
-                    AbsenceAttachment.objects.create(
-                        absence_record=record,
-                        file=uploaded_file,
-                         file_name=uploaded_file.name,
-                    )
-
-                return redirect(
-                    f"{reverse('schedule:coordination_choice')}?date={posted_date.isoformat()}"
+                if AbsenceRecord.objects.filter(
+                    child=child,
+                    record_date=posted_date,
+                ).exists():
+                    absence_form.add_error(
+                        None,
+                        "この子どものこの日の欠席記録はすでに登録されています。登録済みの記録を編集してください"
                 )
+                else:
+                    record.save()
+                
+                    # 欠席記録の添付ファイルを保存する
+                    for uploaded_file in request.FILES.getlist("absence_files"):
+                        AbsenceAttachment.objects.create(
+                            absence_record=record,
+                            file=uploaded_file,
+                            file_name=uploaded_file.name,
+                        )
+
+                    return redirect(
+                        f"{reverse('records:create')}?date={posted_date.isoformat()}&show_coordination_choice=1"
+                    )
                 
     # -----------------------------
     # ④ GET（画面表示）
@@ -161,6 +185,7 @@ def record_create_view(request):
         "absence_form": absence_form,
         "date": date_for_url,
         "children": children,
+        "show_coordination_choice": show_coordination_choice,
     }
 
     return render(request, "records/record_form.html", context)
