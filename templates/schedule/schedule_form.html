@@ -20,13 +20,35 @@
 {% endblock %}
 
 {% block flow_right %}
+    <button
+        type="submit"
+        form="schedule-form"
+        class="button-primary"
+    >
+        {% if mode == "edit" %}
+            更新
+        {% else %}
+            保存
+        {% endif %}
+    </button>
+
     {% if mode == "edit" %}
-        <a href="{% url 'schedule:schedule_delete' schedule.id %}" aria-label="予定を削除">削除</a>
+        <button
+            type="button"
+            onclick="openDeleteDialog()"
+            class="button-danger"
+        >
+            削除
+        </button>
     {% endif %}
 {% endblock %}
 
 {% block content %}
-<form method="post" enctype="multipart/form-data">
+<form
+    id="schedule-form" 
+    method="post"
+    enctype="multipart/form-data"
+>
     {% csrf_token %}
     
     {# 特定の項目ではなく、フォーム全体のエラーを表示 例：「開始時刻は終了時刻より前にしてください」など #}
@@ -244,18 +266,47 @@
         {% endif %}
 
     </div>
-    <button type="submit">
-        {% if mode == "edit" %}
-            更新
-        {% else %}
-            保存
-        {% endif %}    
-    </button>
 </form>
+
+{% if mode == "edit" %}
+    <div id="delete-dialog" class="modal-overlay">
+        <div class="modal-dialog">
+            <p>本当にこの予定・記録を削除しますか？</p>
+
+            <div class="modal-button-row">
+                <form
+                    method="post"
+                    action="{% url 'schedule:schedule_delete' schedule.id %}"
+                >
+                    {% csrf_token %}
+                    <button type="submit" class="button-danger-text">
+                        OK
+                    </button>
+                </form>
+
+                <button
+                    type="button"
+                    onclick="closeDeleteDialog()"
+                    class="button-secondary"
+                >
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
 <script>
+function openDeleteDialog() {
+    document.getElementById("delete-dialog").classList.add("is-active");
+}
+
+function closeDeleteDialog() {
+    document.getElementById("delete-dialog").classList.remove("is-active");
+}
+
 // ①HTMLが読み込み終わってから、中の処理を実行する(ページの部品がそろってからJSを動かす)
 document.addEventListener("DOMContentLoaded", function () {
     // ②画面の部品を変数に入れている。
