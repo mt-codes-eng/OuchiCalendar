@@ -459,18 +459,7 @@ def bowel_record_delete_view(request, pk):
 
         return redirect("schedule:day", date=day_str)
 
-    # GET時は確認画面表示
-    context = {
-        "record": record,
-        "record_type": "bowel",
-        "day_str": day_str,
-    }
-
-    return render(
-        request,
-        "schedule/schedule_confirm_delete.html",
-        context,
-    )
+    return redirect("records:bowel_edit", pk=record.pk)
     
 @login_required
 def absence_record_delete_view(request, pk):
@@ -493,14 +482,4 @@ def absence_record_delete_view(request, pk):
 
         return redirect("schedule:day", date=day_str)
 
-    context = {
-        "record": record,
-        "record_type": "absence",
-        "day_str": day_str,
-    }
-
-    return render(
-        request,
-        "schedule/schedule_confirm_delete.html",
-        context,
-    )
+    return redirect("records:absence_edit", pk=record.pk)
