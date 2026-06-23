@@ -733,13 +733,8 @@ def schedule_delete_view(request, pk):
     if request.method == "POST":
         schedule.delete()
         return redirect("schedule:day", date=day_str)
-
-    context = {
-        "schedule": schedule,
-        "day_str": day_str,
-    }
     
-    return render(request, "schedule/schedule_confirm_delete.html", context)
+    return redirect("schedule:schedule_edit", pk=schedule.pk)
 
 
 @login_required
