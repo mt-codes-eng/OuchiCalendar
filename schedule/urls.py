@@ -11,6 +11,4 @@ urlpatterns = [
     path("<int:pk>/", views.schedule_detail_view, name="schedule_detail"), # 予定詳細
     path("<int:pk>/edit/", views.schedule_edit_view, name="schedule_edit"), # 予定編集
     path("<int:pk>/delete/", views.schedule_delete_view, name="schedule_delete"), # 予定削除
-    path("coordination-choice/", views.coordination_choice_view, name="coordination_choice",
-),
 ]
