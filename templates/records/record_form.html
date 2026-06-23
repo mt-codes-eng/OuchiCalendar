@@ -4,7 +4,13 @@
 {% block title %}記録 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
-    <a href="{% url 'schedule:day' date=date %}" aria-label="予定・記録概要へ戻る">×</a>
+    <a
+        href="{% url 'schedule:day' date=date %}"
+        aria-label="予定・記録概要へ戻る"
+        class="link-reset"
+    >
+        ×
+    </a>
 {% endblock %}
 
 {% block page_title %}
@@ -16,17 +22,74 @@
 {% endblock %}
 
 {% block flow_right %}
+    <button
+        type="submit"
+        form="record-form"
+        class="button-primary"
+    >
+        {% if mode == "edit" %}
+            更新
+        {% else %}
+            保存
+        {% endif %}
+    </button>
     {% if mode == "edit" %}
         {% if record_type == "bowel" %}
-            <a href="{% url 'records:bowel_delete' pk=record.pk %}">削除</a>
+            <button
+                type="button"
+                onclick="openDeleteDialog()"
+                class="button-danger"
+            >
+                削除
+            </button>
         {% elif record_type == "absence" %}
-            <a href="{% url 'records:absence_delete' pk=record.pk %}">削除</a>
+            <button
+                type="button"
+                onclick="openDeleteDialog()"
+                class="button-danger"
+            >
+                削除
+            </button>
         {% endif %}
     {% endif %}
 {% endblock %}
 
 {% block content %}
-<form method="post" enctype="multipart/form-data">
+<style>
+    .record-type-tabs {
+        display: flex;
+        margin-top: 8px;
+    }
+
+    .record-type-tab input {
+        display: none;
+    }
+
+    .record-type-tab span {
+        display: inline-block;
+        padding: 8px 40px;
+        border: 1px solid #35322E;
+        background-color: #F3F3F3;
+        cursor: pointer;
+    }
+
+    .record-type-tab input:checked + span {
+        background-color: white;
+        border-bottom: 1px solid white;
+    }
+
+    .record-fields-card {
+        border: 1px solid #35322E;
+        padding: 16px;
+        margin-top: -1px;
+        background-color: white;
+    }
+</style>
+<form
+    id="record-form"
+    method="post"
+    enctype="multipart/form-data"
+>
     {% csrf_token %}
 
     <!-- 日付 -->
@@ -69,21 +132,34 @@
     {% else %}
     <p>
         記録の種類：
-        <label>
-            <input type="radio" name="record_type" value="bowel" checked>
-            排便
-        </label>
-        <label>
-            <input type="radio" name="record_type" value="absence">
-            欠席
-        </label>
     </p>
+    <div class="record-type-tabs">
+        <label class="record-type-tab">
+            <input
+                type="radio"
+                name="record_type"
+                value="bowel"
+                checked
+            >
+            <span>排便</span>
+        </label>
+        <label class="record-type-tab">
+            <input 
+                type="radio"
+                name="record_type"
+                value="absence"
+            >
+            <span>欠席</span>
+        </label>
+    </div>
     {% endif %}
 
     <!-- 排便フォーム -->
-    <div id="bowel-fields">
+    <div
+        id="bowel-fields"
+        class="record-fields-card"
+    >
         <p>
-    <p>
             {{ bowel_form.has_bowel_movement }}
             {{ bowel_form.has_bowel_movement.label }}
             <img src="{% static 'images/icons/bowel_movement.svg' %}" alt="排便" width="20" height="20">
@@ -140,7 +216,11 @@
     </div>
 
     <!-- 欠席フォーム -->
-    <div id="absence-fields" style="display: none;">
+    <div
+        id="absence-fields"
+        class="record-fields-card"
+        style="display: none;"
+    >
         <p>
             {{ absence_form.is_absent }}
             {{ absence_form.is_absent.label }}
@@ -192,14 +272,47 @@
     {{ bowel_form.errors }}
     {{ absence_form.errors }}
 
-    <button type="submit">
-        {% if mode == "edit" %}
-            更新
-        {% else %}
-            保存
-        {% endif %}
-    </button>
 </form>
+
+{% if mode == "edit" %}
+    <div id="delete-dialog" class="modal-overlay">
+        <div class="modal-dialog">
+            <p>本当にこの予定・記録を削除しますか？</p>
+
+            <div class="modal-button-row">
+                {% if record_type == "bowel" %}
+                    <form
+                        method="post"
+                        action="{% url 'records:bowel_delete' pk=record.pk %}"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="button-danger-text">
+                            OK
+                        </button>
+                    </form>
+                {% elif record_type == "absence" %}
+                    <form
+                        method="post"
+                        action="{% url 'records:absence_delete' pk=record.pk %}"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="button-danger-text">
+                            OK
+                        </button>
+                    </form>
+                {% endif %}
+
+                <button
+                    type="button"
+                    onclick="closeDeleteDialog()"
+                    class="button-secondary"
+                >
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -263,6 +376,14 @@
         // radioの選択が変わったら実行
         radio.addEventListener("change", toggleFields);
     });
+
+    function openDeleteDialog() {
+        document.getElementById("delete-dialog").classList.add("is-active");
+    }
+
+    function closeDeleteDialog() {
+        document.getElementById("delete-dialog").classList.remove("is-active");
+    }
 
     // 画面を開いた直後にも実行
     // 初期表示を正しくするため
