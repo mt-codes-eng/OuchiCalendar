@@ -56,6 +56,17 @@
 
 {% block content %}
 <style>
+    .record-form-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .record-form-label {
+        width: 140px;
+        flex-shrink: 0;
+    }
+
     .record-type-tabs {
         display: flex;
         margin-top: 8px;
@@ -93,8 +104,13 @@
     {% csrf_token %}
 
     <!-- 日付 -->
-    <p>
-        <label for="id_record_date">日付：</label>
+    <div class="record-form-row">
+        <label
+            for="id_record_date"
+            class="record-form-label"
+        >
+            日付：
+        </label>
         <input
             type="date"
             id="id_record_date"
@@ -102,20 +118,34 @@
             value="{{ date }}"
             required
         >
-    </p>
+    </div>
 
     <!-- 子ども -->
-    <p>
-        <label for="id_child_id">記録する子ども：</label>
-        <select id="id_child_id" name="child_id" required>
+    <div class="record-form-row">
+        <label
+            for="id_child_id"
+            class="record-form-label"
+        >
+            記録する子ども：
+        </label>
+        <select
+            id="id_child_id"
+            name="child_id"
+            required
+        >
             <option value="">子どもを選択</option>
             {% for child in children %}
-                <option value="{{ child.id }}" {% if selected_child_id == child.id %}selected{% endif %}>
+                <option
+                    value="{{ child.id }}"
+                    {% if selected_child_id == child.id %}
+                        selected
+                    {% endif %}
+                >
                     {{ child.name }}
                 </option>
             {% endfor %}
         </select>
-    </p>
+    </div>
 
     <!-- 記録の種類（排便 or 欠席） -->
     {% if mode == "edit" %}
