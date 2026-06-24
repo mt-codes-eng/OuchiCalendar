@@ -4,12 +4,15 @@
 {% block title %}アプリの使い方 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
- <a
-    href="{% url 'core:settings'%}"
-    class="link-reset"
- >
-    ←
- </a>
+ {% if next_url %}
+    {% if "?" in next_url %}
+        <a href="{{ next_url }}&open_side_menu=1" class="link-reset">←</a>
+    {% else %}
+        <a href="{{ next_url }}?open_side_menu=1" class="link-reset">←</a>
+    {% endif %}
+{% else %}
+    <a href="{% url 'schedule:month' %}?open_side_menu=1" class="link-reset">←</a>
+{% endif %}
 {% endblock %}
 
 {% block page_title %}アプリの使い方{% endblock %}
