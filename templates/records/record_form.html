@@ -149,20 +149,25 @@
 
     <!-- 記録の種類（排便 or 欠席） -->
     {% if mode == "edit" %}
-    <p>
-        記録の種類：
-        {% if record_type == "bowel" %}
-            排便
-            <input type="hidden" name="record_type" value="bowel">
-        {% elif record_type == "absence" %}
-            欠席
-            <input type="hidden" name="record_type" value="absence">
-        {% endif %}
-    </p>
+    <div class="record-form-row">
+        <div class="record-form-label">
+            記録の種類：
+        </div>
+        <div>
+            {% if record_type == "bowel" %}
+                排便
+                <input type="hidden" name="record_type" value="bowel">
+            {% elif record_type == "absence" %}
+                欠席
+                <input type="hidden" name="record_type" value="absence">
+            {% endif %}
+        </div>
+    </div>
     {% else %}
-    <p>
+    <div class="record-form-label">
         記録の種類：
-    </p>
+    </div>
+   
     <div class="record-type-tabs">
         <label class="record-type-tab">
             <input
