@@ -130,7 +130,7 @@
 
     <div>
       <a 
-        href="{% url 'core:howto' %}"
+        href="{% url 'core:howto' %}?next={{ request.get_full_path|urlencode }}"
         class="link-reset"  
       >
         <img
@@ -173,6 +173,15 @@ function openLogoutDialog() {
 function closeLogoutDialog() {
     document.getElementById("logout-dialog").style.display = "none";
 }
+
+/* ページ表示時 */
+document.addEventListener("DOMContentLoaded", function () {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("open_side_menu") === "1") {
+        openSideMenu();
+    }
+});
 </script>
 {% endblock %}
 
