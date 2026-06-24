@@ -25,7 +25,13 @@ def logout_view(request):
 
 @login_required
 def howto_view(request):
-    return render(request, "core/howto.html")
+    next_url = request.GET.get("next")
+    
+    context = {
+        "next_url": next_url,        
+    }
+    
+    return render(request, "core/howto.html", context,)
 
     
 
