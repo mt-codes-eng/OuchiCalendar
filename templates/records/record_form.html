@@ -63,36 +63,47 @@
     }
 
     .record-form-label {
-        width: 140px;
+        width: 120px;
         flex-shrink: 0;
     }
 
     .record-type-tabs {
         display: flex;
         margin-top: 8px;
+        margin-bottom: 0;
+    }
+
+    .record-type-tab {
+        display: inline-block;
+        padding: 8px 28px;
+        border: 1px solid #35322E;
+        background-color: #F3F3F3;
+        color: #35322E;
+        text-decoration: none;
+        cursor: pointer;
+        margin-bottom: -1px;
     }
 
     .record-type-tab input {
         display: none;
     }
 
-    .record-type-tab span {
+    .record-type-tab input + span {
         display: inline-block;
-        padding: 8px 40px;
-        border: 1px solid #35322E;
-        background-color: #F3F3F3;
-        cursor: pointer;
     }
 
-    .record-type-tab input:checked + span {
+    .record-type-tab:has(input:checked),
+    .record-type-tab.is-active {
         background-color: white;
         border-bottom: 1px solid white;
+        position: relative;
+        z-index: 1;
     }
 
     .record-fields-card {
         border: 1px solid #35322E;
         padding: 16px;
-        margin-top: -1px;
+        margin-top: 0px;
         background-color: white;
     }
 </style>
@@ -109,9 +120,9 @@
             for="id_record_date"
             class="record-form-label"
         >
-            日付：
+            日付
         </label>
-        <input
+        ：<input
             type="date"
             id="id_record_date"
             name="record_date"
@@ -126,9 +137,9 @@
             for="id_child_id"
             class="record-form-label"
         >
-            記録する子ども：
+            記録する子ども
         </label>
-        <select
+        ：<select
             id="id_child_id"
             name="child_id"
             required
@@ -149,20 +160,28 @@
 
     <!-- 記録の種類（排便 or 欠席） -->
     {% if mode == "edit" %}
-    <div class="record-form-row">
         <div class="record-form-label">
             記録の種類：
         </div>
-        <div>
-            {% if record_type == "bowel" %}
-                排便
-                <input type="hidden" name="record_type" value="bowel">
-            {% elif record_type == "absence" %}
-                欠席
-                <input type="hidden" name="record_type" value="absence">
+        <div class="record-type-tabs">
+            {% if bowel_record %}
+                <a
+                    href="{% url 'records:bowel_edit' pk=bowel_record.id %}"
+                    class="record-type-tab {% if record_type == 'bowel' %}is-active{% endif %}"
+                >
+                    排便
+                </a>
+            {% endif %}
+            {% if absence_record %}
+                <a
+                    href="{% url 'records:absence_edit' pk=absence_record.id %}"
+                    class="record-type-tab {% if record_type == 'absence' %}is-active{% endif %}"
+                >
+                    欠席
+                </a>
             {% endif %}
         </div>
-    </div>
+        <input type="hidden" name="record_type" value="{{ record_type }}">
     {% else %}
     <div class="record-form-label">
         記録の種類：
