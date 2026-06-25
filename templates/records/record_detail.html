@@ -4,7 +4,12 @@
 {% block title %}記録詳細 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
-    <a href="{% url 'schedule:day' date=day_str %}" aria-label="予定・記録概要へ戻る">×</a>
+    <a 
+        href="{% url 'schedule:day' date=day_str %}" aria-label="予定・記録概要へ戻る"
+        class="link-reset"
+    >
+        ×
+    </a>
 {% endblock %}
 
 {% block page_title %}
@@ -24,33 +29,98 @@
 {% endblock %}
 
 {% block content %}
-<p>日付：{{ page_date }}</p>
-<p>記録した子ども：{{ record.child.name }}</p>
+<style>
+    .record-type-tabs {
+        display: flex;
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
 
-<p>記録の種類：</p>
-<div>
+    .record-type-tab {
+        display: inline-block;
+        padding: 8px 28px;
+        border: 1px solid #35322E;
+        text-decoration: none;
+        color: #35322E;
+        background-color: #F3F3F3;
+        margin-bottom: -1px;
+    }
+
+    .record-type-tab.is-active {
+        background-color: #ffffff;
+        border-bottom: 1px solid #ffffff;
+        position: relative;
+        z-index: 1;
+    }
+
+    .record-detail-card {
+        border: 1px solid #35322E;
+        padding: 12px;
+        background-color: #ffffff;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .record-memo-box {
+        display: inline-block;
+        border: 1px solid #dddddd;
+        padding: 4px 8px;
+        background-color: #ffffff;
+        margin: 4px 0 12px;
+    }
+
+   .record-detail-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .record-detail-label {
+        width: 120px;
+        flex-shrink: 0;
+    }
+</style>
+
+<div class="record-detail-row">
+    <div class="record-detail-label">
+        日付
+    </div>
+    <div>
+        ：{{ page_date }}
+    </div>
+</div>
+<div class="record-detail-row">
+    <div class="record-detail-label">
+        記録した子ども
+    </div>
+    <div>
+        ：{{ record.child.name }}
+    </div>
+</div>
+
+<div>記録の種類：</div>
+<div class="record-type-tabs">
     {% if bowel_record %}
-        <a href="{% url 'records:bowel_detail' pk=bowel_record.id %}">
-            {% if record_type == "bowel" %}
-                <strong>排便</strong>
-            {% else %}
-                排便
-            {% endif %}
+        <a 
+            href="{% url 'records:bowel_detail' pk=bowel_record.id %}"
+            class="record-type-tab {% if record_type == 'bowel' %}is-active{% endif %}"    
+        >
+            排便
         </a>
     {% endif %}
 
     {% if absence_record %}
-        <a href="{% url 'records:absence_detail' pk=absence_record.id %}">
-            {% if record_type == "absence" %}
-                <strong>欠席</strong>
-            {% else %}
-                欠席
-            {% endif %}
+        <a
+            href="{% url 'records:absence_detail' pk=absence_record.id %}"
+            class="record-type-tab {% if record_type == 'absence' %}is-active{% endif %}"
+        >
+            欠席
         </a>
     {% endif %}
 </div>
 
-{% if record_type == "bowel" %}
+<div class="record-detail-card">
+    {% if record_type == "bowel" %}
         {% if record.has_bowel_movement %}
             <p>
                 ☑ 排便があった 
@@ -58,7 +128,7 @@
             </p>
 
             {% if record.memo %}
-                <p>{{ record.memo }}</p>
+                <p class="record-memo-box">{{ record.memo }}</p>
             {% endif %}
         {% endif %}
 
@@ -69,12 +139,12 @@
             </p>
 
             {% if record.concern_memo %}
-                <p>{{ record.concern_memo }}</p>
+                <p class="record-memo-box">{{ record.concern_memo }}</p>
             {% endif %}
         {% endif %}
-{% endif %}
+    {% endif %}
 
-{% if record_type == "absence" %}
+    {% if record_type == "absence" %}
         {% if record.is_absent %}
             <p>
                 ☑ 欠席した
@@ -82,10 +152,10 @@
             </p>
 
             {% if record.memo %}
-                <p>{{ record.memo }}</p>
+                <p class="record-memo-box">{{ record.memo }}</p>
             {% endif %}
         {% endif %}
-{% endif %}
+    {% endif %}
 
 {% if record.attachments.all %}
     <div style="display: flex; align-items: flex-start; gap: 8px;">
@@ -120,13 +190,17 @@
         </div>
     </div>
 {% endif %}
+</div>
 
 <p>
     何か対応・調整が必要ですか？<br>
     必要な場合はこちらから！
 </p>
 <p>
-    <a href="{% url 'schedule:schedule_create' %}?date={{ record.record_date|date:'Y-m-d' }}">
+    <a
+        href="{% url 'schedule:schedule_create' %}?date={{ record.record_date|date:'Y-m-d' }}"
+        class="button-secondary"
+    >
         ＋予定を作成（行事・勤務・通院など）
     </a>
 </p>
