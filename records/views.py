@@ -288,6 +288,12 @@ def bowel_record_edit_view(request, pk):
         pk=pk,
         child__family=request.user.family,
     )
+    
+    # 同じ子ども・同じ日付の欠席記録を探す
+    absence_record = AbsenceRecord.objects.filter(
+        child=record.child,
+        record_date=record.record_date,
+    ).first()
 
     # 家族の子ども一覧
     children = Child.objects.filter(
@@ -368,6 +374,8 @@ def bowel_record_edit_view(request, pk):
         "selected_child_id": record.child.id,
         "record": record,
         "attachments": record.attachments.all(),
+        "bowel_record": record,
+        "absence_record": absence_record,
     }
 
     return render(request, "records/record_form.html", context)
@@ -388,6 +396,12 @@ def absence_record_edit_view(request, pk):
         pk=pk,
         child__family=request.user.family,
     )
+    
+    # 同じ子ども・同じ日付の排便記録を探す
+    bowel_record = BowelMovementRecord.objects.filter(
+        child=record.child,
+        record_date=record.record_date,
+    ).first()
 
     children = Child.objects.filter(
         family=request.user.family
@@ -456,6 +470,8 @@ def absence_record_edit_view(request, pk):
         "selected_child_id": record.child.id,
         "record": record,
         "attachments": record.attachments.all(),
+        "bowel_record": bowel_record,
+        "absence_record": record,
     }
 
     return render(request, "records/record_form.html", context)
