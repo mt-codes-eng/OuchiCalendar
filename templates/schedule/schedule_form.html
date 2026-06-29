@@ -5,9 +5,19 @@
 
 {% block flow_left %}
     {% if date %}
-        <a href="{% url 'schedule:day' date %}" aria-label="予定・記録概要へ戻る">× </a>
+        <a
+            href="{% url 'schedule:day' date %}" aria-label="予定・記録概要へ戻る"
+            class="link-reset"
+        >
+            ×
+        </a>
     {% else %}
-         <a href="{% url 'schedule:month' %}" aria-label="カレンダーへ戻る">× </a>
+        <a
+            href="{% url 'schedule:month' %}" aria-label="カレンダーへ戻る"
+            class="link-reset"
+        >
+            ×
+        </a>
     {% endif %}
 {% endblock %}
 
@@ -44,6 +54,93 @@
 {% endblock %}
 
 {% block content %}
+<style>
+    .schedule-form-row {
+        display: flex;
+        align-items: flex-start; /* flexアイテムの高さを揃える方法。子要素を上部で揃える */
+        margin-bottom: 12px;
+    }
+
+    .schedule-form-label {
+        width: 100px;
+        flex-shrink: 0; /* 幅を変更したくない要素に指定 */
+    }
+
+    .schedule-form-colon {
+        width: 16px;
+        flex-shrink: 0;
+    }
+
+    .schedule-form-control {
+        flex: 1;
+    }
+
+    .schedule-time-line {
+        margin-bottom: 3px;
+    }
+
+    /* 予定メンバー選択全体 */
+    .member-dropdown {
+        position: relative;
+        display: inline-block;
+        min-width: 180px; /* 要素の最小幅を設定。最低でも180pxの幅を確保する */
+    }
+
+    /* プルダウンを開くボタン */
+    .member-dropdown-button {
+        width: 100%; /* 親(.member-dropdown)と同じ横幅にする */
+        border: 1px solid #999;
+        background-color: white;
+        color: #35322E;
+        font-size: 14px;
+        padding: 2px 28px 2px 8px;
+        text-align: left;
+        cursor: pointer;
+        position: relative;
+    }
+
+    /* ˅マークを作る */
+    .member-dropdown-button::after {
+        content: ""; /* 空の要素を作る */
+        position: absolute;
+        right: 8px; /* 右から8pxの位置 */
+        top: 50%; /* 上から50%の位置 */
+        width: 7px;
+        height: 7px;
+        border-right: 2px solid #35322E;
+        border-bottom: 2px solid #35322E;
+        transform: translateY(-65%) rotate(45deg);  /* 要素を垂直方向に移動させてから、時計回りに45度傾ける */
+    }
+
+    /* メニューを開いたら矢印を上向きにする */
+    .member-dropdown.is-open .member-dropdown-button::after {
+        transform: translateY(-35%) rotate(225deg);
+    }
+
+    /* メニュー本体 */
+    .member-dropdown-menu {
+        display: none; /* 最初は非表示 */
+        border: 1px solid #999;
+        border-top: none;
+        background-color: white;
+        padding: 8px;
+    }
+
+    /* JavaScriptでis-openクラスが付いたらメニューを表示 */
+    .member-dropdown.is-open .member-dropdown-menu {
+        display: block;
+    }
+
+    .comment-card {
+        background-color: white;
+        border: 1px solid #999;
+        border-radius: 4px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+</style>
 <form
     id="schedule-form" 
     method="post"
@@ -57,68 +154,91 @@
             {{ form.non_field_errors }}
         </div>
     {% endif %}
-    
-    {% comment %}
-    {{ form.フィールド名.label_tag }} 項目名
-    {{ form.フィールド名 }} 入力欄
-    {{ form.フィールド名.errors }} エラー
-    で1セット
-    {% endcomment %}
 
     {# 日付 #}
-    <p>
-        {{ form.date.label_tag }}
-        {{ form.date }}
-        {{ form.date.errors }}
-    </p>
-
-    
-    {% comment %}
-    チェックボックスは普通の入力欄と違い、label_tagよりもlabelの方が自然に並ぶことが多い
-    {{ form.フィールド名 }} 入力欄
-    {{ form.フィールド名.label }} 項目名
-    {{ form.フィールド名.errors }} エラー
-    で1セット
-    {% endcomment %}
+    <div class="schedule-form-row">
+        <div class="schedule-form-label">
+            日付
+        </div>
+        <div class="schedule-form-colon">
+            ：
+        </div>
+        <div class="schedule-form-control">
+            {{ form.date }}
+            {{ form.date.errors }}
+        </div>
+    </div>
     
     {# 時間・終日 #}
-    <div>
-        <p>
-            時間:
-            {{ form.is_all_day }} {{ form.is_all_day.label }}
-            {{ form.is_all_day.errors }}
-        </p>
-        <div id="time-fields">
-            <p>
-                {{ form.start_time.label_tag }}
-                {{ form.start_time }}～
-                {{ form.start_time.errors }}
-            </p>
-            <p>
-                {{ form.end_time.label_tag }}
-                {{ form.end_time }}
-                {{ form.end_time.errors }}
-            </p>
+    <div class="schedule-form-row">
+        <div class="schedule-form-label">
+            時間
+        </div>
+        <div class="schedule-form-colon">    
+            ：
+        </div>   
+        <div class="schedule-form-control">
+            <div class="schedule-time-line">    
+                {{ form.is_all_day }} {{ form.is_all_day.label }}
+                {{ form.is_all_day.errors }}
+            </div>
+        
+            <div id="time-fields">
+                <div class="schedule-time-line">
+                    開始{{ form.start_time }}～
+                    {{ form.start_time.errors }}
+                </div>
+                <div class="schedule-time-line">
+                    終了{{ form.end_time }}
+                    {{ form.end_time.errors }}
+                </div>
+            </div>
         </div>
     </div>
 
     {# タイトル #}
-    <p>
-        {{ form.title.label_tag }}
-        {{ form.title }}
-        {{ form.title.errors }}
-    </p>
+    <div class="schedule-form-row">
+        <div class="schedule-form-label">
+            タイトル
+        </div>
+        <div class="schedule-form-colon">
+            ：
+        </div>
+        <div class="schedule-form-control">
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
+    </div>
 
     {# 予定メンバー #}
-    <div>
-        <p>予定メンバー:</p>
-        <div class="member-checkbox-group">
-            {{ form.user_members }}
-            {{ form.child_members }}
+    <div class="schedule-form-row">
+        <div class="schedule-form-label">
+            予定メンバー
         </div>
+        <div class="schedule-form-colon">
+            ：
+        </div>
+        <div class="schedule-form-control">
+            <div class="member-dropdown" id="member-dropdown">
+                <button
+                    type="button"
+                    class="member-dropdown-button"
+                    id="member-dropdown-button"
+                >
+                    <span id="selected-members-text">メンバーを選択</span>
+                </button>
 
-        {{ form.user_members.errors }}
-        {{ form.child_members.errors }}
+                <div class="member-dropdown-menu">
+                    <div class="member-checkbox-group">
+                        {{ form.user_members }}
+                        {{ form.child_members }}
+                    </div>
+                </div>
+            </div>
+
+            {{ form.user_members.errors }}
+            {{ form.child_members.errors }}
+        </div>   
     </div>
 
     {# メモ #}
@@ -182,48 +302,98 @@
     {# 対応/調整関連まとめ #}
     <div id="coordination-fields">
         {# 対応内容 #}
-        <p>
-            {{ form.coordination_type.label_tag }}
-            {{ form.coordination_type }}
-            {{ form.coordination_type.errors }}
-        </p>
-
+        <div class="schedule-form-row">
+            <div class="schedule-form-label">
+                対応内容
+            </div>
+            <div class="schedule-form-colon">
+                ：
+            </div>
+            <div class="schedule-form-control">
+                {{ form.coordination_type }}
+                {{ form.coordination_type.errors }}
+            </div>
+        </div>
         {# その他詳細 #}
-        <p id="coordination-other-detail-field">
-            {{ form.coordination_other_detail.label_tag }}
-            {{ form.coordination_other_detail }}
-            {{ form.coordination_other_detail.errors }}
-        </p>
+        <div 
+            id="coordination-other-detail-field"
+            class="schedule-form-row"
+        >
+            <div class="schedule-form-label">
+                その他の詳細
+            </div>
+            <div class="schedule-form-colon">
+                ：
+            </div>
+            <div class="schedule-form-control">
+                {{ form.coordination_other_detail }}
+                {{ form.coordination_other_detail.errors }}
+            </div>
+        </div>
 
         {# 担当者 #}
-        <p>
-            {{ form.user.label_tag }}
-            {{ form.user }}
-            {{ form.user.errors }}
-        </p>
-
+        <div class="schedule-form-row">
+            <div class="schedule-form-label">
+                担当
+            </div>
+            <div class="schedule-form-colon">
+                ：
+            </div>
+            <div class="schedule-form-control">
+                {{ form.user }}
+                {{ form.user.errors }}
+            </div>
+        </div>
         {# ステータス #}
-        <p>
-            {{ form.status.label_tag }}
-            {{ form.status }}
-            {{ form.status.errors }}
-        </p>
-        <p id="status-message"></p>
+        <div class="schedule-form-row">
+            <div class="schedule-form-label">
+                ステータス
+            </div>
+            <div class="schedule-form-colon">
+                ：
+            </div>
+            <div class="schedule-form-control">
+                {{ form.status }}
+                {{ form.status.errors }}
+            </div>
+        </div>    
+                <p
+                    id="status-message"
+                    style="
+                        color: white;
+                        font-size: 10px;
+                        background-color: #c85a5a;
+                        display: inline-block;
+                        padding: 2px 6px;
+                    "
+                >
+                </p>
 
         {# 連続して対応要否 #}
-        <p>
-            連続して対応:
-            {{ form.is_consecutive_coordination }}
-            {{ form.is_consecutive_coordination.label }}
-            {{ form.is_consecutive_coordination.errors }}
-        </p>
+        <div class="schedule-form-row">
+            <div class="schedule-form-label">
+                連続して対応:
+            </div>
+            <div class="schedule-form-colon">
+                ：
+            </div>
+            <div class="schedule-form-control">
+                <div class="schedule-time-line">
+                    {{ form.is_consecutive_coordination }}
+                    {{ form.is_consecutive_coordination.label }}
+                    {{ form.is_consecutive_coordination.errors }}
+                </div>
 
-        {# 対応/調整終了日 #}
-        <p id="coordination-end-date-field">
-            {{ form.coordination_end_date.label_tag }}
-            {{ form.coordination_end_date }}
-            {{ form.coordination_end_date.errors }}
-        </p>
+                {# 対応/調整終了日 #}
+                <div
+                    id="coordination-end-date-field"
+                    class="schedule-time-line"
+                >
+                    {{ form.coordination_end_date }}
+                    {{ form.coordination_end_date.errors }}
+                </div>
+            </div>
+        </div>
 
         {# コメント欄 #}
         <div id="comment-fields">
@@ -243,11 +413,9 @@
         {# 既存コメント一覧 #}
         {% if mode == "edit" %}
             <div>
-                <p>これまでのコメント：</p>
-
                 {% if comments %}
                     {% for comment in comments %}
-                        <div style="margin-bottom: 12px;">
+                        <div class="comment-card">
                         <p style="margin: 0; font-size: 12px;">
                             {{ comment.created_at|date:"H:i" }}
                             To:{{ comment.to_user.name|default:comment.to_user.email }}
@@ -367,7 +535,7 @@ document.addEventListener("DOMContentLoaded", function () {
             coordinationTypeField.value === "4"
         ) {
             // その他詳細を表示する
-            coordinationOtherDetailField.style.display = "block";
+            coordinationOtherDetailField.style.display = "flex";
         // そうでないなら
         } else {
             // その他詳細を隠す
@@ -432,6 +600,54 @@ document.addEventListener("DOMContentLoaded", function () {
     statusField.addEventListener("change", updateAll);
     // 連続して対応チェックボックスの値が変わったとき
     isConsecutiveField.addEventListener("change", updateAll);
+
+    // 画面にある部品（HTML）を取得する
+    const memberDropdown = document.getElementById("member-dropdown");
+    const memberDropdownButton = document.getElementById("member-dropdown-button");
+    const selectedMembersText = document.getElementById("selected-members-text");
+    const memberCheckboxes = document.querySelectorAll( // querySelectorAll() は条件に一致する要素を全部取得する
+        ".member-checkbox-group input[type='checkbox']"
+    );
+
+    function updateSelectedMembersText() {
+        // チェックされた人の名前を入れる配列
+        const selectedNames = [];
+        // チェックボックスを1つずつ確認する
+        memberCheckboxes.forEach(function (checkbox) {
+            // チェックが付いている場合
+            if (checkbox.checked) {
+                // このチェックボックスを囲っている<label>を取得
+                const label = checkbox.closest("label");
+                // label が見つかったら
+                if (label) {
+                    // ラベルの文字を取り出して配列へ追加する
+                    // trim() は前後の余分な空白や改行を取り除く
+                    selectedNames.push(label.textContent.trim());
+                }
+            }
+        });
+        // 誰も選択していない場合
+        if (selectedNames.length === 0) {
+            // 「メンバーを選択」と表示する
+            selectedMembersText.textContent = "メンバーを選択";
+        } else {
+            // 選択した名前を「、」でつないで表示する
+            selectedMembersText.textContent = selectedNames.join("、");
+        }
+    }
+    // 「メンバーを選択」ボタンがクリックされたら
+    memberDropdownButton.addEventListener("click", function () {
+        // is-open クラスを付けたり外したりする
+        memberDropdown.classList.toggle("is-open");
+    });
+    // チェックボックスを変更したとき、チェックボックス全部にイベントを登録する
+    memberCheckboxes.forEach(function (checkbox) {
+        // チェックが変更されたら
+        checkbox.addEventListener("change", updateSelectedMembersText);
+    });
+    // ページを開いたとき
+    // 編集画面などで最初からチェックが付いている場合にも対応
+    updateSelectedMembersText();
 
     // ⑥ページを開いた直後にも updateAll() を実行する
     updateAll();
