@@ -140,6 +140,16 @@
         width: 100%;
         box-sizing: border-box;
     }
+
+    .comment-meta {
+        margin: 0 0 6px;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .comment-body {
+        margin: 2px 0 0;
+    }   
 </style>
 <form
     id="schedule-form" 
@@ -416,19 +426,19 @@
                 {% if comments %}
                     {% for comment in comments %}
                         <div class="comment-card">
-                        <p style="margin: 0; font-size: 12px;">
-                            {{ comment.created_at|date:"H:i" }}
-                            To:{{ comment.to_user.name|default:comment.to_user.email }}
-                            From:{{ comment.from_user.name|default:comment.from_user.email }}
-                        </p>
-
-                        <p style="margin: 2px 0 0 0;">
-                            {{ comment.body|linebreaksbr }}
-                        </p>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <img src="{% static 'images/icons/comment.svg' %}" alt="コメント" width="20" height="20">
+                                <p class="comment-meta">
+                                    {{ comment.created_at|date:"H:i" }}
+                                    To:{{ comment.to_user.name|default:comment.to_user.email }}
+                                    From:{{ comment.from_user.name|default:comment.from_user.email }}
+                                </p>
+                            </div>
+                            <p class="comment-body">
+                                {{ comment.body|linebreaksbr }}
+                            </p>
                         </div>
                     {% endfor %}
-                {% else %}
-                    <p>なし</p>
                 {% endif %}
             </div>
         {% endif %}
