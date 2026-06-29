@@ -5,7 +5,13 @@
 
 {% block flow_left %}
     {# この予定が属している日付の day画面 に戻る。day_str は view から渡された "YYYY-MM-DD" 文字列 #}
-    <a href="{% url 'schedule:day' day_str %}" aria-label="予定・記録概要へ戻る">× </a>
+    <a
+        href="{% url 'schedule:day' day_str %}"
+        aria-label="予定・記録概要へ戻る"
+        class="link-reset"
+    >
+        ×
+    </a>
 {% endblock %}
 
 {% block page_title %}
@@ -19,35 +25,110 @@
 {% endblock %}
 
 {% block content %}
-    <p>
-        日付：{{ page_date }}
-    </p>
+    <style>
+        .schedule-detail-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
 
-    <div>
-        <p>時間：</p>
+        .schedule-detail-label {
+            width: 120px;
+            flex-shrink: 0;
+        }
 
-        {% if schedule.is_all_day %}
-            <p><input type="checkbox" checked disabled>終日</p>
-        {% else %}
-            <p>開始 {{ schedule.start_at|date:"H:i" }}〜</p>
-            <p>終了 {{ schedule.end_at|date:"H:i" }}</p>
-        {% endif %}
-    </div> 
+        .schedule-detail-colon {
+            width: 16px;
+            flex-shrink: 0;
+        }
 
-    <p>予定のタイトル：{{schedule.title|default:"(未設定)"}}</p>
+        .schedule-detail-control {
+            flex: 1;
+        }
 
-    <p>予定メンバー:
-        {% if user_memberships or child_memberships %}
-            {% for membership in user_memberships %}
-                {{ membership.user.name|default:membership.user.email }}{% if not forloop.last or child_memberships %}、{% endif %}
-            {% endfor %}
-            {% for membership in child_memberships %}
-                {{ membership.child.name }}{% if not forloop.last %}、{% endif %}
-            {% endfor %}
-        {% else %}
-            なし
-        {% endif %}
-    </p>
+        .schedule-detail-line {
+            margin-bottom: 3px;
+        }
+
+        .schedule-status-message {
+            display: inline-block;
+            margin-top: -8px;
+            margin-bottom: 8px;
+            color: white;
+            font-size: 10px;
+            background-color: #c85a5a;
+            padding: 2px 6px;
+        }
+
+        .schedule-comment-card {
+            background-color: white;
+            border: 1px solid #999;
+            border-radius: 4px;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .schedule-comment-meta {
+            margin: 0 0 6px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .schedule-comment-body {
+            margin: 0;
+    }
+    </style>
+
+    <div class="schedule-detail-row">
+        <div class="schedule-detail-label">日付</div>
+        <div class="schedule-detail-colon">：</div>
+        <div class="schedule-detail-control">{{ page_date }}</div>
+    </div>
+
+    <div class="schedule-detail-row">
+        <div class="schedule-detail-label">時間</div>
+        <div class="schedule-detail-colon">：</div>
+        <div class="schedule-detail-control">
+            {% if schedule.is_all_day %}
+                <input type="checkbox" checked disabled>終日
+            {% else %}
+                <div class="schedule-detail-line">
+                    開始 {{ schedule.start_at|date:"H:i" }}〜
+                </div>    
+                <div class="schedule-detail-line">
+                    終了 {{ schedule.end_at|date:"H:i" }}
+                </div> 
+            {% endif %}
+        </div> 
+    </div>
+
+    <div class="schedule-detail-row">
+        <div class="schedule-detail-label">予定のタイトル</div>
+        <div class="schedule-detail-colon">：</div>
+        <div class="schedule-detail-control">
+            {{schedule.title|default:"(未設定)"}}
+        </div>
+    </div>
+
+
+    <div class="schedule-detail-row">
+        <div class="schedule-detail-label">予定メンバー</div>
+        <div class="schedule-detail-colon">：</div>
+        <div class="schedule-detail-control">
+            {% if user_memberships or child_memberships %}
+                {% for membership in user_memberships %}
+                    {{ membership.user.name|default:membership.user.email }}{% if not forloop.last or child_memberships %}、{% endif %}
+                {% endfor %}
+                {% for membership in child_memberships %}
+                    {{ membership.child.name }}{% if not forloop.last %}、{% endif %}
+                {% endfor %}
+            {% else %}
+                なし
+            {% endif %}
+        </div>
+    </div>
     
     {% if schedule.memo %}
         <p>
@@ -96,65 +177,92 @@
 
     {# 対応・調整が必要な予定のときだけ表示するブロック #}
     {% if schedule.requires_coordination %}
-         <p>
+        <p>
             <img src="{% static 'images/icons/heart.svg' %}" alt="対応・調整" width="20" height="20">
             <input type="checkbox" checked disabled>
             この予定は対応・調整が必要
         </p>
     
-    <p>対応内容：{{ schedule.get_coordination_type_display }}</p>
+        <div class="schedule-detail-row">
+            <div class="schedule-detail-label">対応内容</div>
+            <div class="schedule-detail-colon">：</div>
+            <div class="schedule-detail-control">
+                {{ schedule.get_coordination_type_display }}
+            </div>
+        </div>
+
+        {% if schedule.coordination_other_detail %}
+            <div class="schedule-detail-row">
+                <div class="schedule-detail-label">その他の詳細</div>
+                <div class="schedule-detail-colon">：</div>
+                <div class="schedule-detail-control">
+                    {{ schedule.coordination_other_detail }}
+                </div>
+            </div>
+        {% endif %}
     
-    {% if schedule.coordination_other_detail %}
-        <p>その他の詳細：{{ schedule.coordination_other_detail }}</p>
-    {% endif %}
-    
-    {% if schedule.user %}
-        <p>担当：{{ schedule.user }}</p>
-    {% endif %}
+        {% if schedule.user %}
+            <div class="schedule-detail-row">
+                <div class="schedule-detail-label">担当</div>
+                <div class="schedule-detail-colon">：</div>
+                <div class="schedule-detail-control">
+                    {{ schedule.user }}
+                </div>
+            </div>
+        {% endif %}
 
-    <p>ステータス：{{ schedule.get_status_display }}</p>
-
-    {# ステータスに応じた補助メッセージ #}
-    {% if status_message %}
-      <p>
-        {{ status_message }}
-      </p>
-    {% endif %}
-
-    <p>
-      連続して対応 ：
-      {% if schedule.is_consecutive_coordination %}
-        <input type="checkbox" checked disabled>
-        連続する
-      {% else %}
-        なし
-      {% endif %}
-    </p>
-
-    {# 連続対応の終了日があるときだけ表示 #}
-    {% if schedule.is_consecutive_coordination and coordination_end_date_display %}
-      <p>
-        終了 ： {{ coordination_end_date_display }}
-      </p>
-    {% endif %}
+        <div class="schedule-detail-row">
+            <div class="schedule-detail-label">ステータス</div>
+            <div class="schedule-detail-colon">：</div>
+            <div class="schedule-detail-control">
+                <div class="schedule-detail-line">
+                    {{ schedule.get_status_display }}
+                </div>
+            </div>
+        </div>
+        {# ステータスに応じた補助メッセージ #}
+        {% if status_message %}
+            <div class="schedule-status-message">
+                {{ status_message }}
+            </div>
+        {% endif %}
+            
+        <div class="schedule-detail-row">
+            <div class="schedule-detail-label">連続して対応</div>
+            <div class="schedule-detail-colon">：</div>
+            <div class="schedule-detail-control">
+                {% if schedule.is_consecutive_coordination %}
+                    <div class="schedule-detail-line">
+                        <input type="checkbox" checked disabled>
+                        連続する
+                    </div>    
+                
+                    {# 連続対応の終了日があるときだけ表示 #}
+                    {% if schedule.is_consecutive_coordination and coordination_end_date_display %}
+                        <div class="schedule-detail-line">
+                            終了 {{ coordination_end_date_display }}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    なし
+                {% endif %}
+            </div>
+        </div>
 
     {# コメント一覧 #}
     <div>
     {% if comments %}
         {% for comment in comments %}
-            <div style="margin-bottom: 12px;">
-                {# アイコン + 時間を横並びにする #}
-                {# align-items: center;はflexの中の要素を縦方向中央にそろえる #}
-                {# gap: 6px;はflex内の要素同士の間隔 #}
+            <div class="schedule-comment-card">
                 <div style="display: flex; align-items: center; gap: 6px;">
                     <img src="{% static 'images/icons/comment.svg' %}" alt="コメント" width="20" height="20">
-                    <p style="margin: 0 0 4px 0; font-size: 12px;">
+                    <p class="schedule-comment-meta">
                         {{ comment.created_at|date:"H:i" }}
                         To: {{ comment.to_user.name|default:comment.to_user.email }}
                         From: {{ comment.from_user.name|default:comment.from_user.email }}
                     </p>
                 </div>
-                <p style="margin: 4px 0 0 26px;">
+                <p class="schedule-comment-body">
                     {{ comment.body|linebreaksbr }}
                 </p>
             </div>
