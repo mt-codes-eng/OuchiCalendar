@@ -8,18 +8,65 @@
 {% endblock %}
 
 {% block content %}
-<p>
-    <a href="{% url 'analytics:index' %}?tab=absence&year={{ year }}&month={{ month }}">
+<style>
+    .analytics-tabs {
+        display: flex;
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
+
+    .analytics-tab {
+        display: inline-block;
+        padding: 8px 36px;
+        border: 1px solid #35322E;
+        background-color: #F3F3F3;
+        color: #35322E;
+        text-decoration: none;
+        margin-bottom: -1px;
+    }
+
+    .analytics-tab.is-active {
+        background-color: #ffffff;
+        border-bottom: 1px solid #ffffff;
+        position: relative;
+        z-index: 1;
+    }
+
+    .analytics-card {
+        border: 1px solid #35322E;
+        background-color: #ffffff;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .analytics-table {
+        border-collapse: collapse;
+        margin-top: 16px;
+    }
+
+    .analytics-table th,
+    .analytics-table td {
+        border: 2px solid #999;
+        padding: 8px 12px;
+    }
+</style>
+<div class="analytics-tabs">
+    <a
+        href="{% url 'analytics:index' %}?tab=absence&year={{ year }}&month={{ month }}"
+        class="analytics-tab {% if active_tab == 'absence' %}is-active{% endif %}"    
+    >
         欠席集計
     </a>
 
-    |
-
-    <a href="{% url 'analytics:index' %}?tab=coordination&year={{ year }}&month={{ month }}">
+    <a
+        href="{% url 'analytics:index' %}?tab=coordination&year={{ year }}&month={{ month }}"
+        class="analytics-tab {% if active_tab == 'coordination' %}is-active{% endif %}"
+    >
         対応集計
     </a>
-</p>
+</div>
 
+<div class="analytics-card">
 {# 年月選択フォーム #}
 <form method="get">
     {# 年月変更しても tab が消えないようにする。現在のタブを hidden で保持する #}
@@ -47,7 +94,7 @@
 {% if active_tab == "absence" %}
 
     {% if absence_rows %}
-        <table border="1" style="border-collapse: collapse;">
+        <table class="analytics-table">
             <tr>
                 <th>子どもの名前</th>
                 <th>欠席回数</th>
@@ -138,7 +185,7 @@
 {% if active_tab == "coordination" %}
 
     {% if coordination_rows %}
-        <table border="1" style="border-collapse: collapse;">
+        <table class="analytics-table">
             <tr>
                 <th>対応者</th>
                 <th>対応回数</th>
@@ -226,5 +273,5 @@
         <p>データがありません</p>
     {% endif %}
 {% endif %}
-
+</div>
 {% endblock %}
