@@ -2,8 +2,23 @@
 {% extends "base_app.html" %}
 {% block title %}コメント新着 | おうちカレンダー{% endblock %}
 
+{% block page_title %}
+    コメント＆対応・調整 新着一覧
+{% endblock %}
+
 {% block content %}
-    <h1>コメント＆対応・調整 新着一覧</h1>
+    <style>
+        .recent-comment-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .recent-comment-table th,
+        .recent-comment-table td {
+            border: 2px solid #999;
+            padding: 4px 6px;
+        }
+    </style>
 
     {# 選択された並び順をGETでサーバーに送り直す #}
     <form method="get">
@@ -22,7 +37,7 @@
     {% if rows %}
         {# border="1"→表に細い枠線をつける。border="0"→枠線はなし。#}
         {# border-collapse: collapse;→枠線1本にする #}
-        <table border="1" style="border-collapse: collapse; width: 100%;">
+        <table class="recent-comment-table">
             <thead>
                 {# tr→行。th→見出し。td→データ #}
                 <tr>
