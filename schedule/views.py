@@ -450,16 +450,6 @@ def day_view(request, date):
 
     return render(request, "schedule/day.html", context)
 
-
-@login_required
-def create_choice_view(request, date):
-    context = {
-        "date": date,
-    }
-    
-    return render(request, "schedule/create_choice.html", context)
-
-
 @login_required
 def schedule_create_view(request):
     # create-choice 画面から ?date=2026-04-10 のように受け取る想定
