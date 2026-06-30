@@ -182,6 +182,14 @@ document.addEventListener("DOMContentLoaded", function () {
         openSideMenu();
     }
 });
+
+function openCreateChoiceDialog() {
+    document.getElementById("create-choice-dialog").classList.add("is-active");
+}
+
+function closeCreateChoiceDialog() {
+    document.getElementById("create-choice-dialog").classList.remove("is-active");
+}
 </script>
 {% endblock %}
 
@@ -207,7 +215,16 @@ document.addEventListener("DOMContentLoaded", function () {
       >
       <span>コメント新着</span>
     </a>
-    <a href="{% url 'schedule:day_create_choice' today_str %}?next={% url 'schedule:month' %}" class="bottom-nav-item">
+    <button
+      type="button"
+      onclick="openCreateChoiceDialog()"
+      class="bottom-nav-item"
+      style="
+        border: none;
+        background: none;
+        padding: 0;
+      "
+    >
       <img
         src="{% static 'images/icons/plus.svg' %}"
         alt="追加"
@@ -215,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
         height="24"
       >
       <span>追加</span>
-    </a> 
+    </button> 
     <a href="{% url 'analytics:index' %}"  class="bottom-nav-item">
       <img
         src="{% static 'images/icons/bar_graph.svg' %}"
@@ -235,5 +252,50 @@ document.addEventListener("DOMContentLoaded", function () {
       <span>検索</span>
     </a>
   </nav>
+  <div id="create-choice-dialog" class="modal-overlay">
+    <div class="modal-dialog create-choice-dialog">
+      <button
+        type="button"
+        onclick="closeCreateChoiceDialog()"
+        aria-label="閉じる"
+        style="
+          position: absolute;
+          top: 1px;
+          right: 1px;
+          border: none;
+          background: none;
+          font-size: 28px;
+          color: #35322E; 
+          cursor: pointer; 
+        "
+      >
+        ×
+      </button>
+
+      <div>
+        <a
+          href="{% url 'schedule:schedule_create' %}?date={{ today_str }}"
+          class="link-reset"
+        >
+          ＋ 予定を作成（行事・勤務・通院など）
+        </a>
+        <div style="font-size: 12px;">
+          これから先の予定や対応依頼を登録します
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <a
+          href="{% url 'records:create' %}?date={{ today_str }}"
+          class="link-reset"
+        >
+          ＋ 記録を作成（排便・欠席）
+        </a>
+        <div style="font-size: 12px;">
+          すでに起きた子どもの出来事を記録します
+        </div>
+      </div>
+    </div>
+  </div>
 </footer>
 {% endblock %}
