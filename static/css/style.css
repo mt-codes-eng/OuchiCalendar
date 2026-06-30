@@ -110,6 +110,7 @@ input[type="submit"] {
     padding: 28px 20px;
     text-align: center;
     color: #35322E;
+    position: relative;
 }
 
 .modal-button-row {
@@ -149,6 +150,22 @@ input[type="submit"] {
     width: 56px;
 }
 
+/* ボトムナビの「追加」ボタン専用 */
+button.bottom-nav-item {
+    border: none;
+    background: none;
+    padding: 0;
+    font: inherit; /* 親要素(.bottom-nav-item)の文字サイズやフォントを引き継ぐ */
+    color: inherit; /* 文字色も親要素と同じにする */
+    cursor: pointer;
+    font-size: 9px;
+    height: auto; /* 共通buttonで高さ28pxが指定されているため、ボトムナビでは高さを自動に戻す */
+    line-height: normal; /* 行の高さもブラウザ標準に戻す */
+}
+
+.bottom-nav-item span {
+    display: block;
+}
 
 .color-bar {
     /* 左側に6px幅の線を表示する
