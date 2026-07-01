@@ -14,7 +14,13 @@
 
 {% block auth_left %}
   {% if not invitation_token %}
-    <a href="{% url 'accounts:login' %}" aria-label="ログイン画面へ戻る">×</a>
+    <a
+      href="{% url 'accounts:login' %}"
+      aria-label="ログイン画面へ戻る"
+      class="link-reset"
+    >
+      ×
+    </a>
   {% endif %}
 {% endblock %}
 

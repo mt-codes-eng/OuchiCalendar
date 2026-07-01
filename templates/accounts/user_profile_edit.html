@@ -4,7 +4,13 @@
 {% block title %}家族設定 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
- <a href="{% url 'families:family_settings' %}"> × </a>
+<a 
+   href="{% url 'families:family_settings' %}"
+   aria-label="家族設定画面へ戻る"
+   class="link-reset"
+>
+   × 
+</a>
 {% endblock %}
 
 {% block page_title %}
