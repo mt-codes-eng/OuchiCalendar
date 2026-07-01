@@ -57,7 +57,7 @@
         {% endif %}
 
           {# 予定をクリックすると予定詳細画面へ移動する。schedule.pk はその予定のID#}
-          <a href="{% url 'schedule:schedule_detail' schedule.pk %}">
+          <a href="{% url 'schedule:schedule_detail' schedule.pk %}" class="link-reset">
             <div>
               {# 予定メンバー画像（大人） #}
               {% for membership in schedule.user_memberships.all %}
@@ -170,8 +170,8 @@
   {% if bowel_records or absence_records %}
     <ul class="list-reset">
         {% for record in bowel_records %}
-            <li class="color-bar" style="border-left-color: {{ record.display_color }};">
-                <a href="{% url 'records:bowel_detail' pk=record.pk %}">
+            <li class="color-bar" style="border-left-color: {{ record.display_color }};" >
+                <a href="{% url 'records:bowel_detail' pk=record.pk %}" class="link-reset">
                     {% if record.child.image %}
                         <img
                             src="{{ record.child.image.url }}"
@@ -204,7 +204,7 @@
 
         {% for record in absence_records %}
             <li class="color-bar" style="border-left-color: {{ record.display_color }};">
-                <a href="{% url 'records:absence_detail' pk=record.pk %}">
+                <a href="{% url 'records:absence_detail' pk=record.pk %}" class="link-reset">
                     {% if record.child.image %}
                         <img
                             src="{{ record.child.image.url }}"
