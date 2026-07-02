@@ -349,7 +349,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("image-modal");
     const modalImage = document.getElementById("modal-image");
     const closeButton = document.getElementById("modal-close");
-    const overlay = document.getElementById("image-modal-overlay");
 
     // サムネイルをクリックしたらモーダルを開く
     thumbnails.forEach(function (thumbnail) {
@@ -366,13 +365,6 @@ document.addEventListener("DOMContentLoaded", function () {
         modalImage.src = "";
     });
 
-    // 背景クリックで閉じる
-    overlay.addEventListener("click", function (event) {
-        if (event.target === overlay) {
-            modal.style.display = "none";
-            modalImage.src = "";
-        }
-    });
 });
 </script>
 {% endblock %}
