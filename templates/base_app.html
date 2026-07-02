@@ -4,18 +4,14 @@
 
 {% block header %}
 <header>
-  <div>
+  <div class="app-header-row">
     {# aria-label="メニュー"：画面には表示されないが、読み上げソフト用（視覚障害者向け）にボタンの説明をつけるもの #}
     <button
       type="button"
       onclick="openSideMenu()"
       aria-label="メニュー"
-      style="
-        border: none;
-        background: none;
-        padding: 0;
-      "
-      >
+      class="app-header-menu-button"
+    >
       <img
         src="{% static 'images/icons/hamburger_menu.svg' %}"
         alt="メニュー"
@@ -27,7 +23,7 @@
     {# spanタグ：文字の一部を囲って、CSSで調整しやすくする #}
     <span>{% block page_title %}{% endblock %}</span>
 
-    <span>{% block header_right %}{% endblock %}</span>
+    <div class="app-header-right">{% block header_right %}{% endblock %}</div>
   </div>
 </header>
 
