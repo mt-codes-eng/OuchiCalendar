@@ -4,7 +4,14 @@
 {% block title %}スケジュール | おうちカレンダー{% endblock %}
 
 {% block page_title %}
-    <form method="get" style="display: inline;">
+    <form
+      method="get"
+      style="
+        display:flex;
+        align-items:flex-end;
+        gap:4px;
+      "
+    >
         <select name="year" onchange="this.form.submit()">
             {% for y in years %}
                 <option value="{{ y }}" {% if y == year %}selected{% endif %}>
@@ -28,8 +35,7 @@
     <img
       src="{{ family.image.url }}"
       alt="{{ family.name }}家の家族アイコン"
-      width="40"
-      style="border-radius: 8px;"
+      class="calendar-family-icon"
     >
   {% endif %}
 {% endblock %}
@@ -62,6 +68,8 @@
               valign="top"
               width="120"
               height="100"
+              onclick="location.href='{% url 'schedule:day' cell.date_str %}'"
+              style="cursor: pointer;"
               class="
                 {% if not cell.is_current_month %}schedule-outside-month{% endif %}
                 {% if cell.is_today %}schedule-today{% endif %}
@@ -69,16 +77,14 @@
             >
               <div>
                 {# 日付を押すとその日の概要画面へ移動 #}
-                <a 
-                  href="{% url 'schedule:day' cell.date_str %}"
+                <span
                   class="
-                    link-reset
                     {% if cell.date.weekday == 5 %}schedule-saturday{% endif %}
                     {% if cell.date.weekday == 6 %}schedule-sunday{% endif %}
                 "  
                 >
                   {{ cell.date.day }}
-                </a>
+              </span>
               </div>
 
               {# その日の予定一覧を表示 #}
