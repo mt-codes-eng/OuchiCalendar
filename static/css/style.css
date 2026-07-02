@@ -167,6 +167,33 @@ button.bottom-nav-item {
     display: block;
 }
 
+.app-header-row {
+    display: flex;
+    align-items: flex-end; /* 下側を揃える */
+    gap: 8px;
+    max-width: 840px;
+}
+
+.app-header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: flex-end;
+}
+
+.calendar-family-icon {
+    width: 56px;
+    height: 32px;
+    border-radius: 2px;
+    object-fit: cover;
+}
+
+.app-header-menu-button {
+    border: none;
+    background: none;
+    padding: 0;
+    line-height: 1;
+}
+
 .color-bar {
     /* 左側に6px幅の線を表示する
        色はテンプレートから
