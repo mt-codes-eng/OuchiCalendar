@@ -1,6 +1,6 @@
 <!-- templates/core/howto.html -->
 {% extends "base_flow.html" %}
-
+{% load static %}
 {% block title %}アプリの使い方 | おうちカレンダー{% endblock %}
 
 {% block flow_left %}
@@ -45,25 +45,45 @@
     <li>
         対応/調整が不要な予定(予定メンバーが一人)
         <ul class="sub">
-         <li>予定メンバーのカラーバー＋予定タイトル</li>
+            <li>予定メンバーのカラーバー＋予定タイトル</li>
+            <img
+                src="{% static 'images/howto/schedule_single.jpg' %}"
+                alt="個人予定の表示例"
+                class="howto-image"
+            >
         </ul>
     </li>
     <li>
         対応/調整が不要な予定(予定メンバーが複数人)
         <ul class="sub">
-         <li>合同予定カラーバー＋予定タイトル</li>
+            <li>合同予定カラーバー＋予定タイトル</li>
+            <img
+                src="{% static 'images/howto/schedule_multiple.jpg' %}"
+                alt="合同予定の表示例"
+                class="howto-image"
+            >
         </ul>
     </li>
     <li>
         対応/調整が必要な予定
         <ul class="sub">
-         <li>担当者のカラーマーカー＋ステータス/対応内容</li>
+            <li>担当者のカラーマーカー＋ステータス/対応内容</li>
+            <img
+                src="{% static 'images/howto/schedule_coordination.jpg' %}"
+                alt="対応調整が必要な予定の表示例"
+                class="howto-image"
+            >
         </ul>
     </li>
     <li>
-        予定
+        記録
         <ul class="sub">
-         <li>子どものカラーバー＋記録内容に応じたアイコン</li>
+            <li>子どものカラーバー＋記録内容に応じたアイコン</li>
+            <img
+                src="{% static 'images/howto/record.jpg' %}"
+                alt="記録の表示例"
+                class="howto-image"
+            >
         </ul>
     </li>
  </ul>
@@ -107,6 +127,15 @@
 
     .content{
         margin-top: 0;
+    }
+
+    .howto-image {
+        width: 100%;
+        max-width: 260px;
+        width: 240px;
+        height: auto;
+        display: block;
+        margin-top: 8px;
     }
  </style>
 {% endblock %}
