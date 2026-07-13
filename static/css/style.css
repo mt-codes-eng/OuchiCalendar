@@ -184,7 +184,7 @@ button.bottom-nav-item {
     width: 56px;
     height: 32px;
     border-radius: 2px;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .app-header-menu-button {
