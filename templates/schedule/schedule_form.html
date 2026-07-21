@@ -496,9 +496,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const coordinationTypeField = document.getElementById("id_coordination_type");
     // ステータスを取得
     const statusField = document.getElementById("id_status");
+    // 担当者の選択欄を取得
+    const coordinatorField = document.getElementById("id_user");
+    // コメント宛先の選択欄を取得
+    const commentRecipientField = document.getElementById("id_to_user");
     // 連続して対応チェックボックスを取得
     const isConsecutiveField = document.getElementById("id_is_consecutive_coordination");
-
     // 時間欄のまとまりを取得
     const timeFields = document.getElementById("time-fields");
     // 対応/調整関連のまとまりを取得
@@ -608,6 +611,10 @@ document.addEventListener("DOMContentLoaded", function () {
     coordinationTypeField.addEventListener("change", updateAll);
     // ステータスが変わったとき
     statusField.addEventListener("change", updateAll);
+    // 担当者を変更したら、コメント宛先にも同じ人を選択する
+    coordinatorField.addEventListener("change", function () {
+        commentRecipientField.value = coordinatorField.value;
+    });
     // 連続して対応チェックボックスの値が変わったとき
     isConsecutiveField.addEventListener("change", updateAll);
 
