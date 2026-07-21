@@ -52,6 +52,9 @@ class ScheduleCommentForm(forms.ModelForm):
         # 宛先も、本文が空なら未選択でよいので任意
         self.fields["to_user"].required = False
         
+        # 未選択時の「---------」を「宛先を選択」に変更する
+        self.fields["to_user"].empty_label = "宛先を選択"
+        
         # まずは宛先候補を空にしておく
         # （万一 schedule も user も渡らなかったときに全ユーザーが出るのを防ぐ）
         self.fields["to_user"].queryset = self.fields["to_user"].queryset.none()
