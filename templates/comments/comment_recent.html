@@ -26,7 +26,7 @@
         {# onchange="this.form.submit()" → 選択を変えた瞬間に自動で送信される #}
         <select name="sort" onchange="this.form.submit()">
             <option value="comment" {% if sort == "comment" %}selected{% endif %}>
-                コメント投稿日順
+                コメント投稿日順(新着順)
             </option>
             <option value="schedule" {% if sort == "schedule" %}selected{% endif %}>
                 予定日が早い順
@@ -76,7 +76,7 @@
                             {{ row.created_at_display }}
                         </td>
                         <td>
-                            {{ row.body|truncatechars:20 }}
+                            {{ row.body_preview }}
                         </td>
                     </tr>
                 {% endfor %}
