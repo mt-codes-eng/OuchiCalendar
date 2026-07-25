@@ -357,8 +357,12 @@ def bowel_record_edit_view(request, pk):
                     file_name=uploaded_file.name,
                 )
 
-            return redirect("records:bowel_detail", pk=updated_record.pk)
+            # 更新した記録の日付をURL用の文字列にする
+            day_str = updated_record.record_date.isoformat()
 
+            # 予定・記録概要画面へ戻る
+            return redirect("schedule:day", date=day_str)
+        
     else:
         # GET時：既存データをフォームに入れて表示する
         bowel_form = BowelMovementRecordForm(instance=record)
@@ -454,7 +458,11 @@ def absence_record_edit_view(request, pk):
                     file_name=uploaded_file.name,
                 )
 
-            return redirect("records:absence_detail", pk=updated_record.pk)
+            # 更新した記録の日付をURL用の文字列にする
+            day_str = updated_record.record_date.isoformat()
+
+            # 予定・記録概要画面へ戻る
+            return redirect("schedule:day", date=day_str)
         
     else:
         bowel_form = BowelMovementRecordForm()
