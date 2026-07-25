@@ -227,28 +227,24 @@
             </div>
         {% endif %}
             
-        <div class="schedule-detail-row">
-            <div class="schedule-detail-label">連続して対応</div>
-            <div class="schedule-detail-colon">：</div>
-            <div class="schedule-detail-control">
-                {% if schedule.is_consecutive_coordination %}
+        {% if schedule.is_consecutive_coordination %}
+            <div class="schedule-detail-row">
+                <div class="schedule-detail-label">連続して対応</div>
+                <div class="schedule-detail-colon">：</div>
+                <div class="schedule-detail-control">
                     <div class="schedule-detail-line">
                         <input type="checkbox" checked disabled>
                         連続する
                     </div>    
-                
-                    {# 連続対応の終了日があるときだけ表示 #}
-                    {% if schedule.is_consecutive_coordination and coordination_end_date_display %}
+                    {% if coordination_end_date_display %}
                         <div class="schedule-detail-line">
                             終了 {{ coordination_end_date_display }}
                         </div>
                     {% endif %}
-                {% else %}
-                    なし
-                {% endif %}
+                </div>
             </div>
-        </div>
-
+        {% endif %}
+            
     {# コメント一覧 #}
     <div>
     {% if comments %}
