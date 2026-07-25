@@ -5,6 +5,27 @@ from django.utils import timezone
 from schedule.models import Schedule
 from .models import ScheduleComment
 
+def _make_comment_preview(body, max_length=20):
+    """
+    コメント新着画面に表示する短いコメント本文を作る
+
+    ・改行や連続する空白を1つの空白にまとめる
+    ・20文字以内ならそのまま表示する
+    ・20文字を超える場合は、先頭20文字＋「…」にする
+    """
+    # bodyがNoneの場合にもエラーにならないように空文字へ変換する
+    text = body or ""
+
+    # 改行や連続する空白を、1つの半角スペースにまとめる
+    text = " ".join(text.split())
+
+    # 20文字以内なら、そのまま返す
+    if len(text) <= max_length:
+        return text
+
+    # 20文字を超える場合は、先頭20文字に「…」を付ける
+    return text[:max_length] + "…"
+
 @login_required
 def comment_recent_view(request):
     """
@@ -55,7 +76,8 @@ def comment_recent_view(request):
             "comment_user": comment.from_user,
             "created_at_display": created_at_display,
             "created_at": created_at, # 並び替え用
-            "body": comment.body,
+            "body": comment.body, # コメント全文
+            "body_preview": _make_comment_preview(comment.body), # コメント新着画面に表示する先頭20文字
         })
         
     # ② コメントがまだない「対応・調整あり」の予定
@@ -85,6 +107,8 @@ def comment_recent_view(request):
             f"{created_at.month}/{created_at.day}({weekday})"
             f"{created_at.hour}:{created_at.minute:02}"
         )
+        
+        system_body = "【対応依頼】担当者に選ばれました。"
 
         # 表示用データを1件分まとめる
         rows.append({
@@ -95,7 +119,8 @@ def comment_recent_view(request):
             "comment_user": None,   # コメント者なし
             "created_at_display": created_at_display,
             "created_at": created_at,
-            "body": "【対応依頼】担当者に選ばれました。",
+            "body": system_body,
+            "body_preview": _make_comment_preview(system_body),
         })
         
     # ③ 予定が早い順 or コメント投稿日順（新着順）で並び替え(デフォルトは新着順)
