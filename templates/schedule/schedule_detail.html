@@ -298,10 +298,11 @@
                 style="
                     position: relative;
                     background: #fff;
-                    padding: 16px;
+                    padding: 48px 16px 16px 16px;
                     max-width: 90%;
                     max-height: 90%;
                     overflow: auto;
+                    box-sizing: border-box;
                 "
             >
                 <button
@@ -310,12 +311,21 @@
                     aria-label="拡大画像を閉じる"
                     style="
                         position: absolute;
-                        top: 8px;
-                        right: 8px;
-                        font-size: 40px;
+                        top: 6px;
+                        right: 10px;
+                        width: 36px;
+                        height: 36px;
+                        padding: 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 32px;
+                        line-height: 1;
+                        color: #35322E;
                         background: none;
                         border: none;
                         cursor: pointer;
+                        z-index: 1;
                     "
                 >
                     ×
@@ -328,7 +338,7 @@
                     style="
                         display: block;
                         max-width: 100%;
-                        max-height: 80vh;
+                        max-height: calc(90vh - 64px);
                         object-fit: contain;
                     "
                 >
