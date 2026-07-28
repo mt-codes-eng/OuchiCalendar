@@ -269,10 +269,8 @@ def analytics_view(request):
     coordination_rows = sorted(coordination_rows, key=lambda row: row["name"])
     
     # 縦軸の中央目盛り
-    # 最大値が 1 のときは 1,1,0 にならないように、
-    # half が 0 のままでもOKにする
-    half_absence_count = max_absence_count // 2
-    half_coordination_count = max_coordination_count // 2
+    half_absence_count = max_absence_count / 2
+    half_coordination_count = max_coordination_count / 2
         
     # ⑤ テンプレートに渡すデータ
     context = {
