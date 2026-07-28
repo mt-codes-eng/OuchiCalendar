@@ -128,13 +128,19 @@
                 height: 220px;
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between;
+                {% if max_absence_count == 0 %}
+                    justify-content: flex-end;
+                {% else %}
+                    justify-content: space-between;
+                {% endif %}
                 margin-right: 8px;
                 font-size: 12px;
             ">
-                <span>{{ max_absence_count }}</span>
-                {% if half_absence_count != 0 and half_absence_count != max_absence_count %}
-                    <span>{{ half_absence_count }}</span>
+                {% if max_absence_count != 0 %}
+                    <span>{{ max_absence_count }}</span>
+                    {% if half_absence_count != 0 and half_absence_count != max_absence_count %}
+                        <span>{{ half_absence_count|floatformat:"-1" }}</span>
+                    {% endif %}
                 {% endif %}
                 <span>0</span>
             </div>
@@ -162,7 +168,7 @@
                     {% endfor %}
                 </div>
 
-                {# 横軸の下に名前・回数を表示 #}
+                {# 横軸の下に名前を表示 #}
                 <div style="
                     display: flex;
                     gap: 24px;
@@ -172,7 +178,6 @@
                     {% for row in absence_rows %}
                         <div style="width: 48px; text-align: center;">
                             <div>{{ row.name }}</div>
-                            <div>{{ row.count }}回</div>
                         </div>
                     {% endfor %}
             </div>
@@ -218,13 +223,19 @@
                 height: 220px;
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between;
+                {% if max_coordination_count == 0 %}
+                    justify-content: flex-end;
+                {% else %}
+                    justify-content: space-between;
+                {% endif %}
                 margin-right: 8px;
                 font-size: 12px;
             ">
-                <span>{{ max_coordination_count }}</span>
-                {% if half_coordination_count != 0 and half_coordination_count != max_coordination_count %}
-                    <span>{{ half_coordination_count }}</span>
+                {% if max_coordination_count != 0 %}
+                    <span>{{ max_coordination_count }}</span>
+                    {% if half_coordination_count != 0 and half_coordination_count != max_coordination_count %}
+                        <span>{{ half_coordination_count|floatformat:"-1" }}</span>
+                    {% endif %}
                 {% endif %}
                 <span>0</span>
             </div>
@@ -252,7 +263,7 @@
                     {% endfor %}
                 </div>
 
-                {# 横軸の下に名前・回数を表示 #}
+                {# 横軸の下に名前を表示 #}
                 <div style="
                     display: flex;
                     gap: 24px;
@@ -262,7 +273,6 @@
                     {% for row in coordination_rows %}
                         <div style="width: 48px; text-align: center;">
                             <div>{{ row.name }}</div>
-                            <div>{{ row.count }}回</div>
                         </div>
                     {% endfor %}
                 </div>
