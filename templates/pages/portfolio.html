@@ -1,14 +1,124 @@
+{% load static %}
 <!doctype html>
 <html lang="ja"> {# 「このHTMLは日本語のページとして表示されることを想定しています」とブラウザ側に伝える #}
 <head>
   <meta charset="utf-8" /> {# charsetでこのWebページの文字コード（ブラウザが文字を正しく認識・表示するための規格）を設定 #}
-  <title>ポートフォリオ | おうちカレンダー</title>
+  <title>ポートフォリオ</title>
+
+  <style>
+    body {
+      margin: 0;
+      color: #35322E;
+    }
+
+    .portfolio-container {
+      width: calc(100% - 32px);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 0;
+      text-align: center;
+    }
+
+    .portfolio-image {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+      display: block;
+      margin: 24px auto;
+    }
+
+    .portfolio-description {
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.8;
+      text-align: left;
+    }
+
+    .portfolio-document-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .portfolio-document-links a {
+      color: inherit;
+    }
+
+    .portfolio-document-links a:hover {
+      opacity: 0.7;
+    }
+
+    .portfolio-access-button {
+      display: inline-block;
+      padding: 6px 16px;
+      background-color: #6f789d;
+      color: white;
+      text-decoration: none;
+      border-radius: 1px;
+    }
+
+    .portfolio-access-button:hover {
+      opacity: 0.85;
+    }
+  </style>
 </head>
 <body>
-  <h1>おうちカレンダー</h1>
-  <p>ポートフォリオページ（仮）</p>
-  <a href="{% url 'accounts:login' %}"> {# aタグは遷移を作るためのタグ。{% url %}を用いて、urls.pyで指定した遷移先に移動する。app_nameがaccounts、nameがloginのViewに遷移する。'app_name:name' #}
-  <button type="button">このアプリにアクセス</button> {# a の中に button → △（実務では避けることも多い。実務的には a にCSSを当ててボタン風が一番安全。<a href="{% url 'accounts:login' %}" class="btn">このアプリにアクセス</a>）#}
-  </a>
+  <main class="portfolio-container">
+    <h2>作品No.1 おうちカレンダー</h2>
+    <img
+      src="{% static 'images/portfolio/portfolio_ouchicalendar.jpg' %}"
+      alt="おうちカレンダーの画面"
+      class="portfolio-image"
+    >
+    <div class="portfolio-description">
+      <p>
+        おうちカレンダーは、家族の予定・育児記録・対応調整をまとめて管理できる家族向けカレンダーアプリです。
+        予定や育児記録を登録できるほか、対応が必要な場合は担当者やステータスを設定しコメントで調整できます。
+        また、家族カラーやアイコンによる表示、写真・PDFの添付、検索、担当者別の月次集計などの機能も備え、
+        家庭内の情報を一元管理できます。
+      </p>
+    </div>
+    <nav
+      class="portfolio-document-links"
+      aria-label="作品資料"
+    >
+      <a
+        href="{% static 'documents/portfolio/ouchi-calendar_proposal.pdf' %}"
+        target="_blank"
+        rel="noopener"
+      >
+        企画書
+      </a>
+      <a
+        href="{% static 'documents/portfolio/ouchi-calendar_screen_design.pdf' %}"
+        target="_blank"
+        rel="noopener"
+      >
+        画面設計図
+      </a>
+      <a
+        href="{% static 'documents/portfolio/ouchi-calendar_screen_flow_diagram.svg' %}"
+        target="_blank"
+        rel="noopener"
+      >
+        画面遷移図
+      </a>
+      <a
+        href="{% static 'documents/portfolio/ouchi-calendar_entity_relationship_diagram.svg' %}"
+        target="_blank"
+        rel="noopener"
+      >
+        ER図
+      </a>
+    </nav>
+    <a
+      href="{% url 'accounts:login' %}"
+      class="portfolio-access-button"  
+    > {# aタグは遷移を作るためのタグ。{% url %}を用いて、urls.pyで指定した遷移先に移動する。app_nameがaccounts、nameがloginのViewに遷移する。'app_name:name' #}
+      このアプリにアクセス
+    </a>
+  </main>
 </body>
 </html>
