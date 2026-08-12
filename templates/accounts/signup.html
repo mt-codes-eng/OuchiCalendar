@@ -28,10 +28,41 @@
 <style>
 /* signup.html専用 */
 
+.signup-form-box {
+    border: 1px solid #35322E; /* 枠線の太さ・線の種類・色 */
+    border-radius: 15px; /* 角を丸くする */
+    padding: 24px;
+    margin: 20px auto 0 auto; /* 左右は自動計算。結果的に中央に配置 */
+    box-sizing: border-box;
+    width: calc(100% - 32px); /* 親要素の幅100%から32pxを引いた値が横幅 */
+    max-width: 500px;
+}
+
+.signup-form-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 0;
+}
+
 /* ラベル部分 */
 .form-label {
-    display: inline-block;
-    width: 140px; /* ラベルの横幅を固定 */
+    width: 130px; /* ラベルの横幅を固定 */
+    flex-shrink: 0;
+}
+
+.signup-form-row input {
+    min-width: 0;
+    flex: 1;
+    box-sizing: border-box;
+}
+
+.signup-form-row input[type="file"] {
+    max-width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 12px;
 }
 </style>
 
@@ -70,16 +101,8 @@
   {% endif %}
   
   {# 入力項目を囲う枠 #}
-  <div
-    style="
-      border: 1px solid #35322E; /* 枠線の太さ・線の種類・色 */
-      border-radius: 15px; /* 角を丸くする */
-      padding: 24px;
-      width: fit-content; /* 横幅を中身の幅に合わせる */
-      margin: 20px auto 0 auto; /* 左右は自動計算。結果的に中央に配置 */
-    "
-  >
-    <p>
+  <div class="signup-form-box">
+    <div class="signup-form-row">
       <label
         for="{{ form.name.id_for_label }}"
         class="form-label"
@@ -87,9 +110,9 @@
         {{ form.name.label }}
       </label>
       {{ form.name }}
-      {{ form.name.errors }}
-    </p>
-    <p>
+    </div>
+    {{ form.name.errors }}
+    <div class="signup-form-row">
       <label
         for="{{ form.email.id_for_label }}"
         class="form-label"
@@ -97,9 +120,9 @@
         {{ form.email.label }}
       </label>
       {{ form.email }}
-      {{ form.email.errors }}
-    </p>
-    <p>
+    </div>
+    {{ form.email.errors }}
+    <div class="signup-form-row">
       <label
         for="{{ form.password1.id_for_label }}"
         class="form-label"
@@ -107,9 +130,9 @@
         {{ form.password1.label }}
       </label>
       {{ form.password1 }}
-      {{ form.password1.errors }}
-    </p>
-    <p>
+    </div>
+    {{ form.password1.errors }}
+    <div class="signup-form-row">
       <label
         for="{{ form.password2.id_for_label }}"
         class="form-label"
@@ -117,9 +140,9 @@
         {{ form.password2.label }}
       </label>
       {{ form.password2 }}
-      {{ form.password2.errors }}
-    </p>
-    <p>
+    </div>
+    {{ form.password2.errors }}
+    <div class="signup-form-row">
       <label
         for="{{ form.image.id_for_label }}"
         class="form-label"
@@ -127,15 +150,9 @@
         {{ form.image.label }}
       </label>
       {{ form.image }}
-      {{ form.image.errors }}
-    </p>
-    <div 
-      style="
-        display: flex;
-        align-items: center; 
-        gap: 10px;
-      "
-    >
+    </div>
+    {{ form.image.errors }}
+    <div class="signup-form-row">
       <label class="form-label">
         個人カラー
       </label>
