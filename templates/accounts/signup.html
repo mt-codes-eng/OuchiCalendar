@@ -57,12 +57,22 @@
     box-sizing: border-box;
 }
 
-.signup-form-row input[type="file"] {
-    max-width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    overflow: hidden;
-    font-size: 12px;
+@media (max-width: 480px) {
+    .signup-file-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .signup-file-row .form-label {
+        width: auto;
+    }
+
+    .signup-file-row input[type="file"] {
+        width: 100%;
+        max-width: 100%;
+        font-size: 12px;
+    }
 }
 </style>
 
@@ -84,7 +94,7 @@
           display: inline-block;
           text-align: left;
           margin: 0;
-          font-size: 13px;
+          font-size: 10px;
         "
       >
         この画面は、家族からの招待を受けた方専用のアカウント登録画面です<br>
@@ -142,16 +152,7 @@
       {{ form.password2 }}
     </div>
     {{ form.password2.errors }}
-    <div class="signup-form-row">
-      <label
-        for="{{ form.image.id_for_label }}"
-        class="form-label"
-      >
-        {{ form.image.label }}
-      </label>
-      {{ form.image }}
-    </div>
-    {{ form.image.errors }}
+    
     <div class="signup-form-row">
       <label class="form-label">
         個人カラー
@@ -250,9 +251,18 @@
         {% endfor %}
       </div>
     </div>
+    {{ form.color_code.errors }}
+    <div class="signup-form-row signup-file-row">
+      <label
+        for="{{ form.image.id_for_label }}"
+        class="form-label"
+      >
+        {{ form.image.label }}
+      </label>
+      {{ form.image }}
+    </div>
+    {{ form.image.errors }}
   </div>
-
-  {{ form.color_code.errors }}
 
   <div
     style="
@@ -266,7 +276,7 @@
       style="
         display: inline-block; /* 文章の幅だけを使う */
         text-align: left; /* 文章は左揃え */
-        font-size: 13px;
+        font-size: 10px;
       "
     >
       ＊すべて必須項目です<br>
