@@ -129,7 +129,7 @@ input[type="submit"] {
     /* 真ん中寄せ */
     justify-content: center;
     /* アイコン同士の間隔 */
-    gap: 32px;
+    gap: 0;
     /* 上の線 */
     border-top: 2px solid #ccc;
     /* 要素の内側の余白 */
@@ -146,8 +146,8 @@ input[type="submit"] {
     text-decoration: none;
     /* 文字サイズ */
     font-size: 9px;
-    /* 横幅を56pxに固定する */
-    width: 56px;
+    flex: 1;
+    min-width: 0;
 }
 
 /* ボトムナビの「追加」ボタン専用 */
@@ -165,6 +165,7 @@ button.bottom-nav-item {
 
 .bottom-nav-item span {
     display: block;
+    white-space: nowrap;
 }
 
 .app-header-row {
