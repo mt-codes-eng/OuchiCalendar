@@ -373,7 +373,7 @@
                         color: white;
                         font-size: 10px;
                         background-color: #c85a5a;
-                        display: inline-block;
+                        display: none;
                         padding: 2px 6px;
                     "
                 >
@@ -577,6 +577,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!requiresCoordinationField.checked) {
             // ステータス下のメッセージは空文字
             statusMessage.textContent = "";
+            statusMessage.style.display = "none";
             // ここでこの関数を終わりにする
             return;
         }
@@ -584,12 +585,16 @@ document.addEventListener("DOMContentLoaded", function () {
         // statusField.value：選ばれている値を見る。selectで今選ばれている値を見る
         if (statusField.value === "0") {
             statusMessage.textContent = "＊ この予定の調整は完了しています。";
+            statusMessage.style.display = "inline-block";
         } else if (statusField.value === "1") {
             statusMessage.textContent = "＊ 担当者の返事が分かったら、ステータスを「確定」または「不可」に変更してください。";
+            statusMessage.style.display = "inline-block";
         } else if (statusField.value === "2") {
             statusMessage.textContent = "＊ 現在、対応できる担当者がいない状態です。";
+            statusMessage.style.display = "inline-block";
         } else {
             statusMessage.textContent = "";
+            statusMessage.style.display = "none";
         }
     }
 
