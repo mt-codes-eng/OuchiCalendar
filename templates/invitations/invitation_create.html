@@ -24,28 +24,38 @@
 {% endblock %}
 
 {% block content %}
-    <div
-        style="
-            border: 1px solid #35322E; 
-            border-radius: 15px; 
-            padding: 10px 24px 10px 24px;
-            width: fit-content; 
-            margin: 20px auto 0 auto; 
-        "
-    >
+    <style>
+        /* invitation_create.html専用 */
+
+        .invitation-box {
+            border: 1px solid #35322E;
+            border-radius: 15px;
+            padding: 10px 24px;
+            margin: 20px auto 0 auto;
+
+            width: calc(100% - 32px);
+            max-width: 560px;
+            box-sizing: border-box;
+        }
+
+        .invitation-url {
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: white;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            box-sizing: border-box;
+        }
+    </style>
+    <div class="invitation-box">
         <p>
             以下のURLを家族に共有してください。<br>
-            相手のアカウント登録が完了するとおうちカレンダーを共有できます。<br>
-            発行したURLは一度利用した時点で無効になります。<br>
+            相手のアカウント登録が完了するとおうちカレンダーを共有できます。
+            発行したURLは一度利用した時点で無効になります。
             また、招待URLの有効期限は発行から72時間です。
         </p>
 
-        <p style="
-                border: 1px solid #ccc;
-                padding: 10px;
-                background-color: white;
-            "
-        >
+        <p class="invitation-url">
             {{ invite_url }}
         </p>
     </div>
@@ -55,6 +65,7 @@
             display: flex;
             justify-content: center;
             margin-top: 5px;
+            font-size: 10px;
         "
     >
         ＊有効期限：{{ expires_at_display }}
