@@ -612,6 +612,18 @@ document.addEventListener("DOMContentLoaded", function () {
     isAllDayField.addEventListener("change", updateAll);
     // 対応/調整要否チェックボックスの値が変わったとき
     requiresCoordinationField.addEventListener("change", updateAll);
+    // 対応/調整要否チェックボックスの値が変わったとき
+    requiresCoordinationField.addEventListener("change", function () {
+    // 「対応・調整が必要」をONにしたとき、
+    // ステータスがまだ未選択なら「△調整中」にする
+    if (
+        requiresCoordinationField.checked &&
+        statusField.value === ""
+    ) {
+        statusField.value = statusField.dataset.adjustingValue;
+    }
+    updateAll();
+    });
     // 対応内容の値が変わったとき
     coordinationTypeField.addEventListener("change", updateAll);
     // ステータスが変わったとき
