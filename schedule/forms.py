@@ -150,6 +150,10 @@ class ScheduleForm(forms.ModelForm):
             ("", "ステータスを選択")
         ] + list(Schedule.Status.choices)
 
+        self.fields["status"].widget.attrs["data-adjusting-value"] = str(
+            Schedule.Status.ADJUSTING
+        )
+        
         # user は ModelChoiceField なので empty_label が使える
         self.fields["user"].empty_label = "担当者を選択"
         
@@ -165,6 +169,13 @@ class ScheduleForm(forms.ModelForm):
         # instanceはこのフォームが相手にしている Schedule データ
         if not self.instance.pk:
             self.fields["status"].initial = Schedule.Status.ADJUSTING
+        
+        # 編集時：対応・調整が必要で、ステータス未設定なら△調整中を表示
+        elif (
+            self.instance.requires_coordination
+            and self.instance.status is None
+        ):
+            self.fields["status"].initial = Schedule.Status.ADJUSTING    
             
         # 編集時：既存の start_at/end_at を date/start_time/end_time に分解して初期表示
         if self.instance.pk and self.instance.start_at:
@@ -219,6 +230,17 @@ class ScheduleForm(forms.ModelForm):
         status = cleaned.get("status")
         is_consecutive = cleaned.get("is_consecutive_coordination")
         end_date = cleaned.get("coordination_end_date")
+        
+        # 予定メンバー
+        user_members = cleaned.get("user_members")
+        child_members = cleaned.get("child_members")
+
+        # 大人・子どものどちらか1人以上必須
+        if not user_members and not child_members:
+            self.add_error(
+                "user_members",
+                "予定メンバーを1人以上選択してください。"
+            )
 
         # 日付が無いのはフォーム自体のエラー（ここは必須なので通常は起きない）
         if not d:
