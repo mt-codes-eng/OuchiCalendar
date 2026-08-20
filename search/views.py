@@ -169,7 +169,7 @@ def search_view(request):
                 else:
                     schedule.display_color = color_map["shared"]
                     
-            result_date = schedule.start_at.date()
+            result_date = timezone.localdate(schedule.start_at)
 
             grouped_results[result_date].append({
                 "type": "schedule", # 種類
