@@ -134,6 +134,17 @@ input[type="submit"] {
     border-top: 2px solid #ccc;
     /* 要素の内側の余白 */
     padding: 8px 0 8px 0;
+    /* 画面下部に固定 */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    /* 本文の上に表示 */
+    z-index: 100;
+    /* 下の本文が透けないように背景色を付ける */
+    background-color: #F3F3F3;
+    /* 幅計算を安定させる */
+    box-sizing: border-box;
 }
 
 .bottom-nav-item {
@@ -166,6 +177,10 @@ button.bottom-nav-item {
 .bottom-nav-item span {
     display: block;
     white-space: nowrap;
+}
+
+main {
+    padding-bottom: 60px;
 }
 
 .app-header-row {
