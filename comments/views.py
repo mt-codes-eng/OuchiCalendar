@@ -53,7 +53,7 @@ def comment_recent_view(request):
         schedule = comment.schedule
         
         # 予定日付(例：4/14(火))
-        schedule_date = schedule.start_at
+        schedule_date = timezone.localtime(schedule.start_at)
         weekday = week_map[schedule_date.weekday()]
         schedule_date_display = (
             f"{schedule_date.month}/{schedule_date.day}({weekday})"
@@ -61,10 +61,11 @@ def comment_recent_view(request):
 
         # コメント投稿日時(例：5/15（日）16:00)
         created_at = comment.created_at
-        weekday = week_map[created_at.weekday()]
+        local_created_at = timezone.localtime(created_at)
+        weekday = week_map[local_created_at.weekday()]
         created_at_display = (
-            f"{created_at.month}/{created_at.day}({weekday})"
-            f"{created_at.hour}:{created_at.minute:02}"
+            f"{local_created_at.month}/{local_created_at.day}({weekday})"
+            f"{local_created_at.hour}:{local_created_at.minute:02}"
         )
         
         # 表示用データを1件分まとめる
@@ -94,7 +95,7 @@ def comment_recent_view(request):
 
     for schedule in schedules:
         # 予定日付(例：4/14(火))
-        schedule_date = schedule.start_at
+        schedule_date = timezone.localtime(schedule.start_at)
         weekday = week_map[schedule_date.weekday()]
         schedule_date_display = (
             f"{schedule_date.month}/{schedule_date.day}({weekday})"
@@ -102,10 +103,11 @@ def comment_recent_view(request):
 
         # コメント投稿日時の代わりに「予定作成日時」(例：5/15（日）16:00)
         created_at = schedule.created_at
-        weekday = week_map[created_at.weekday()]
+        local_created_at = timezone.localtime(created_at)
+        weekday = week_map[local_created_at.weekday()]
         created_at_display = (
-            f"{created_at.month}/{created_at.day}({weekday})"
-            f"{created_at.hour}:{created_at.minute:02}"
+            f"{local_created_at.month}/{local_created_at.day}({weekday})"
+            f"{local_created_at.hour}:{local_created_at.minute:02}"
         )
         
         system_body = "【対応依頼】担当者に選ばれました。"
