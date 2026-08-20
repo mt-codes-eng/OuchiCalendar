@@ -145,8 +145,8 @@ def month_view(request):
     schedules_by_date = {}
 
     for schedule in schedules:
-        # date().isoformat() で "YYYY-MM-DD" 形式の文字列にする
-        day_key = schedule.start_at.date().isoformat()
+        # 日本時間に直してから "YYYY-MM-DD" 形式の文字列にする
+        day_key = timezone.localdate(schedule.start_at).isoformat()
 
         # まだその日付の入れ物がなければ、空リストを作る
         if day_key not in schedules_by_date:
@@ -500,7 +500,7 @@ def schedule_create_view(request):
                     body=body,                                      # コメント本文
                 )
 
-            day_str = schedule.start_at.date().isoformat() # 予定・記録概要画面のURLに渡すには 文字列 が必要だから、.isoformat()
+            day_str = timezone.localdate(schedule.start_at).isoformat() # 予定・記録概要画面のURLに渡すには 文字列 が必要だから、.isoformat()
             return redirect("schedule:day", date=day_str)
     
     else:
@@ -532,11 +532,11 @@ def schedule_detail_view(request, pk):
     )
     
     # 戻るリンク用に、予定の日付を "YYYY-MM-DD" 文字列にする
-    day_str = schedule.start_at.date().isoformat()
+    day_str = timezone.localdate(schedule.start_at).isoformat()
     
     # 画面表示用の日付文字列を作る
     week_map = ["月", "火", "水", "木", "金", "土", "日"]
-    start_date = schedule.start_at.date()
+    start_date = timezone.localdate(schedule.start_at)
     start_weekday = week_map[start_date.weekday()]
     page_date = f"{start_date.year}/{start_date.month}/{start_date.day}（{start_weekday}）"
     
@@ -600,7 +600,7 @@ def schedule_edit_view(request, pk):
     )
     
     # 2. 戻るリンク用の日付文字列を作る
-    date_str = schedule.start_at.date().isoformat()
+    date_str = timezone.localdate(schedule.start_at).isoformat()
     
     # 3. POSTかGETかで処理を分ける
     # GET  : 画面を開いたとき → 既存内容入りフォームを表示
@@ -673,7 +673,7 @@ def schedule_edit_view(request, pk):
                 ) 
              
             # 保存後は、その予定が属する day画面 に戻る
-            day_str = updated_schedule.start_at.date().isoformat()
+            day_str = timezone.localdate(updated_schedule.start_at).isoformat()
             return redirect("schedule:day", date=day_str)
 
     else:
@@ -716,7 +716,7 @@ def schedule_delete_view(request, pk):
     )
     
     # 2. 戻るリンク用の日付文字列を作る
-    day_str = schedule.start_at.date().isoformat()
+    day_str = timezone.localdate(schedule.start_at).isoformat()
     
     # 3. POSTなら本当に削除する
     # 削除後は、その日の day画面 に戻る

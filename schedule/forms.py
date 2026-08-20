@@ -177,15 +177,22 @@ class ScheduleForm(forms.ModelForm):
         ):
             self.fields["status"].initial = Schedule.Status.ADJUSTING    
             
-        # 編集時：既存の start_at/end_at を date/start_time/end_time に分解して初期表示
+        # 編集時：既存の start_at/end_at を日本時間に変換して、 date/start_time/end_time に分解して初期表示
         if self.instance.pk and self.instance.start_at:
-            self.fields["date"].initial = self.instance.start_at.date()
-
+            local_start = timezone.localtime(self.instance.start_at)
+            self.fields["date"].initial = local_start.date()
             # 終日でないときだけ時間を初期表示
             if not self.instance.is_all_day:
-                self.fields["start_time"].initial = self.instance.start_at.time().replace(second=0, microsecond=0)
+                self.fields["start_time"].initial = local_start.time().replace(
+                    second=0,
+                    microsecond=0
+                )
                 if self.instance.end_at:
-                    self.fields["end_time"].initial = self.instance.end_at.time().replace(second=0, microsecond=0)
+                    local_end = timezone.localtime(self.instance.end_at)
+                    self.fields["end_time"].initial = local_end.time().replace(
+                        second=0,
+                        microsecond=0
+                    )
 
         # 編集時：連続対応終了日も初期表示
         if self.instance.pk and self.instance.coordination_end_date:
