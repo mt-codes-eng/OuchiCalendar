@@ -8,9 +8,14 @@
 
 {% block content %}
     <style>
+        .recent-comment-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
         .recent-comment-table {
             border-collapse: collapse;
-            width: 100%;
+            width: 650px;
         }
 
         .recent-comment-table th,
@@ -35,6 +40,7 @@
     </form>
 
     {% if rows %}
+        <div class="recent-comment-table-wrap">
         {# border="1"→表に細い枠線をつける。border="0"→枠線はなし。#}
         {# border-collapse: collapse;→枠線1本にする #}
         <table class="recent-comment-table">
@@ -82,6 +88,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     {% else %}
         <p>コメントがありません</p>
     {% endif %}
