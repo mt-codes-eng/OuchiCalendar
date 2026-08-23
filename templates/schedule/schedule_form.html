@@ -456,9 +456,20 @@
                 <form
                     method="post"
                     action="{% url 'schedule:schedule_delete' schedule.id %}"
+                    onsubmit="
+                        if (this.dataset.submitting === 'true') {
+                            return false;
+                        }
+                        this.dataset.submitting = 'true';
+                        document.getElementById('schedule-delete-submit-button').disabled = true;
+                    "
                 >
                     {% csrf_token %}
-                    <button type="submit" class="button-danger-text">
+                    <button
+                        type="submit"
+                        id="schedule-delete-submit-button"
+                        class="button-danger-text"
+                    >
                         OK
                     </button>
                 </form>
