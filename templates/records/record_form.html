@@ -25,6 +25,7 @@
     <button
         type="submit"
         form="record-form"
+        id="record-submit-button"
         class="button-primary"
     >
         {% if mode == "edit" %}
@@ -463,6 +464,12 @@
         document.getElementById("delete-dialog").classList.remove("is-active");
     }
 
+    // 保存・更新ボタンの二重送信を防止
+    const recordForm = document.getElementById("record-form");
+    const recordSubmitButton = document.getElementById("record-submit-button");
+    recordForm.addEventListener("submit", function () {
+        recordSubmitButton.disabled = true;
+    });
     // 画面を開いた直後にも実行
     // 初期表示を正しくするため
     toggleFields();
