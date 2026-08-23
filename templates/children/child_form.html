@@ -125,7 +125,11 @@
     }
   </style>
 
-  <form method="post" enctype="multipart/form-data">
+  <form
+    id="child-form" 
+    method="post"
+    enctype="multipart/form-data"
+  >
     {% csrf_token %}
     
     {# フォーム全体エラー #}
@@ -273,7 +277,12 @@
         margin-top: 20px;
       "
     >
-      <button type="submit">保存</button>
+      <button
+        type="submit"
+        id="child-submit-button"
+      >
+        保存
+      </button>
 
       {% if child %}
         <button
@@ -337,6 +346,10 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    const childForm = document.getElementById("child-form");
+    const submitButton = document.getElementById("child-submit-button");
+    let isSubmitting = false;
+    
     const colorInput = document.getElementById("id_color_code");
     const toggleButton = document.getElementById("color-picker-toggle");
     const optionsBox = document.getElementById("color-picker-options");
@@ -386,6 +399,16 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!clickedInside) {
             optionsBox.style.display = "none";
         }
+    });
+
+    // 保存ボタンの連打による二重送信を防ぐ
+    childForm.addEventListener("submit", function (event) {
+        if (isSubmitting) {
+            event.preventDefault();
+            return;
+        }
+        isSubmitting = true;
+        submitButton.disabled = true;
     });
 
     updatePreviewFromValue();
