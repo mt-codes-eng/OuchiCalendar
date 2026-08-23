@@ -129,6 +129,16 @@
         margin-top: 0;
     }
 
+    /* 見出し役の「・」の文章だけ太字 */
+    .content > li {
+        font-weight: bold;
+    }
+
+    /* その下の補足説明は通常の太さに戻す */
+    .content > li .sub {
+        font-weight: normal;
+    }
+    
     .howto-image {
         width: 100%;
         max-width: 260px;
