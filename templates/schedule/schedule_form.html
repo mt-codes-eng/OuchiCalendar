@@ -34,6 +34,7 @@
         type="submit"
         form="schedule-form"
         class="button-primary"
+        id="schedule-submit-button"
     >
         {% if mode == "edit" %}
             更新
@@ -487,6 +488,10 @@ function closeDeleteDialog() {
 
 // ①HTMLが読み込み終わってから、中の処理を実行する(ページの部品がそろってからJSを動かす)
 document.addEventListener("DOMContentLoaded", function () {
+    const scheduleForm = document.getElementById("schedule-form");
+    const submitButton = document.getElementById("schedule-submit-button");
+    let isSubmitting = false;
+
     // ②画面の部品を変数に入れている。
     // document.getElementById("id_is_all_day")：id でHTMLの部品を取る。終日チェックボックスを取得
     const isAllDayField = document.getElementById("id_is_all_day");
@@ -682,6 +687,21 @@ document.addEventListener("DOMContentLoaded", function () {
     // ページを開いたとき
     // 編集画面などで最初からチェックが付いている場合にも対応
     updateSelectedMembersText();
+
+    // 保存・更新ボタンの連打による二重送信を防ぐ
+    scheduleForm.addEventListener("submit", function (event) {
+    // すでに送信処理が始まっていたら、2回目以降は送信しない
+    if (isSubmitting) {
+        event.preventDefault();
+        return;
+    }
+
+    // 1回目の送信が始まったことを記録する
+    isSubmitting = true;
+
+    // 保存・更新ボタンを押せない状態にする
+    submitButton.disabled = true;
+    });
 
     // ⑥ページを開いた直後にも updateAll() を実行する
     updateAll();
