@@ -363,9 +363,20 @@
                     <form
                         method="post"
                         action="{% url 'records:bowel_delete' pk=record.pk %}"
+                        onsubmit="
+                            if (this.dataset.submitting === 'true') {
+                                return false;
+                            }
+                            this.dataset.submitting = 'true';
+                            document.getElementById('bowel-delete-submit-button').disabled = true;
+                        "
                     >
                         {% csrf_token %}
-                        <button type="submit" class="button-danger-text">
+                        <button
+                            type="submit" 
+                            id="bowel-delete-submit-button"
+                            class="button-danger-text"
+                        >
                             OK
                         </button>
                     </form>
@@ -373,9 +384,20 @@
                     <form
                         method="post"
                         action="{% url 'records:absence_delete' pk=record.pk %}"
+                        onsubmit="
+                            if (this.dataset.submitting === 'true') {
+                                return false;
+                            }
+                            this.dataset.submitting = 'true';
+                            document.getElementById('absence-delete-submit-button').disabled = true;
+                        "
                     >
                         {% csrf_token %}
-                        <button type="submit" class="button-danger-text">
+                        <button
+                            type="submit"
+                            id="absence-delete-submit-button"
+                            class="button-danger-text"
+                        >
                             OK
                         </button>
                     </form>
