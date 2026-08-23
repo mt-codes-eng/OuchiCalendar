@@ -328,10 +328,18 @@
           <form
             method="post"
             action="{% url 'children:child_delete' child.id %}"
+            onsubmit="
+              if (this.dataset.submitting === 'true') {
+                return false;
+              }
+              this.dataset.submitting = 'true';
+              document.getElementById('child-delete-submit-button').disabled = true;
+            "
           > 
             {% csrf_token %}
             <button
               type="submit"
+              id="child-delete-submit-button"
               class="button-danger-text"
             >
               OK
