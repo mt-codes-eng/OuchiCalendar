@@ -193,25 +193,26 @@
             ></span>
           </button>
         </div>
+      </div>
 
-        {# 色候補一覧 #}
-        <div
-          id="color-picker-options"
-          style="
-            display: none;
-            margin-top: 8px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: white;
-            width: fit-content;
-            max-width: 100%;
-            box-sizing: border-box;
-          "
-        >
-          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-            {% for value, hex in form.fields.color_code.choices %}
-              {% if value != "" %}
-                <button
+      {# 色候補一覧 #}
+      <div
+        id="color-picker-options"
+        style="
+          display: none;
+          margin-top: 8px;
+          padding: 10px;
+          border: 1px solid #ccc;
+          background-color: white;
+          width: fit-content;
+          max-width: 100%;
+          box-sizing: border-box;
+        "
+      >
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          {% for value, hex in form.fields.color_code.choices %}
+            {% if value != "" %}
+              <button
                 type="button"
                 class="color-option-button"
                 data-value="{{ value }}"
@@ -226,9 +227,8 @@
                 "
                 aria-label="色 {{ value }} を選択"
               ></button>
-              {% endif %}
-            {% endfor %}
-          </div>
+            {% endif %}
+          {% endfor %}
         </div>
       </div>
       {{ form.color_code.errors }}
