@@ -3,6 +3,7 @@
 <html lang="ja"> {# 「このHTMLは日本語のページとして表示されることを想定しています」とブラウザ側に伝える #}
 <head>
   <meta charset="utf-8" /> {# charsetでこのWebページの文字コード（ブラウザが文字を正しく認識・表示するための規格）を設定 #}
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ポートフォリオ</title>
 
   <style>
@@ -19,6 +20,11 @@
       text-align: center;
     }
 
+    .portfolio-container h2 {
+      font-size: 28px;
+      line-height: 1.4;
+    }
+
     .portfolio-image {
       width: 100%;
       max-width: 500px;
@@ -32,18 +38,21 @@
       margin: 0 auto;
       line-height: 1.8;
       text-align: left;
+      font-size: 16px;
     }
 
     .portfolio-document-links {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 16px;
-      margin: 24px 0;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      margin: 28px 0;
     }
 
     .portfolio-document-links a {
       color: inherit;
+      text-align: center;
+      white-space: nowrap;
     }
 
     .portfolio-document-links a:hover {
@@ -61,6 +70,23 @@
 
     .portfolio-access-button:hover {
       opacity: 0.85;
+    }
+
+    @media (max-width: 480px) {
+      .portfolio-image {
+        width: 74%;
+        max-width: none;
+        margin: 20px auto 28px auto;
+      }
+
+      .portfolio-container h2 {
+        font-size: 26px;
+      }
+
+      .portfolio-description {
+        font-size: 16px;
+        line-height: 1.8;
+      }
     }
   </style>
 </head>
