@@ -21,7 +21,18 @@
 <body>
   {# 画面上部（ヘッダー）#}
   {% block header %}{% endblock %}
-    
+  
+  {# Django messages の表示 #}
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="success-message">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  
   <main>
     {# 各ページのメイン内容 #}
     {% block content %}{% endblock %}
