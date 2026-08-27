@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import authenticate, login, update_session_auth_hash
+from django.contrib import messages
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from .forms import SignUpForm, UserProfileForm
@@ -165,7 +166,7 @@ def signup_view(request):
 
             # ⑥ 自動ログイン。登録後、そのままログイン状態にする
             login(request, user)
-
+            messages.success(request, "アカウント登録が完了しました")
             # ⑦ 遷移
             return redirect("families:family_settings")
 
