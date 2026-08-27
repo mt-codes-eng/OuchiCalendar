@@ -25,8 +25,8 @@ button,
 input[type="submit"] {
     display: inline-block;
     border: none;/* 枠線を消す */
-    border-radius: 1px;/* 角を少し丸くする */
-    padding: 4px 20px 4px 20px;
+    border-radius: 3px;/* 角を少し丸くする */
+    padding: 8px 20px 8px 20px;
     cursor: pointer;/* マウスを乗せた時に指マークにする */
     text-decoration: none;
     font-size: 14px;
@@ -240,6 +240,14 @@ main {
 .link-reset {
     text-decoration: none; /* 下線を消す */
     color: inherit;        /* 親要素の文字色を使う */
+}
+
+/* =======================
+   フォームのエラー表示
+======================= */
+.errorlist,
+.form-errors {
+    color: #c85a5a;
 }
 
 .month-schedule-item {
