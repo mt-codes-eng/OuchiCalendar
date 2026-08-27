@@ -16,6 +16,19 @@
 {% endblock %}
 
 {% block content %}
+<style>
+  /* login.html専用 */
+
+  /* ログイン画面の入力欄 */
+  .login-input {
+    width: 240px;
+    height: 36px;
+    padding: 6px 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    border: 1px solid #888;
+  }
+</style>
 <div
   style="
     margin-top: 80px; /* 外側の上余白 */
@@ -31,10 +44,13 @@
   <form method="post">
     {% csrf_token %}
 
-    <div style="margin-bottom: 10px;">
+    <div style="margin-bottom: 24px;">
       <label 
         for="email"
-        style="display: block;" /* 要素が横までいっぱいに広がり、縦に並んでいく */
+        style="
+          display: block; /* 要素が横までいっぱいに広がり、縦に並んでいく */
+          margin-bottom: 6px;
+        "
       >
         メールアドレス
       </label>
@@ -42,6 +58,7 @@
         type="email"
         name="email"
         id="email"
+        class="login-input"
         required
       >
     </div>
@@ -56,10 +73,13 @@
     required：空欄NG（ブラウザチェック）。「ここは空欄のまま送信できません」というブラウザへのお願い
     {% endcomment %}
 
-    <div style="margin-bottom: 10px;">
+    <div style="margin-bottom: 18px;">
       <label
         for="password"
-        style="display: block;"
+        style="
+          display: block;
+          margin-bottom: 6px;
+        "
       >
         パスワード
       </label>
@@ -67,13 +87,14 @@
         type="password"
         name="password"
         id="password"
+        class="login-input"
         required
       >
     </div>
 
     <div
       style="
-        margin-top: 10px;
+        margin-top: 18px;
         text-align: center; /* ボタンを中央揃え */
       "
     >
@@ -81,7 +102,7 @@
     </div>
   </form>
 
-  <p style="margin-top: 10px;">
+  <p style="margin-top: 18px;">
     <a href="{% url 'accounts:signup' %}">
       アカウント登録
     </a>
