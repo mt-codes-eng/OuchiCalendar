@@ -55,6 +55,11 @@
     margin: 0 0 24px 0;
 }
 
+/* 個人カラーだけ、色候補一覧との間を狭くする */
+.signup-color-row {
+    margin-bottom: 12px;
+}
+
 /* ラベル部分 */
 .form-label {
     width: auto; /* ラベルの横幅を固定 */
@@ -171,7 +176,7 @@
     </div>
     {{ form.password2.errors }}
     
-    <div class="signup-form-row">
+    <div class="signup-form-row signup-color-row">
       <label class="form-label">
         個人カラー
       </label>
@@ -230,6 +235,7 @@
       style="
         display: none;
         margin-top: 8px;
+        margin-bottom: 24px;
         padding: 10px;
         border: 1px solid #ccc;
         background-color: white;
