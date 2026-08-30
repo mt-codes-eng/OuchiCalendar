@@ -46,6 +46,25 @@
             word-break: break-word;
             box-sizing: border-box;
         }
+
+        .copy-success-toast {
+            display: none;
+            position: fixed;
+            left: 50%;
+            bottom: 80px;
+            transform: translateX(-50%);
+            padding: 10px 16px;
+            background-color: #35322E;
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+
+        .copy-success-toast.is-visible {
+            display: block;
+        }
     </style>
     <div class="invitation-box">
         <p>
@@ -70,4 +89,54 @@
     >
         ＊有効期限：{{ expires_at_display }}
     </div>
+
+    <div
+        style="
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        "
+    >
+        <button
+            type="button"
+            id="copy-invite-url-button"
+            data-invite-url="{{ invite_url }}"
+        >
+            URLをコピー
+        </button>
+    </div>
+
+    <div
+        id="copy-success-toast"
+        class="copy-success-toast"
+    >
+        クリップボードにコピーしました
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const copyButton = document.getElementById("copy-invite-url-button");
+            const toast = document.getElementById("copy-success-toast");
+
+            copyButton.addEventListener("click", async function () {
+                const inviteUrl = copyButton.dataset.inviteUrl;
+
+                try {
+                    // 招待URLをクリップボードへコピー
+                    await navigator.clipboard.writeText(inviteUrl);
+
+                    // 成功メッセージを表示
+                    toast.classList.add("is-visible");
+
+                    // 2秒後に消す
+                    setTimeout(function () {
+                        toast.classList.remove("is-visible");
+                    }, 2000);
+
+                } catch (error) {
+                    alert("URLをコピーできませんでした");
+                }
+            });
+        });
+    </script>
 {% endblock %}
