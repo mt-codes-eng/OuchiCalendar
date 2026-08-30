@@ -7,7 +7,7 @@
 <a
   href="{% url 'families:family_settings' %}"
   aria-label="家族設定画面へ戻る"
-  class="link-reset"
+  class="link-reset family-close-button"
 >
   ×
 </a>
@@ -26,6 +26,16 @@
 {% block content %}
 <style>
   /*family_profile_edit.html専用 */
+  /* 左上の「×」 */
+  .family-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 28px;
+    line-height: 1;
+  }
 
   /* 入力項目全体の枠 */
   .profile-edit-box {
@@ -44,7 +54,7 @@
   .profile-form-row {
     display: flex;
     align-items: center;
-    margin: 18px 0;
+    margin: 0 0 24px 0;
   }
 
   /* 項目名 */
@@ -65,14 +75,27 @@
   .form-value input[type="text"] {
     width: 100%;
     min-width: 0;
+    height: 40px;
+    padding: 6px 8px;
+    font-size: 16px;
+    border: 1px solid #888;
     box-sizing: border-box;
+  }
+
+  /* 合同予定カラー行だけ、候補一覧との間を調整 */
+  .profile-color-row {
+    margin-bottom: 20px;
+  }
+
+  .profile-color-row:has(+ #color-picker-options[style*="display: block"]) {
+    margin-bottom: 6px;
   }
 
   /* 家族アイコン部分 */
   .profile-image-row {
     display: flex;
     align-items: flex-start;
-    margin: 18px 0;
+    margin: 0 0 24px 0;
   }
 
   .profile-image-heading {
@@ -100,12 +123,61 @@
 
   /* スマホ表示 */
   @media (max-width: 480px) {
+    .profile-edit-box {
+      padding: 18px;
+      width: calc(100% - 24px);
+    }
+
+    /* 家族名・合同予定カラーを上下配置 */
+    .profile-form-row {
+      display: block;
+      margin-bottom: 24px;
+    }
+
+    .profile-color-row {
+      margin-bottom: 20px;
+    }
+
+    /* 色一覧表示時 */
+    .profile-color-row:has(+ #color-picker-options[style*="display: block"]) {
+      margin-bottom: 6px;
+    }
+
+    .profile-form-row .form-label {
+      display: block;
+      width: auto;
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+
+    .profile-form-row .form-value {
+      display: block;
+      width: 100%;
+    }
+
+    /* スマホでは「：」を消す */
+    .profile-form-row .form-value > span {
+      display: none;
+    }
+
+    /* 家族アイコンも上下配置 */
     .profile-image-row {
       display: block;
+      margin-bottom: 24px
     }
 
     .profile-image-heading {
       display: flex;
+      margin-bottom: 8px;
+    }
+
+    .profile-image-heading .form-label {
+      width: auto;
+      font-size: 16px;
+    }
+
+    .profile-image-heading > span {
+      display: none;
     }
 
     .profile-image-content {
@@ -147,7 +219,7 @@
     {{ form.name.errors }}
 
     {# ラベルと色選択ボタンを横並びにする #}
-    <div class="profile-form-row">
+    <div class="profile-form-row profile-color-row">
       <label class="form-label">
         合同予定カラー
       </label>
@@ -193,7 +265,8 @@
       id="color-picker-options"
       style="
         display: none;
-        margin-top: 8px;
+        margin-top: 0;
+        margin-bottom: 20px;
         padding: 10px;
         border: 1px solid #ccc;
         background-color: white;
