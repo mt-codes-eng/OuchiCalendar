@@ -7,7 +7,7 @@
 <a
   href="{% url 'families:family_settings' %}"
   aria-label="家族設定画面へ戻る"
-  class="link-reset"  
+  class="link-reset child-close-button"  
 >
   ×
 </a>
@@ -31,6 +31,17 @@
   <style>
     /*child_form.html専用 */
 
+    /* 左上の「×」 */
+    .child-close-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      font-size: 28px;
+      line-height: 1;
+    }
+
     /* 入力項目全体の枠 */
     .profile-edit-box {
       border: 1px solid #35322E;
@@ -48,7 +59,7 @@
     .profile-form-row {
       display: flex;
       align-items: center;
-      margin: 18px 0;
+      margin: 0 0 24px 0;
     }
 
     /* 項目名 */
@@ -68,16 +79,30 @@
 
     /* 子ども名の入力欄 */
     .form-value input[type="text"] {
-      width: 100%;
+       width: 100%;
       min-width: 0;
+      height: 40px;
+      padding: 6px 8px;
+      font-size: 16px;
+      border: 1px solid #888;
       box-sizing: border-box;
+    }
+
+    /* 通常時：個人カラーと個人アイコンの間を少し空ける */
+    .profile-color-row {
+      margin-bottom: 20px;
+    }
+
+    /* 色候補一覧を開いたときだけ、□と一覧を近づける */
+    .profile-color-row:has(+ #color-picker-options[style*="display: block"]) {
+      margin-bottom: 6px;
     }
 
     /* 子どもアイコン部分 */
     .profile-image-row {
       display: flex;
       align-items: flex-start;
-      margin: 18px 0;
+      margin: 0 0 24px 0;
     }
 
     .profile-image-heading {
@@ -105,12 +130,62 @@
 
     /* スマホ表示 */
     @media (max-width: 480px) {
+      .profile-edit-box {
+        padding: 18px;
+        width: calc(100% - 24px);
+      }
+
+      /* 子ども名・個人カラーを上下配置 */
+      .profile-form-row {
+        display: block;
+        margin-bottom: 24px;
+      }
+
+      /* 通常時：個人カラーと個人アイコンの間 */
+      .profile-color-row {
+        margin-bottom: 20px;
+      }
+
+      /* 色候補一覧を開いたとき：□と色一覧を近づける */
+      .profile-color-row:has(+ #color-picker-options[style*="display: block"]) {
+        margin-bottom: 6px;
+      }
+
+      .profile-form-row .form-label {
+        display: block;
+        width: auto;
+        margin-bottom: 6px;
+        font-size: 16px;
+      }
+
+      .profile-form-row .form-value {
+        display: block;
+        width: 100%;
+      }
+
+      /* スマホでは「：」を消す */
+      .profile-form-row .form-value > span {
+        display: none;
+      }
+
+      /* 個人アイコンも上下配置 */
       .profile-image-row {
         display: block;
+        margin-bottom: 24px;
       }
 
       .profile-image-heading {
-        display: flex;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .profile-image-heading .form-label {
+        width: auto;
+        font-size: 16px;
+      }
+
+      .profile-image-heading > span {
+        display: none;
       }
 
       .profile-image-content {
@@ -161,7 +236,7 @@
       </div>
       {{ form.name.errors }}
 
-      <div class="profile-form-row">
+      <div class="profile-form-row profile-color-row">
         <label class="form-label">
           個人カラー
         </label>
@@ -211,7 +286,8 @@
         id="color-picker-options"
         style="
           display: none;
-          margin-top: 8px;
+          margin-top: 0;
+          margin-bottom: 20px;
           padding: 10px;
           border: 1px solid #ccc;
           background-color: white;
