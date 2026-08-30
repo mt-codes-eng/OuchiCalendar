@@ -7,7 +7,7 @@
     <a
         href="{% url 'families:family_settings' %}"
         aria-label="家族設定へ戻る"
-        class="link-reset"
+        class="link-reset invitation-close-button"
     >
         ×
     </a>
@@ -27,6 +27,17 @@
     <style>
         /* invitation_create.html専用 */
 
+        /* 左上の「×」 */
+        .invitation-close-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            font-size: 28px;
+            line-height: 1;
+        }
+        
         .invitation-box {
             border: 1px solid #35322E;
             border-radius: 15px;
