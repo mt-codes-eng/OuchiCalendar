@@ -7,6 +7,13 @@
 {% block content %}
   <style>
   /* family_settings.html専用 */
+  
+  /* 長いメールアドレスをカード内で折り返す */
+  .setting-email {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 
   /* 家族設定画面の角丸カード */
   .family-card {
@@ -30,6 +37,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    min-width: 0;
   }
 
   /* 項目名部分 */
@@ -38,6 +46,31 @@
     flex-shrink: 0;
     display: flex;
     justify-content: space-between;
+  }
+
+  .child-edit-link {
+    margin-left: 8px;
+  }
+
+  /* 編集リンク */
+  .edit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #8e95b8;
+    font-size: 14px;
+  }
+
+  /* 鉛筆アイコン */
+  .edit-link img {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* タップ・クリックしたとき */
+  .edit-link:hover {
+    opacity: 0.7;
+    text-decoration: underline;
   }
   </style>
 
@@ -49,8 +82,15 @@
     >
       {{ request.user.name}}
     </h3>
-    <a href="{% url 'accounts:user_profile_edit' %}" aria-label="私の設定を編集">
-      <img src="{% static 'images/icons/pencil.svg' %}" alt="私の設定を編集" width="20" height="20">
+    <a
+      href="{% url 'accounts:user_profile_edit' %}"
+      class="edit-link"
+    >
+      <img
+        src="{% static 'images/icons/pencil.svg' %}"
+        alt=""
+      >
+      <span>編集する</span>
     </a>
   </div>
   <section class="family-card"> {# 意味づけ用の区切りタグ。見出しごとの箱。1つのまとまり（セクション）#}
@@ -59,7 +99,9 @@
         <span>Email</span>
         <span>：</span>
       </span>
-      <span>{{ request.user.email }}</span>
+      <span class="setting-email">
+        {{ request.user.email }}
+      </span>
     </p>
     <p class="setting-row">
       <span class="setting-label">
@@ -111,8 +153,15 @@
     >
       {{ family.name|default:"未設定(家族名)" }}家
     </h3>
-    <a href="{% url 'families:family_profile_edit' %}" aria-label="苗字の設定を編集">
-      <img src="{% static 'images/icons/pencil.svg' %}" alt="苗字の設定を編集" width="20" height="20">
+    <a
+      href="{% url 'families:family_profile_edit' %}"
+      class="edit-link"  
+    >
+      <img
+        src="{% static 'images/icons/pencil.svg' %}"
+        alt=""
+      >
+      <span>編集する</span>
     </a>
   </div>
   <section class="family-card">
@@ -229,14 +278,15 @@
             ">
             </span>
           {% endif %}
-          <a href="{% url 'children:child_edit' child.id %}" aria-label="子どもメンバーを編集">
+          <a
+            href="{% url 'children:child_edit' child.id %}"
+            class="edit-link child-edit-link"
+          >
             <img
               src="{% static 'images/icons/pencil.svg' %}"
-              alt="子どもメンバーを編集"
-              width="20"
-              height="20"
-              style="vertical-align: middle;"
+              alt=""
             >
+            <span>編集する</span>
           </a>
         </li>
       {% endfor %}
