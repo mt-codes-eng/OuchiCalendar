@@ -157,13 +157,16 @@ class ScheduleForm(forms.ModelForm):
         # user は ModelChoiceField なので empty_label が使える
         self.fields["user"].empty_label = "担当者を選択"
         
-        # 予定メンバーの候補を家族内に絞る
+        # 大人の予定メンバー・子どもの予定メンバー・担当者を
+        # ログイン中ユーザーと同じ家族だけに絞る
         if family:
             self.fields["user_members"].queryset = family.users.all()
             self.fields["child_members"].queryset = family.children.all()
+            self.fields["user"].queryset = family.users.all()
         else:
             self.fields["user_members"].queryset = User.objects.none()
             self.fields["child_members"].queryset = Child.objects.none()
+            self.fields["user"].queryset = User.objects.none()
             
         # 新規作成時(pkがないとき)：ステータスの初期表示を△調整中
         # instanceはこのフォームが相手にしている Schedule データ
