@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 
 {% block header %}
-<header>
+<header class="app-page-header {% block header_class %}{% endblock %}">
   <div>
     {# 左側：← / × など #}
     {% block flow_left %}{% endblock %}
