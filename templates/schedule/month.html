@@ -12,7 +12,11 @@
         gap:4px;
       "
     >
-        <select name="year" onchange="this.form.submit()">
+        <select
+          name="year"
+          onchange="this.form.submit()"
+          class="view-switch-select"  
+        >
             {% for y in years %}
                 <option value="{{ y }}" {% if y == year %}selected{% endif %}>
                     {{ y }}年
@@ -20,7 +24,11 @@
             {% endfor %}
         </select>
 
-        <select name="month" onchange="this.form.submit()">
+        <select
+          name="month"
+          onchange="this.form.submit()"
+          class="view-switch-select"  
+        >
             {% for m in months %}
                 <option value="{{ m }}" {% if m == month %}selected{% endif %}>
                     {{ m }}月

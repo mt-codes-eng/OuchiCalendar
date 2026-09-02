@@ -8,13 +8,6 @@
 
 {% block content %}
     <style>
-        /* 並び順の選択欄 */
-        .recent-comment-sort {
-            height: 30px;
-            padding: 4px 8px;
-            font-size: 14px;
-        }
-
         /* 選択欄と表の間 */
         .recent-comment-sort-form {
             margin-bottom: 8px;
@@ -44,7 +37,7 @@
         <select
             name="sort"
             onchange="this.form.submit()"
-            class="recent-comment-sort"    
+            class="view-switch-select"    
         >
             <option value="comment" {% if sort == "comment" %}selected{% endif %}>
                 コメント投稿日順(新着順)

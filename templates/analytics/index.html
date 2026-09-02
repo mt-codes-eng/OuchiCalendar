@@ -73,7 +73,11 @@
     <input type="hidden" name="tab" value="{{ active_tab }}">
     
     {# onchange は「選択が変わったら」の意味。this.form.submit() はフォーム送信 #}
-    <select name="year" onchange="this.form.submit()">
+    <select
+        name="year"
+        onchange="this.form.submit()"
+        class="view-switch-select"
+    >
         {% for y in years %}
             {# 現在選択中の年なら selected を付ける #}
             <option value="{{ y }}" {% if y == year %}selected{% endif %}>
@@ -82,7 +86,11 @@
         {% endfor %}
     </select>
 
-    <select name="month" onchange="this.form.submit()">
+    <select
+        name="month"
+        onchange="this.form.submit()"
+        class="view-switch-select"    
+    >
         {% for m in months %}
             <option value="{{ m }}" {% if m == month %}selected{% endif %}>
                 {{ m }}月
