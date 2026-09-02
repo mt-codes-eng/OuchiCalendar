@@ -9,6 +9,20 @@
 {% endblock %}
 
 {% block content %}
+<style>
+  /* search.html専用 */
+
+  /* 検索キーワード入力欄 */
+  .search-keyword-input {
+    width: 260px;
+    max-width: 100%;
+    height: 40px;
+    padding: 6px 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+</style>
+
 {# method="get" にすると、URL に ?q=会議 のように検索キーワードが付く #}
 <form method="get">
     <input 
@@ -16,6 +30,7 @@
         name="q"
         value="{{ keyword }}"
         placeholder="キーワードを入力"
+        class="search-keyword-input"
     >
     <button type="submit">検索</button>
 </form>
