@@ -254,6 +254,16 @@ main {
   border-bottom: none;
 }
 
+/* 表示切替用のセレクトボックス */
+.view-switch-select {
+    height: 30px;
+    padding: 2px 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    border: 1px solid #888;
+    background-color: white;
+}
+
 /* =======================
    フォームのエラー表示
 ======================= */
