@@ -131,7 +131,7 @@ input[type="submit"] {
     /* アイコン同士の間隔 */
     gap: 0;
     /* 上の線 */
-    border-top: 2px solid #ccc;
+    border-top: 1px solid #D9D9D9;
     /* 要素の内側の余白 */
     padding: 8px 0 8px 0;
     /* 画面下部に固定 */
@@ -240,6 +240,18 @@ main {
 .link-reset {
     text-decoration: none; /* 下線を消す */
     color: inherit;        /* 親要素の文字色を使う */
+}
+
+/* ログイン後画面の共通ヘッダー */
+.app-page-header {
+  border-bottom: 1px solid #D9D9D9;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+/* ヘッダー下のラインが不要な画面 */
+.app-page-header.no-header-line {
+  border-bottom: none;
 }
 
 /* =======================
