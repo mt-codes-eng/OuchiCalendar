@@ -264,6 +264,22 @@ main {
     background-color: white;
 }
 
+/* 戻る・閉じるボタン */
+.flow-nav-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    font-size: 22px;
+    line-height: 1;
+
+    text-decoration: none;
+    color: #35322E;
+}
+
 /* =======================
    フォームのエラー表示
 ======================= */
