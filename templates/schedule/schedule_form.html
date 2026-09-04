@@ -7,14 +7,14 @@
     {% if date %}
         <a
             href="{% url 'schedule:day' date %}" aria-label="予定・記録概要へ戻る"
-            class="link-reset"
+            class="link-reset flow-nav-button"
         >
             ×
         </a>
     {% else %}
         <a
             href="{% url 'schedule:month' %}" aria-label="カレンダーへ戻る"
-            class="link-reset"
+            class="link-reset flow-nav-button"
         >
             ×
         </a>
@@ -29,30 +29,7 @@
     {% endif %}
 {% endblock %}
 
-{% block flow_right %}
-    <button
-        type="submit"
-        form="schedule-form"
-        class="button-primary"
-        id="schedule-submit-button"
-    >
-        {% if mode == "edit" %}
-            更新
-        {% else %}
-            保存
-        {% endif %}
-    </button>
-
-    {% if mode == "edit" %}
-        <button
-            type="button"
-            onclick="openDeleteDialog()"
-            class="button-danger"
-        >
-            削除
-        </button>
-    {% endif %}
-{% endblock %}
+{% block flow_right %}{% endblock %}
 
 {% block content %}
 <style>
@@ -80,6 +57,66 @@
         margin-bottom: 3px;
     }
 
+    .schedule-submit-row {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 24px;
+        margin-bottom: 24px;
+    }
+
+    /* メモ：アイコンと入力欄を横並び */
+    .schedule-memo-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .schedule-memo-control {
+        flex: 1;
+        min-width: 0;
+    }
+
+    #id_memo {
+        width: 100%;
+        min-height: 36px;
+        padding: 6px 8px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+
+    /* 入力欄をスマホで操作しやすい大きさにする */
+    .schedule-form-control input[type="text"],
+    .schedule-form-control input[type="date"],
+    .schedule-form-control input[type="time"],
+    .schedule-form-control select {
+        min-height: 36px;
+        padding: 4px 6px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    /* コメント宛先 */
+    #id_to_user {
+        min-width: 180px;
+        min-height: 36px;
+        padding: 4px 6px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    /* コメント本文 */
+    #id_body {
+        width: 100%;
+        max-width: 100%;
+        min-height: 80px;
+        font-size: 16px;
+        padding: 6px 8px;
+        box-sizing: border-box;
+    }
+
     /* 予定メンバー選択全体 */
     .member-dropdown {
         position: relative;
@@ -90,11 +127,12 @@
     /* プルダウンを開くボタン */
     .member-dropdown-button {
         width: 100%; /* 親(.member-dropdown)と同じ横幅にする */
+        min-height: 36px;
         border: 1px solid #999;
         background-color: white;
         color: #35322E;
-        font-size: 14px;
-        padding: 2px 28px 2px 8px;
+        font-size: 16px;
+        padding: 4px 28px 4px 8px;
         text-align: left;
         cursor: pointer;
         position: relative;
@@ -253,11 +291,18 @@
     </div>
 
     {# メモ #}
-    <p>
-        <img src="{% static 'images/icons/memo.svg' %}" alt="メモ" width="20" height="20">
-        {{ form.memo }}
-        {{ form.memo.errors }}
-    </p>
+    <div class="schedule-memo-row">
+        <img
+            src="{% static 'images/icons/memo.svg' %}"
+            alt="メモ"
+            width="20"
+            height="20"
+        >
+        <div class="schedule-memo-control">
+            {{ form.memo }}
+            {{ form.memo.errors }}
+        </div>
+    </div>
 
     {# 添付ファイル #}
     <p>
@@ -444,6 +489,30 @@
             </div>
         {% endif %}
 
+    </div>
+
+    <div class="schedule-submit-row">
+        <button
+            type="submit"
+            class="button-primary"
+            id="schedule-submit-button"
+        >
+            {% if mode == "edit" %}
+                更新
+            {% else %}
+                保存
+            {% endif %}
+        </button>
+
+        {% if mode == "edit" %}
+            <button
+                type="button"
+                onclick="openDeleteDialog()"
+                class="button-danger"
+            >
+                削除
+            </button>
+        {% endif %}
     </div>
 </form>
 
