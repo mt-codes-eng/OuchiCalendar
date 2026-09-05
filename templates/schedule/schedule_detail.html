@@ -19,8 +19,18 @@
 {% endblock %}
 
 {% block flow_right %}
-    <a href="{% url 'schedule:schedule_edit' schedule.id %}" aria-label="予定を編集">
-        <img src="{% static 'images/icons/pencil.svg' %}" alt="予定を編集" width="20" height="20">
+    <a
+        href="{% url 'schedule:schedule_edit' schedule.id %}"
+        aria-label="予定を編集する"
+        class="schedule-edit-link"
+    >
+        <img
+            src="{% static 'images/icons/pencil.svg' %}"
+            alt=""
+            width="20"
+            height="20"
+        >
+        <span>編集する</span>
     </a>
 {% endblock %}
 
@@ -29,7 +39,7 @@
         .schedule-detail-row {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .schedule-detail-label {
@@ -78,7 +88,20 @@
 
         .schedule-comment-body {
             margin: 0;
-    }
+        }
+
+        /* 編集リンク */
+        .schedule-edit-link  {
+            display: inline-flex;
+            align-items:  baseline;
+            gap: 4px;
+            color: #8e95b8;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .schedule-edit-link img {
+            display: block;
+        }
     </style>
 
     <div class="schedule-detail-row">
