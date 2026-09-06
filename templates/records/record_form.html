@@ -7,7 +7,7 @@
     <a
         href="{% url 'schedule:day' date=date %}"
         aria-label="予定・記録概要へ戻る"
-        class="link-reset"
+        class="link-reset flow-nav-button"
     >
         ×
     </a>
@@ -21,38 +21,7 @@
     {% endif %}
 {% endblock %}
 
-{% block flow_right %}
-    <button
-        type="submit"
-        form="record-form"
-        id="record-submit-button"
-        class="button-primary"
-    >
-        {% if mode == "edit" %}
-            更新
-        {% else %}
-            保存
-        {% endif %}
-    </button>
-    {% if mode == "edit" %}
-        {% if record_type == "bowel" %}
-            <button
-                type="button"
-                onclick="openDeleteDialog()"
-                class="button-danger"
-            >
-                削除
-            </button>
-        {% elif record_type == "absence" %}
-            <button
-                type="button"
-                onclick="openDeleteDialog()"
-                class="button-danger"
-            >
-                削除
-            </button>
-        {% endif %}
-    {% endif %}
+{% block flow_right %}   
 {% endblock %}
 
 {% block content %}
@@ -60,7 +29,7 @@
     .record-form-row {
         display: flex;
         align-items: center;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
     }
 
     .record-form-label {
@@ -106,6 +75,54 @@
         padding: 16px;
         margin-top: 0px;
         background-color: white;
+    }
+
+    .record-submit-row {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 24px;
+        margin-bottom: 24px;
+    }
+
+    #id_record_date,
+    #id_child_id {
+        min-height: 36px;
+        padding: 4px 6px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    .record-fields-card input[type="text"],
+    .record-fields-card textarea,
+    .record-fields-card select {
+        width: 100%;
+        min-height: 36px;
+        padding: 4px 6px;
+        font-size: 16px;
+        box-sizing: border-box;
+        border: 1px solid #999;
+        background-color: white;
+    }
+
+    .record-fields-card textarea {
+        height: 36px;
+        min-height: 36px;
+        padding: 7px 6px;
+        line-height: 20px;
+        resize: vertical;
+    }
+
+    .record-file-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 16px 0;
+    }
+
+    .record-file-row input[type="file"] {
+        max-width: calc(100% - 26px);
+        font-size: 12px;
     }
 </style>
 <form
@@ -230,7 +247,7 @@
         <p>
             {{ bowel_form.concern_memo }}
         </p>
-        <p>
+        <p class="record-file-row">
             <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="20" height="20">
             <input type="file" id="id_bowel_files" name="bowel_files" multiple>
         </p>
@@ -284,7 +301,7 @@
         <p>
             {{ absence_form.memo }}
         </p>
-        <p>
+        <p class="record-file-row">
             <img src="{% static 'images/icons/clip.svg' %}" alt="添付ファイル" width="20" height="20">
             <input type="file" id="id_absence_files" name="absence_files" multiple>
         </p>
@@ -327,6 +344,39 @@
     {{ bowel_form.errors }}
     {{ absence_form.errors }}
 
+    <div class="record-submit-row">
+    <button
+        type="submit"
+        form="record-form"
+        id="record-submit-button"
+        class="button-primary"
+    >
+        {% if mode == "edit" %}
+            更新
+        {% else %}
+            保存
+        {% endif %}
+    </button>
+    {% if mode == "edit" %}
+        {% if record_type == "bowel" %}
+            <button
+                type="button"
+                onclick="openDeleteDialog()"
+                class="button-danger"
+            >
+                削除
+            </button>
+        {% elif record_type == "absence" %}
+            <button
+                type="button"
+                onclick="openDeleteDialog()"
+                class="button-danger"
+            >
+                削除
+            </button>
+        {% endif %}
+    {% endif %}
+    </div>
 </form>
 
 {% if show_coordination_choice %}
