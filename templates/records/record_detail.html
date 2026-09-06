@@ -18,18 +18,53 @@
 
 {% block flow_right %}
     {% if record_type == "bowel" %}
-        <a href="{% url 'records:bowel_edit' pk=record.pk %}" aria-label="排便記録を編集">
-            <img src="{% static 'images/icons/pencil.svg' %}" alt="排便記録を編集" width="20" height="20">
+        <a
+            href="{% url 'records:bowel_edit' pk=record.pk %}"
+            aria-label="排便記録を編集する"
+            class="record-edit-link"    
+        >
+            <img
+                src="{% static 'images/icons/pencil.svg' %}"
+                alt=""
+                width="20"
+                height="20"
+            >
+            <span>編集する</span>
         </a>
     {% elif record_type == "absence" %}
-        <a href="{% url 'records:absence_edit' pk=record.pk %}" aria-label="欠席記録を編集">
-            <img src="{% static 'images/icons/pencil.svg' %}" alt="欠席記録を編集" width="20" height="20">
+        <a
+            href="{% url 'records:absence_edit' pk=record.pk %}"
+            aria-label="欠席記録を編集する"
+            class="record-edit-link"
+        >
+            <img
+                src="{% static 'images/icons/pencil.svg' %}"
+                alt=""
+                width="20"
+                height="20"
+            >
+            <span>編集する</span>
         </a>
     {% endif %}
 {% endblock %}
 
 {% block content %}
 <style>
+    /* 編集リンク */
+    .record-edit-link {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 4px;
+        color: #8e95b8;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .record-edit-link img {
+        position: relative;
+        top: 2px;
+    }
+
     .record-type-tabs {
         display: flex;
         margin-top: 8px;
@@ -72,12 +107,21 @@
    .record-detail-row {
         display: flex;
         align-items: center;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
     }
 
     .record-detail-label {
         width: 120px;
         flex-shrink: 0;
+    }
+
+    .record-coordination-guide {
+        text-align: center;
+        margin-top: 24px;
+    }
+
+    .record-coordination-guide p {
+        margin-bottom: 12px;
     }
 </style>
 
@@ -192,18 +236,18 @@
 {% endif %}
 </div>
 
-<p>
-    何か対応・調整が必要ですか？<br>
-    必要な場合はこちらから！
-</p>
-<p>
+<div class="record-coordination-guide">
+    <p>
+        何か対応・調整が必要ですか？<br>
+        必要な場合はこちらから！
+    </p>
     <a
         href="{% url 'schedule:schedule_create' %}?date={{ record.record_date|date:'Y-m-d' }}"
         class="button-secondary"
     >
         ＋予定を作成（行事・勤務・通院など）
     </a>
-</p>
+</div>
 
 {# 画像拡大表示用モーダル #}
 <div id="image-modal" style="display: none;">
