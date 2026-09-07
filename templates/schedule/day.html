@@ -32,6 +32,12 @@
 {% endblock %}
 
 {% block content %}
+  <style>
+  /* 予定・記録1件ごとの間隔 */
+  .day-list-item {
+    margin-bottom: 16px;
+  }
+  </style>
   {# ------------------------------ #}
   {# 予定セクション #}
   {# ------------------------------ #}
@@ -43,7 +49,7 @@
       {% for schedule in schedules %}
         {% if schedule.requires_coordination %}
           {# 対応・調整が必要な予定：カラーバーなし #}
-          <li>
+          <li class="day-list-item">
             <div style="display: flex; align-items: flex-start;">
               {# 左側：対応・調整が必要な予定だけ表示する「・」 #}
               <span style="margin-right: 4px;">・</span>
@@ -51,7 +57,7 @@
               <div>
         {% else %}
           {# 対応・調整が不要な予定：予定メンバーまたは合同予定カラーのカラーバーを表示 #}
-          <li class="color-bar" style="border-left-color: {{ schedule.display_color }};">
+          <li class="color-bar day-list-item" style="border-left-color: {{ schedule.display_color }};">
             {# 対応・調整が不要な予定も、閉じタグの数をそろえるために箱を作る #}
             <div>
         {% endif %}
@@ -170,7 +176,7 @@
   {% if bowel_records or absence_records %}
     <ul class="list-reset">
         {% for record in bowel_records %}
-            <li class="color-bar" style="border-left-color: {{ record.display_color }};" >
+            <li class="color-bar day-list-item" style="border-left-color: {{ record.display_color }};" >
                 <a href="{% url 'records:bowel_detail' pk=record.pk %}" class="link-reset">
                     {% if record.child.image %}
                         <img
@@ -203,7 +209,7 @@
         {% endfor %}
 
         {% for record in absence_records %}
-            <li class="color-bar" style="border-left-color: {{ record.display_color }};">
+            <li class="color-bar day-list-item" style="border-left-color: {{ record.display_color }};">
                 <a href="{% url 'records:absence_detail' pk=record.pk %}" class="link-reset">
                     {% if record.child.image %}
                         <img
