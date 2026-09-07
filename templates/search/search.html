@@ -21,6 +21,11 @@
     font-size: 16px;
     box-sizing: border-box;
   }
+
+  /* 検索結果1件ごとの間隔 */
+  .search-result-item {
+    margin-bottom: 16px;
+  }
 </style>
 
 {# method="get" にすると、URL に ?q=会議 のように検索キーワードが付く #}
@@ -53,14 +58,14 @@
                             {% with schedule=item.object %}
                                 {% if schedule.requires_coordination %}
                                     {# 対応・調整あり #}
-                                    <li>
+                                    <li class="search-result-item">
                                         <div style="display: flex; align-items: flex-start;">
                                             <span style="margin-right: 4px;">・</span>
                                             <div>
                                 {% else %}
                                     {# 対応・調整なし #}
                                     <li
-                                        class="color-bar"
+                                        class="color-bar search-result-item"
                                         style="border-left-color: {{ schedule.display_color }};"
                                     >
                                         <div>
@@ -168,7 +173,7 @@
                         {% if item.type == "bowel" %}
                             {% with record=item.object %}
                                 <li
-                                  class="color-bar"
+                                  class="color-bar search-result-item"
                                   style="border-left-color: {{ record.display_color }};"
                                 >    
                                     <a 
@@ -209,7 +214,7 @@
                         {% if item.type == "absence" %}
                             {% with record=item.object %}
                                 <li
-                                  class="color-bar"
+                                  class="color-bar search-result-item"
                                   style="border-left-color: {{ record.display_color }};"
                                 >
                                     <a
