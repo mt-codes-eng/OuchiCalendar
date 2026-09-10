@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction, IntegrityError
 from django.utils import timezone
 from django.urls import reverse
+from django.contrib import messages
 
 from .forms import FamilyProfileForm
 from children.models import Child
@@ -137,11 +138,14 @@ def family_profile_edit_view(request):
                             "color_code": color_code,
                         }
                     )
-            
+
                 # 新しい画像が送られたときだけ差し替え後に古い画像を削除
                 # 新しい画像が送られた、もともと古い画像があった、保存後に画像が変わった、この3つを満たしたときだけ古いファイルを削除
                 if new_image and old_image and old_image != family.image:
                     old_image.delete(save=False)
+                
+                # 家族の設定を正常に保存できたことを通知する
+                messages.success(request, "✓ 家族の設定を更新しました")
                 
                 # 初期設定完了 かつ まだ完了画面を見ていないなら
                 #  家族設定登録完了画面へ進める
