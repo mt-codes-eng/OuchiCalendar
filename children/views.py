@@ -1,6 +1,7 @@
 # children/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Child
 from .forms import ChildForm
 from django.db import transaction, IntegrityError
@@ -39,6 +40,9 @@ def child_create_view(request):
                         }
                     )
 
+                # 子どもメンバーの追加が完了したことを通知
+                messages.success(request, "✓ 子どもメンバーを追加しました")
+                
                 return redirect("families:family_settings")
 
             except IntegrityError:
@@ -93,6 +97,8 @@ def child_edit_view(request, pk):
                 if new_image and old_image and old_image != child.image:
                     old_image.delete(save=False)
 
+                messages.success(request, "✓ 子どもメンバーを更新しました")
+                
                 return redirect("families:family_settings")
 
             except IntegrityError:
@@ -118,6 +124,10 @@ def child_delete_view(request, pk):
             
         # ② POST：DBから削除する
         child.delete()
+        
+        # 子どもメンバーの削除が完了したことを通知
+        messages.success(request, "✓ 子どもメンバーを削除しました")
+    
         return redirect("families:family_settings")
     
     # GETで直接このURLに来た場合は、削除確認画面を出さず編集画面へ戻す
