@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from datetime import datetime, date, time, timedelta
 from django.utils import timezone
 from django.db.models import Count
@@ -501,6 +502,7 @@ def schedule_create_view(request):
                 )
 
             day_str = timezone.localdate(schedule.start_at).isoformat() # 予定・記録概要画面のURLに渡すには 文字列 が必要だから、.isoformat()
+            messages.success(request, "✓ 予定を作成しました")
             return redirect("schedule:day", date=day_str)
     
     else:
@@ -674,6 +676,7 @@ def schedule_edit_view(request, pk):
              
             # 保存後は、その予定が属する day画面 に戻る
             day_str = timezone.localdate(updated_schedule.start_at).isoformat()
+            messages.success(request, "✓ 予定を更新しました")
             return redirect("schedule:day", date=day_str)
 
     else:
@@ -722,6 +725,7 @@ def schedule_delete_view(request, pk):
     # 削除後は、その日の day画面 に戻る
     if request.method == "POST":
         schedule.delete()
+        messages.success(request, "✓ 予定を削除しました")
         return redirect("schedule:day", date=day_str)
     
     return redirect("schedule:schedule_edit", pk=schedule.pk)
