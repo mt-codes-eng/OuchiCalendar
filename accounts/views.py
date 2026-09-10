@@ -166,7 +166,7 @@ def signup_view(request):
 
             # ⑥ 自動ログイン。登録後、そのままログイン状態にする
             login(request, user)
-            messages.success(request, "アカウント登録が完了しました")
+            messages.success(request, "✓ アカウント登録が完了しました")
             # ⑦ 遷移
             return redirect("families:family_settings")
 
@@ -193,6 +193,7 @@ def password_change_view(request):
             user = form.save()
             # update_session_auth_hash：パスワード変更後に、今のログイン状態（セッション）を壊さないための処理
             update_session_auth_hash(request, user)
+            messages.success(request, "✓ パスワードを変更しました")
             return redirect("families:family_settings")
     else:
         form = PasswordChangeForm(user=request.user)
@@ -257,6 +258,7 @@ def user_profile_edit_view(request):
                     )
 
                 # ここまで成功したら家族設定画面へ戻す
+                messages.success(request, "✓ プロフィールを更新しました")
                 return redirect("families:family_settings")
 
             except IntegrityError:
