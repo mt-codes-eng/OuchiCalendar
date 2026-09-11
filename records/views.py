@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from datetime import date, datetime
 from django.utils import timezone
 from django.urls import reverse
@@ -130,7 +131,7 @@ def record_create_view(request):
                             file=uploaded_file,
                             file_name=uploaded_file.name,
                         )
-
+                        
                     return redirect(
                         f"{reverse('records:create')}?date={posted_date.isoformat()}&show_coordination_choice=1"
                     )
@@ -165,7 +166,7 @@ def record_create_view(request):
                             file=uploaded_file,
                             file_name=uploaded_file.name,
                         )
-
+                    
                     return redirect(
                         f"{reverse('records:create')}?date={posted_date.isoformat()}&show_coordination_choice=1"
                     )
@@ -360,6 +361,8 @@ def bowel_record_edit_view(request, pk):
             # 更新した記録の日付をURL用の文字列にする
             day_str = updated_record.record_date.isoformat()
 
+            messages.success(request, "✓ 記録を更新しました")
+            
             # 予定・記録概要画面へ戻る
             return redirect("schedule:day", date=day_str)
         
@@ -461,6 +464,8 @@ def absence_record_edit_view(request, pk):
             # 更新した記録の日付をURL用の文字列にする
             day_str = updated_record.record_date.isoformat()
 
+            messages.success(request, "✓ 記録を更新しました")
+            
             # 予定・記録概要画面へ戻る
             return redirect("schedule:day", date=day_str)
         
@@ -506,6 +511,8 @@ def bowel_record_delete_view(request, pk):
         # DBレコード削除
         record.delete()
 
+        messages.success(request, "✓ 記録を削除しました")
+        
         return redirect("schedule:day", date=day_str)
 
     return redirect("records:bowel_edit", pk=record.pk)
@@ -528,6 +535,8 @@ def absence_record_delete_view(request, pk):
                 attachment.file.delete(save=False)
 
         record.delete()
+        
+        messages.success(request, "✓ 記録を削除しました")
 
         return redirect("schedule:day", date=day_str)
 
