@@ -191,6 +191,29 @@ def record_create_view(request):
 
     return render(request, "records/record_form.html", context)
 
+
+@login_required
+def record_create_completed_view(request):
+    """
+    記録作成後の「対応・調整が必要ですか？」で
+    はい / いいえ を押した後の処理
+    """
+
+    date_str = request.GET.get("date")
+    action = request.GET.get("action")
+
+    # 記録作成完了メッセージ
+    messages.success(request, "✓ 記録を作成しました")
+
+    # 「はい」なら予定作成画面へ
+    if action == "create_schedule":
+        return redirect(
+            f"{reverse('schedule:schedule_create')}?date={date_str}"
+        )
+
+    # 「いいえ」なら予定・記録概要画面へ
+    return redirect("schedule:day", date=date_str)
+
 @login_required
 def bowel_record_detail_view(request, pk):
     """
