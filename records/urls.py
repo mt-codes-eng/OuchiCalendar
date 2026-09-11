@@ -12,4 +12,5 @@ urlpatterns = [
     path("absence/<int:pk>/edit/", views.absence_record_edit_view, name="absence_edit"), # 欠席記録編集
     path("bowel/<int:pk>/delete/", views.bowel_record_delete_view, name="bowel_delete"), # 排便記録削除
     path("absence/<int:pk>/delete/", views.absence_record_delete_view, name="absence_delete"), # 欠席記録削除
+    path("create-completed/", views.record_create_completed_view, name="create_completed"),
 ]
