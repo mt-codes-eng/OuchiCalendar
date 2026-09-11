@@ -386,14 +386,14 @@
 
             <div class="modal-button-row">
                 <a
-                    href="{% url 'schedule:schedule_create' %}?date={{ date }}"
+                    href="{% url 'records:create_completed' %}?date={{ date }}&action=create_schedule"
                     class="button-accent"
                 >
                     はい
                 </a>
 
                 <a
-                    href="{% url 'schedule:day' date=date %}"
+                    href="{% url 'records:create_completed' %}?date={{ date }}&action=back_to_day"
                     class="button-secondary"
                 >
                     いいえ
