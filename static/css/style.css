@@ -283,14 +283,15 @@ main {
 /* サクセスメッセージ */
 .success-message {
     margin: 12px 16px;
-    padding: 10px 12px;
+    padding: 12px 14px;
 
-    background-color: #f0f2f8;
+    background-color: #e2e5f0;
     border: 1px solid #6F789D;
     border-radius: 4px;
 
     color: #35322E;
     font-size: 14px;
+    font-weight: bold;
 }
 
 /* =======================
