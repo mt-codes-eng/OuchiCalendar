@@ -244,14 +244,34 @@ main {
 
 /* ログイン後画面の共通ヘッダー */
 .app-page-header {
-  border-bottom: 1px solid #D9D9D9;
-  padding-bottom: 8px;
-  margin-bottom: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+/* ヘッダー下の横線だけ画面いっぱいにする */
+.app-page-header::after {
+    content: "";
+    position: absolute;
+    left: calc(50% - 50vw);
+    bottom: 0;
+    width: 100vw;
+    border-bottom: 1px solid #D9D9D9;
+}
+
+/* スクロールしても上部に残るヘッダー */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background-color: #F3F3F3;
 }
 
 /* ヘッダー下のラインが不要な画面 */
-.app-page-header.no-header-line {
-  border-bottom: none;
+.app-page-header.no-header-line::after {
+    display: none;
 }
 
 /* 表示切替用のセレクトボックス */
