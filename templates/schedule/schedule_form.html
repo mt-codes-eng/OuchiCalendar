@@ -55,6 +55,21 @@
 
     .schedule-time-line {
         margin-bottom: 3px;
+        white-space: nowrap;
+    }
+
+    .schedule-time-inputs {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        white-space: nowrap;
+    }
+
+    .schedule-time-inputs input[type="time"] {
+        width: 88px;
+        min-width: 0;
+        padding: 4px 2px;
+        box-sizing: border-box;
     }
 
     .schedule-submit-row {
@@ -63,6 +78,18 @@
         gap: 12px;
         margin-top: 24px;
         margin-bottom: 24px;
+    }
+
+    /* 添付ファイルをスマホで操作しやすい大きさにする */
+    input[type="file"] {
+        font-size: 14px;
+    }
+
+    input[type="file"]::file-selector-button {
+        height: 36px;
+        padding: 4px 10px;
+        font-size: 16px;
+        box-sizing: border-box;
     }
 
     /* メモ：アイコンと入力欄を横並び */
@@ -86,6 +113,14 @@
         box-sizing: border-box;
     }
 
+    /* ステータスと説明メッセージを近づける */
+    .schedule-status-row {
+        margin-bottom: 6px;
+    }
+
+    #status-message {
+        margin-top: 0;
+    }
 
     /* 入力欄をスマホで操作しやすい大きさにする */
     .schedule-form-control input[type="text"],
@@ -182,7 +217,7 @@
 
     .comment-meta {
         margin: 0 0 6px;
-        font-size: 12px;
+        font-size: 14px;
         color: #666;
     }
 
@@ -233,14 +268,16 @@
             </div>
         
             <div id="time-fields">
-                <div class="schedule-time-line">
-                    開始{{ form.start_time }}～
-                    {{ form.start_time.errors }}
+                <div class="schedule-time-inputs">
+                    <span>開始</span>
+                    {{ form.start_time }}
+                    <span>～</span>
+                    <span>終了</span>
+                    {{ form.end_time }}
                 </div>
-                <div class="schedule-time-line">
-                    終了{{ form.end_time }}
-                    {{ form.end_time.errors }}
-                </div>
+
+                {{ form.start_time.errors }}
+                {{ form.end_time.errors }}
             </div>
         </div>
     </div>
@@ -401,7 +438,7 @@
             </div>
         </div>
         {# ステータス #}
-        <div class="schedule-form-row">
+        <div class="schedule-form-row schedule-status-row">
             <div class="schedule-form-label">
                 ステータス
             </div>
@@ -428,7 +465,7 @@
         {# 連続して対応要否 #}
         <div class="schedule-form-row">
             <div class="schedule-form-label">
-                連続して対応:
+                連続して対応
             </div>
             <div class="schedule-form-colon">
                 ：
@@ -455,7 +492,7 @@
         <div id="comment-fields">
             <p>
                 <img src="{% static 'images/icons/comment.svg' %}" alt="コメント" width="20" height="20">
-                {{ comment_form.to_user.label_tag }}
+                宛先：
                 {{ comment_form.to_user }}
                 {{ comment_form.to_user.errors }}
             </p>
