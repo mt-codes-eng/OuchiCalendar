@@ -22,9 +22,9 @@ class LetterAndNumberPasswordValidator:
         # 英字または数字のどちらかが無ければエラー
         if not has_letter or not has_number:
             raise ValidationError(
-                "パスワードには英字と数字の両方を含めてください",
+                "パスワードには英字と数字の両方を含めてください。",
                 code="password_requires_letter_and_number",
             )
 
     def get_help_text(self):
-        return "パスワードには英字と数字の両方を含めてください"
+        return "パスワードには英字と数字の両方を含めてください。"
