@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import UserCreationForm # Djangoが用意してくれている「ユーザー登録用フォーム」。パスワードの確認（password1/password2）や、パスワードの安全な保存（ハッシュ化）まで面倒をみてくれる 
 from django import forms
 
@@ -18,6 +18,9 @@ class SignUpForm(UserCreationForm):
     color_code = forms.ChoiceField(
         label="個人カラー",
         required=True,
+        error_messages={
+            "required": "個人カラーを選択してください。",
+        },
     )
     
     class Meta:
@@ -41,8 +44,8 @@ class SignUpForm(UserCreationForm):
         
     def __init__(self, *args, **kwargs):
         # フォーム生成時に、各項目の見た目や表示名を整える
-        super().__init__(*args, **kwargs)
-
+        super().__init__(*args, **kwargs)# 必須項目のエラーメッセージを分かりやすくする
+        
         # password1 / password2 は UserCreationForm 側が持っているフィールド
         # ここでラベルを上書きすると、画面表示をわかりやすくできる
         self.fields["password1"].label = "パスワード"
@@ -52,10 +55,37 @@ class SignUpForm(UserCreationForm):
         # モデル側でも必須だが、フォーム側でも明示しておくとわかりやすい
         self.fields["image"].required = True
         
+        # 必須項目のエラーメッセージを分かりやすくする
+        self.fields["name"].error_messages["required"] = "名前を入力してください。"
+        self.fields["email"].error_messages["required"] = "Emailを入力してください。"
+        self.fields["image"].error_messages["required"] = "個人アイコンを選択してください。"
+        self.fields["password1"].error_messages["required"] = "パスワードを入力してください。"
+        self.fields["password2"].error_messages["required"] = "パスワードを再入力してください。"
+
         self.fields["color_code"].choices = [
-            ("", "選択してください"),
+            ("", "選択してください。"),
             *[(code, COLOR_HEX_MAP[code]) for code in COLOR_HEX_MAP]
         ]
+    
+    def clean(self):
+        cleaned_data = super().clean()
+
+        password1 = cleaned_data.get("password1")
+        password2 = self.data.get("password2")
+
+        # パスワードが入力されていて、
+        # 確認用パスワードと一致していない場合も
+        # password1 自体のパスワード条件を確認する
+        if password1 and password2 and password1 != password2:
+            try:
+                password_validation.validate_password(
+                    password1,
+                    self.instance,
+                )
+            except forms.ValidationError as error:
+                self.add_error("password1", error)
+
+        return cleaned_data
         
     def clean_color_code(self):
         """
@@ -68,16 +98,16 @@ class SignUpForm(UserCreationForm):
 
         # 万一、未選択のまま来たらエラー
         if color_code in [None, ""]:
-            raise forms.ValidationError("個人カラーを選択してください")
+            raise forms.ValidationError("個人カラーを選択してください。")
 
         try:
             color_code = int(color_code)
         except (TypeError, ValueError):
-            raise forms.ValidationError("個人カラーの値が不正です")
+            raise forms.ValidationError("個人カラーの値が不正です。")
 
         # 13色パレットの範囲内かチェック
         if color_code not in COLOR_HEX_MAP:
-            raise forms.ValidationError("選択できない色です")
+            raise forms.ValidationError("選択できない色です。")
 
         return color_code
 
@@ -123,7 +153,7 @@ class UserProfileForm(forms.ModelForm):
         # 個人カラーの選択肢を作る
         # choices は [(保存する値, 画面に表示する値), ...] の形
         self.fields["color_code"].choices = [
-            ("", "選択してください"),
+            ("", "選択してください。"),
             *[(code, hex_color) for code, hex_color in COLOR_HEX_MAP.items()]
         ]
         
@@ -161,7 +191,7 @@ class UserProfileForm(forms.ModelForm):
         qs = User.objects.filter(email=email).exclude(pk=self.instance.pk)
         if qs.exists():
             # フォームにエラーを出して、保存を止める
-            raise forms.ValidationError("このメールアドレスはすでに使用されています")
+            raise forms.ValidationError("このメールアドレスはすでに使用されています。")
         return email
     
     def clean_color_code(self):
@@ -175,16 +205,16 @@ class UserProfileForm(forms.ModelForm):
 
         # 未選択チェック
         if color_code in [None, ""]:
-            raise forms.ValidationError("個人カラーを選択してください")
+            raise forms.ValidationError("個人カラーを選択してください。")
 
         # 文字列 → int に変換
         try:
             color_code = int(color_code)
         except (TypeError, ValueError):
-            raise forms.ValidationError("個人カラーの値が不正です")
+            raise forms.ValidationError("個人カラーの値が不正です。")
 
         # 13色パレットの中にある値か確認
         if color_code not in COLOR_HEX_MAP:
-            raise forms.ValidationError("選択できない色です")
+            raise forms.ValidationError("選択できない色です。")
 
         return color_code
