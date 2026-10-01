@@ -105,6 +105,26 @@
     font-size: 16px;
     box-sizing: border-box;
   }
+
+  /* 使用済みの個人カラー */
+  .color-option-button.is-used {
+      position: relative;
+      cursor: not-allowed;
+  }
+
+  /* 使用済みカラーに「×」を重ねる */
+  .color-option-button.is-used::after {
+      content: "×";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #35322E;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1;
+  }
 }
 </style>
 
@@ -260,30 +280,45 @@
           gap: 10px;
         "
       >
-        {# formに設定した選択肢を1つずつ取り出す #}
-        {# value = 0,1,2... の数字 #}
-        {# hex = "#ff7f7f" などの色コード #}
         {% for value, hex in form.fields.color_code.choices %}
-          {# 最初の「選択してください」は表示しない #}
           {% if value != "" %}
             <button
               type="button"
-              class="color-option-button"
+              class="color-option-button{% if value in used_color_codes %} is-used{% endif %}"
               data-value="{{ value }}"
               data-hex="{{ hex }}"
               style="
                 width: 24px;
                 height: 24px;
-                padding: 0; /* 共通ボタンCSSの padding を打ち消す */
+                padding: 0;
                 border: 1px solid #ccc;
                 background-color: {{ hex }};
-                cursor: pointer;
+                {% if value not in used_color_codes %}
+                  cursor: pointer;
+                {% endif %}
               "
-              aria-label="色 {{ value }} を選択"
+              {% if value in used_color_codes %}
+                disabled
+                aria-label="この色は使用済みです"
+                title="使用済み"
+              {% else %}
+                aria-label="色 {{ value }} を選択"
+              {% endif %}
             ></button>
           {% endif %}
         {% endfor %}
       </div>
+
+      {% if used_color_codes %}
+        <div
+          style="
+            margin-top: 8px;
+            font-size: 14px;
+          "
+        >
+          × 使用済み
+        </div>
+      {% endif %}
     </div>
     {{ form.color_code.errors }}
     <div class="signup-form-row signup-file-row">
