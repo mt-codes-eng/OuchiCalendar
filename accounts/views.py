@@ -148,7 +148,7 @@ def signup_view(request):
                 # フォームエラーとしてやさしく返す
                 form.add_error(
                     "color_code",
-                    "この色はすでに家族内で使われています。別の色を選択してください"
+                    "この色はすでに家族内で使われています。別の色を選択してください。"
                 )
                 return render(
                     request,
@@ -175,9 +175,26 @@ def signup_view(request):
         # その型から作られた実物（インスタンス）。何も書かれていない入力用の紙を1枚用意した
         form = SignUpForm()
     
+    # 招待先の家族ですでに使用されている個人カラーを取得する
+    used_color_codes = []
+
+    if invitation_token:
+        invitation = Invitation.objects.filter(
+            invitation_token=invitation_token,
+            status=Invitation.Status.UNUSED,
+        ).first()
+
+        if invitation and not invitation.is_expired():
+            used_color_codes = list(
+                FamilyColorAssignment.objects.filter(
+                    family=invitation.family
+                ).values_list("color_code", flat=True)
+            )
+    
     context = {
         "form": form,
         "invitation_token": invitation_token,
+        "used_color_codes": used_color_codes,
     }
 
     # Python的に省略していない形はreturn render(request=request,template_name="accounts/signup.html",context={"form": form})
@@ -269,7 +286,7 @@ def user_profile_edit_view(request):
                 # 「個人カラー欄のエラー」として画面に戻す
                 form.add_error(
                     "color_code",
-                    "この色はすでに家族内で使われています。別の色を選択してください"
+                    "この色はすでに家族内で使われています。別の色を選択してください。"
                 )
         
     else:
