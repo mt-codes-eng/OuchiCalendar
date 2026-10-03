@@ -9,6 +9,9 @@ class FamilyProfileForm(forms.ModelForm):
     color_code = forms.ChoiceField(
         label="合同予定カラー",
         required=True,
+        error_messages={
+            "required": "合同予定カラーを選択してください。",
+        },
     )
     
     class Meta:
@@ -29,6 +32,8 @@ class FamilyProfileForm(forms.ModelForm):
         フォーム生成時の初期設定
         """
         super().__init__(*args, **kwargs)
+        
+        self.fields["name"].error_messages["required"] = "苗字（家族名）を入力してください。"
 
         # 合同予定カラーの選択肢を作る
         # 例: ("0", "#ff7f7f"), ("1", "#ff7fbf"), ...
@@ -59,16 +64,16 @@ class FamilyProfileForm(forms.ModelForm):
 
         # 未選択チェック
         if color_code in [None, ""]:
-            raise forms.ValidationError("合同予定カラーを選択してください")
+            raise forms.ValidationError("合同予定カラーを選択してください。")
 
         # 文字列 → int に変換
         try:
             color_code = int(color_code)
         except (TypeError, ValueError):
-            raise forms.ValidationError("合同予定カラーの値が不正です")
+            raise forms.ValidationError("合同予定カラーの値が不正です。")
 
         # 13色パレットの中か確認
         if color_code not in COLOR_HEX_MAP:
-            raise forms.ValidationError("選択できない色です")
+            raise forms.ValidationError("選択できない色です。")
 
         return color_code
