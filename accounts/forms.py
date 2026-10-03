@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model, password_validation
-from django.contrib.auth.forms import UserCreationForm # Djangoが用意してくれている「ユーザー登録用フォーム」。パスワードの確認（password1/password2）や、パスワードの安全な保存（ハッシュ化）まで面倒をみてくれる 
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm # Djangoが用意してくれている「ユーザー登録用フォーム」。パスワードの確認（password1/password2）や、パスワードの安全な保存（ハッシュ化）まで面倒をみてくれる 
 from django import forms
 
 from color_assignments.constants import COLOR_HEX_MAP # 色一覧を読み込む
@@ -218,3 +218,45 @@ class UserProfileForm(forms.ModelForm):
             raise forms.ValidationError("選択できない色です。")
 
         return color_code
+    
+class CustomPasswordChangeForm(PasswordChangeForm):
+    """
+    パスワード変更フォーム
+    必須項目のエラーメッセージを分かりやすくする
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["old_password"].error_messages["required"] = (
+            "現在のパスワードを入力してください。"
+        )
+        self.fields["new_password1"].error_messages["required"] = (
+            "新しいパスワードを入力してください。"
+        )
+        self.fields["new_password2"].error_messages["required"] = (
+            "新しいパスワードを再入力してください。"
+        )
+        
+    def clean(self):
+        cleaned_data = super().clean()
+
+        new_password1 = cleaned_data.get("new_password1")
+        new_password2 = self.data.get("new_password2")
+
+        # 確認用パスワードが一致しない場合でも、
+        # new_password1 自体のパスワード条件を確認する
+        if (
+            new_password1
+            and new_password2
+            and new_password1 != new_password2
+        ):
+            try:
+                password_validation.validate_password(
+                    new_password1,
+                    self.user,
+                )
+            except forms.ValidationError as error:
+                self.add_error("new_password1", error)
+
+        return cleaned_data
