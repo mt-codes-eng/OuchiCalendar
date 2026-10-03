@@ -62,6 +62,26 @@
     margin-bottom: 12px;
 }
 
+/* 使用済みの個人カラー */
+.color-option-button.is-used {
+    position: relative;
+    cursor: not-allowed;
+}
+
+/* 使用済みカラーに「×」を重ねる */
+.color-option-button.is-used::after {
+    content: "×";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #35322E;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1;
+}
+
 /* ラベル部分 */
 .form-label {
     width: auto; /* ラベルの横幅を固定 */
@@ -104,26 +124,6 @@
     padding: 4px 10px;
     font-size: 16px;
     box-sizing: border-box;
-  }
-
-  /* 使用済みの個人カラー */
-  .color-option-button.is-used {
-      position: relative;
-      cursor: not-allowed;
-  }
-
-  /* 使用済みカラーに「×」を重ねる */
-  .color-option-button.is-used::after {
-      content: "×";
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #35322E;
-      font-size: 18px;
-      font-weight: bold;
-      line-height: 1;
   }
 }
 </style>
