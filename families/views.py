@@ -106,6 +106,18 @@ def family_settings_view(request):
 def family_profile_edit_view(request):
     family = request.user.family
     
+    # 現在の合同予定カラー以外で、
+    # 家族内ですでに使用されているカラーを取得する
+    used_color_codes = list(
+        FamilyColorAssignment.objects.filter(
+            family=family
+        )
+        .exclude(
+            assign_type=FamilyColorAssignment.AssignType.SHARED
+        )
+        .values_list("color_code", flat=True)
+    )
+    
     if request.method == "POST":
         # もともとの古い画像（保存前の画像）を覚えておく
         old_image = family.image
@@ -165,7 +177,7 @@ def family_profile_edit_view(request):
                 # 合同予定カラーとして選んだときなど
                 form.add_error(
                     "color_code",
-                    "この色はすでに家族内で使われています。別の色を選択してください"
+                    "この色はすでに家族内で使われています。別の色を選択してください。"
                 )
                 
     # form = FamilyProfileForm()は新しくfamilyを作るためのフォーム。instanceなしは白紙の申請書を渡されるイメージ
@@ -177,7 +189,11 @@ def family_profile_edit_view(request):
     return render(
         request,
         "families/family_profile_edit.html",
-        {"form": form, "family": family},
+        {
+            "form": form,
+            "family": family,
+            "used_color_codes": used_color_codes,
+        },
     )
 
 @login_required
