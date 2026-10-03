@@ -1,11 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib import messages
 from django.db import IntegrityError, transaction
 from django.utils import timezone
-from .forms import SignUpForm, UserProfileForm
+from .forms import SignUpForm, UserProfileForm, CustomPasswordChangeForm
 from families.models import Family
 from invitations.models import Invitation
 from color_assignments.models import FamilyColorAssignment
@@ -205,7 +204,10 @@ def signup_view(request):
 @login_required
 def password_change_view(request):
     if request.method == "POST":
-        form = PasswordChangeForm(user=request.user, data=request.POST)
+        form = CustomPasswordChangeForm(
+            user=request.user,
+            data=request.POST,
+        )
         if form.is_valid():
             user = form.save()
             # update_session_auth_hash：パスワード変更後に、今のログイン状態（セッション）を壊さないための処理
@@ -213,7 +215,7 @@ def password_change_view(request):
             messages.success(request, "✓ パスワードを変更しました")
             return redirect("families:family_settings")
     else:
-        form = PasswordChangeForm(user=request.user)
+        form =  CustomPasswordChangeForm(user=request.user)
         
     return render(request, "accounts/password_change.html", {"form": form})
 
