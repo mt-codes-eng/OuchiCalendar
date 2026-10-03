@@ -124,6 +124,9 @@ class UserProfileForm(forms.ModelForm):
     color_code = forms.ChoiceField(
         label="個人カラー",
         required=True,
+        error_messages={
+        "required": "個人カラーを選択してください。",
+        },
     )
     
     class Meta:
@@ -144,6 +147,9 @@ class UserProfileForm(forms.ModelForm):
         フォーム生成時の初期設定
         """
         super().__init__(*args, **kwargs)
+        
+        self.fields["name"].error_messages["required"] = "名前を入力してください。"
+        self.fields["email"].error_messages["required"] = "Emailを入力してください。"
 
         # 編集画面では、新しい画像を選ばなくても保存できるようにしたい
         # （今の画像をそのまま使うため）
