@@ -238,6 +238,15 @@ def user_profile_edit_view(request):
     # ログイン中のユーザー（＝自分）
     user = request.user
     
+    # 同じ家族で、他のメンバーが使用しているカラーを取得する
+    used_color_codes = list(
+        FamilyColorAssignment.objects.filter(
+            family=user.family
+        )
+        .exclude(user=user)
+        .values_list("color_code", flat=True)
+    )
+    
     if request.method == "POST":
         # プロフィール編集でも、画像ファイルが送られる可能性があるので
         # request.POST に加えて request.FILES も渡す
@@ -297,4 +306,12 @@ def user_profile_edit_view(request):
         
     # ビューでuser = request.userとしており、このuserをテンプレで使いたいとき混乱しないようにuser_objという別名で渡している
     # テンプレでuserという名前がすでに別で使われている場合があり、この場合と混乱しないため   
-    return render(request, "accounts/user_profile_edit.html", {"form": form, "user_obj":user})
+    return render(
+            request,
+            "accounts/user_profile_edit.html", 
+            {
+                "form": form, 
+                "user_obj":user,
+                "used_color_codes": used_color_codes,
+            },
+    )
