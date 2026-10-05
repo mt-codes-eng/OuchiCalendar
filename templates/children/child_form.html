@@ -83,7 +83,7 @@
     .form-value input[type="text"] {
        width: 100%;
       min-width: 0;
-      height: 40px;
+      height: 36px;
       padding: 6px 8px;
       font-size: 16px;
       border: 1px solid #888;
@@ -98,6 +98,25 @@
     /* 色候補一覧を開いたときだけ、□と一覧を近づける */
     .profile-color-row:has(+ #color-picker-options[style*="display: block"]) {
       margin-bottom: 6px;
+    }
+
+    /* 使用済みのカラー */
+    .color-option-button.is-used {
+      position: relative;
+      cursor: not-allowed;
+    }
+
+    .color-option-button.is-used::after {
+      content: "×";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #35322E;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1;
     }
 
     /* 子どもアイコン部分 */
@@ -197,7 +216,14 @@
       .profile-image-content input[type="file"] {
         width: 100%;
         max-width: 100%;
-        font-size: 12px;
+        font-size: 14px;
+      }
+
+      .profile-image-content input[type="file"]::file-selector-button {
+        height: 36px;
+        padding: 4px 10px;
+        font-size: 16px;
+        box-sizing: border-box;
       }
     }
   </style>
@@ -206,6 +232,7 @@
     id="child-form" 
     method="post"
     enctype="multipart/form-data"
+    novalidate
     onsubmit="
       if (this.dataset.submitting === 'true') {
         return false;
@@ -303,7 +330,7 @@
             {% if value != "" %}
               <button
                 type="button"
-                class="color-option-button"
+                class="color-option-button{% if value in used_color_codes %} is-used{% endif %}"
                 data-value="{{ value }}"
                 data-hex="{{ hex }}"
                 style="
@@ -314,11 +341,27 @@
                   background-color: {{ hex }};
                   cursor: pointer;
                 "
-                aria-label="色 {{ value }} を選択"
+                {% if value in used_color_codes %}
+                  disabled
+                  aria-label="この色は使用済みです"
+                  title="使用済み"
+                {% else %}
+                  aria-label="色 {{ value }} を選択"
+                {% endif %}
               ></button>
             {% endif %}
           {% endfor %}
         </div>
+          {% if used_color_codes %}
+            <div
+              style="
+                margin-top: 8px;
+                font-size: 14px;
+              "
+            >
+              × 使用済み
+            </div>
+          {% endif %}
       </div>
       {{ form.color_code.errors }}
 
