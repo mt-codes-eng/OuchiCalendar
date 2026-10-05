@@ -32,6 +32,10 @@
     margin-top: 24px;
   }
 
+  .setup-completed-buttons button {
+    width: 130px;
+  }
+
   /* 設定項目の1行 */
   .setting-row {
     display: flex;
@@ -48,15 +52,12 @@
     justify-content: space-between;
   }
 
-  .child-edit-link {
-    margin-left: 8px;
-  }
-
   /* 編集リンク */
   .edit-link {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    margin-left: 12px;
     color: #8e95b8;
     font-size: 14px;
   }
@@ -65,6 +66,14 @@
   .edit-link img {
     width: 18px;
     height: 18px;
+  }
+
+  /* 追加・招待リンクの＋アイコン */
+  .add-link-icon {
+    width: 22px;
+    height: 22px;
+    margin-left: 6px;
+    vertical-align: middle;
   }
 
   /* タップ・クリックしたとき */
@@ -242,9 +251,7 @@
       <img
         src="{% static 'images/icons/plus.svg' %}"
         alt="家族を招待"
-        width="20"
-        height="20"
-        style="vertical-align: middle;"
+        class="add-link-icon"
       >
     </a>
   </p>
@@ -280,7 +287,7 @@
           {% endif %}
           <a
             href="{% url 'children:child_edit' child.id %}"
-            class="edit-link child-edit-link"
+            class="edit-link"
           >
             <img
               src="{% static 'images/icons/pencil.svg' %}"
@@ -300,9 +307,7 @@
       <img
         src="{% static 'images/icons/plus.svg' %}"
         alt="子どもメンバーの追加"
-        width="20"
-        height="20"
-        style="vertical-align: middle;"
+        class="add-link-icon"
       >
     </a>
   </p>
@@ -320,7 +325,7 @@
         予定や記録を作成してみましょう
       </p>
 
-      {# 「はい」「いいえ」を押したときにフラグを True にしてから遷移したいので、aタグではなく form + button にする #}
+      {# 「カレンダーへ進む」などを押したときにフラグを True にしてから遷移したいので、aタグではなく form + button にする #}
       <form method="post" action="{% url 'families:finish_setup_completed' %}">
         {% csrf_token %}
 
@@ -331,7 +336,7 @@
             value="go_calendar"
             class="button-accent"
           >
-            はい
+            カレンダーへ
           </button>
 
           <button
@@ -340,7 +345,7 @@
             value="back_settings"
             class="button-secondary"
           >
-            いいえ
+            設定に戻る
           </button>
         </div>
       </form>
