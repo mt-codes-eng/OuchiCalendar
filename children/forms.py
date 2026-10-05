@@ -9,6 +9,9 @@ class ChildForm(forms.ModelForm):
     color_code = forms.ChoiceField(
         label="個人カラー",
         required=True,
+        error_messages={
+            "required": "個人カラーを選択してください。",
+        },
     )
     
     class Meta:
@@ -24,6 +27,9 @@ class ChildForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.fields["name"].error_messages["required"] = "子ども名を入力してください。"
+        self.fields["image"].error_messages["required"] = "子どもアイコンを選択してください。"
         
          # 個人カラーの選択肢を作る
         self.fields["color_code"].choices = [
@@ -54,16 +60,16 @@ class ChildForm(forms.ModelForm):
 
         # 未選択チェック
         if color_code in [None, ""]:
-            raise forms.ValidationError("個人カラーを選択してください")
+            raise forms.ValidationError("個人カラーを選択してください。")
 
         # 文字列 → int に変換
         try:
             color_code = int(color_code)
         except (TypeError, ValueError):
-            raise forms.ValidationError("個人カラーの値が不正です")
+            raise forms.ValidationError("個人カラーの値が不正です。")
 
         # 13色パレットの中か確認
         if color_code not in COLOR_HEX_MAP:
-            raise forms.ValidationError("選択できない色です")
+            raise forms.ValidationError("選択できない色です。")
 
         return color_code
