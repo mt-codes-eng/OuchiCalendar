@@ -9,6 +9,12 @@ from color_assignments.models import FamilyColorAssignment
 
 @login_required
 def child_create_view(request):
+    used_color_codes = list(
+        FamilyColorAssignment.objects.filter(
+            family=request.user.family
+        ).values_list("color_code", flat=True)
+    )
+    
     if request.method == "POST":
         # 送信されたデータ（記入済みの紙）でフォームを作る
         form = ChildForm(request.POST, request.FILES)
@@ -49,13 +55,20 @@ def child_create_view(request):
                 # すでに家族内で使われている色を選んだ場合など
                 form.add_error(
                     "color_code",
-                    "この色はすでに家族内で使われています。別の色を選択してください"
+                    "この色はすでに家族内で使われています。別の色を選択してください。"
                 )
 
     else:
         form = ChildForm()
 
-    return render(request, "children/child_form.html", {"form": form})
+    return render(
+        request, 
+        "children/child_form.html", 
+        {
+            "form": form,
+            "used_color_codes": used_color_codes,
+        },
+    )
 
 @login_required
 def child_edit_view(request, pk):
@@ -63,6 +76,14 @@ def child_edit_view(request, pk):
     # family=request.user.family：ログイン中の家族の子どもだけに限定する（権限漏れ防止）
     # ① 編集対象の子どもを取得（他家族のデータは取れないようにする。「他人の子どもをURL直打ちで編集」が防ぐ）
     child = get_object_or_404(Child, pk=pk, family=request.user.family)
+    
+    used_color_codes = list(
+        FamilyColorAssignment.objects.filter(
+            family=request.user.family
+        )
+        .exclude(child=child)
+        .values_list("color_code", flat=True)
+    )
     
     if request.method == "POST":
         old_image = child.image
@@ -104,14 +125,22 @@ def child_edit_view(request, pk):
             except IntegrityError:
                 form.add_error(
                     "color_code",
-                    "この色はすでに家族内で使われています。別の色を選択してください"
+                    "この色はすでに家族内で使われています。別の色を選択してください。"
                 )
 
     else:
         # ③ GET：最初に画面を開いたとき、既存データ入りのフォームを作る
         form = ChildForm(instance=child)
     
-    return render(request, "children/child_form.html", {"form":form, "child":child})
+    return render(
+        request, 
+        "children/child_form.html", 
+        {
+            "form":form, 
+            "child":child,
+            "used_color_codes": used_color_codes,
+        },
+    )
 
 @login_required
 def child_delete_view(request, pk):
