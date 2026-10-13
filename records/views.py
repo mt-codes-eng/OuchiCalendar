@@ -76,7 +76,16 @@ def record_create_view(request):
     children = Child.objects.filter(
         family=request.user.family
     ).order_by("id")
+    
+    # 入力エラーの初期値
+    child_error = None
 
+    # 最初に表示する記録の種類
+    selected_record_type = "bowel"
+    
+    # 最初は子ども未選択
+    selected_child_id = ""
+    
     # -----------------------------
     # ③ POST（保存処理）
     # -----------------------------
@@ -84,15 +93,39 @@ def record_create_view(request):
 
         # どの記録を保存するか（radioの値）
         # "bowel" or "absence"
-        
         record_type = request.POST.get("record_type")
         
+        # エラーで再表示するときも、選択していた記録の種類を維持する
+        selected_record_type = record_type
+        
+        # 選択された記録だけ、POSTされた内容を入れたフォームにする
+        if record_type == "bowel":
+            bowel_form = BowelMovementRecordForm(request.POST)
+            absence_form = AbsenceRecordForm()
+        elif record_type == "absence":
+            bowel_form = BowelMovementRecordForm()
+            absence_form = AbsenceRecordForm(request.POST)
+        else:
+            bowel_form = BowelMovementRecordForm()
+            absence_form = AbsenceRecordForm()
+        
+        # 子どもを取得する
         child_id = request.POST.get("child_id")
-        child = get_object_or_404(
-            Child,
-            id=child_id,
-            family=request.user.family,
-        )
+        
+        # エラーで再表示するときも、選択した子どもを保持する
+        selected_child_id = child_id
+        
+        # 子どもが未選択か確認する
+        child = None
+
+        if not child_id:
+            child_error = "記録する子どもを選択してください。"
+        else:
+            child = get_object_or_404(
+                Child,
+                id=child_id,
+                family=request.user.family,
+            )
         
         # POSTでも日付を受け取る
         posted_date = _parse_date(request.POST.get("record_date"))
@@ -102,9 +135,7 @@ def record_create_view(request):
         # -------------------------
         # 排便記録の場合
         # -------------------------
-        if record_type == "bowel":
-            bowel_form = BowelMovementRecordForm(request.POST)
-            absence_form = AbsenceRecordForm()  # 表示用だけ
+        if record_type == "bowel" and child is not None:
 
             if bowel_form.is_valid():
                 record = bowel_form.save(commit=False)
@@ -119,7 +150,7 @@ def record_create_view(request):
                 ).exists():
                     bowel_form.add_error(
                         None,
-                        "この子どものこの日の排便記録はすでに登録されています。登録済みの記録を編集してください"
+                        "この子どものこの日の排便記録はすでに登録されています。登録済みの記録を編集してください。"
                     )
                 else:
                     record.save()
@@ -139,9 +170,7 @@ def record_create_view(request):
         # -------------------------
         # 欠席記録の場合
         # -------------------------
-        elif record_type == "absence":
-            bowel_form = BowelMovementRecordForm()
-            absence_form = AbsenceRecordForm(request.POST)
+        elif record_type == "absence" and child is not None:
 
             if absence_form.is_valid():
                 record = absence_form.save(commit=False)
@@ -154,7 +183,7 @@ def record_create_view(request):
                 ).exists():
                     absence_form.add_error(
                         None,
-                        "この子どものこの日の欠席記録はすでに登録されています。登録済みの記録を編集してください"
+                        "この子どものこの日の欠席記録はすでに登録されています。登録済みの記録を編集してください。"
                 )
                 else:
                     record.save()
@@ -187,6 +216,9 @@ def record_create_view(request):
         "date": date_for_url,
         "children": children,
         "show_coordination_choice": show_coordination_choice,
+        "child_error": child_error,
+        "selected_record_type": selected_record_type,
+        "selected_child_id": selected_child_id,
     }
 
     return render(request, "records/record_form.html", context)
