@@ -50,6 +50,19 @@ class BowelMovementRecordForm(forms.ModelForm):
                 }
             ),
         }
+        
+    def clean(self):
+        cleaned_data = super().clean()
+
+        has_bowel_movement = cleaned_data.get("has_bowel_movement")
+        has_concern = cleaned_data.get("has_concern")
+
+        if not has_bowel_movement and not has_concern:
+            raise forms.ValidationError(
+                "「排便があった」または「気になることがある」にチェックを入れてください。"
+            )
+
+        return cleaned_data
 
 
 class AbsenceRecordForm(forms.ModelForm):
@@ -87,3 +100,15 @@ class AbsenceRecordForm(forms.ModelForm):
                 }
             ),
         }
+        
+    def clean(self):
+        cleaned_data = super().clean()
+
+        is_absent = cleaned_data.get("is_absent")
+
+        if not is_absent:
+            raise forms.ValidationError(
+                "「欠席した」にチェックを入れてください。"
+            )
+
+        return cleaned_data
