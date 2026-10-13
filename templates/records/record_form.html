@@ -113,6 +113,10 @@
         resize: vertical;
     }
 
+    .record-fields-card textarea::placeholder {
+        font-size: 14px;
+    }
+
     .record-file-row {
         display: flex;
         align-items: center;
@@ -122,13 +126,21 @@
 
     .record-file-row input[type="file"] {
         max-width: calc(100% - 26px);
-        font-size: 12px;
+        font-size: 14px;
+    }
+
+    .record-file-row input[type="file"]::file-selector-button {
+        height: 36px;
+        padding: 4px 10px;
+        font-size: 16px;
+        box-sizing: border-box;
     }
 </style>
 <form
     id="record-form"
     method="post"
     enctype="multipart/form-data"
+    novalidate
 >
     {% csrf_token %}
 
@@ -166,7 +178,7 @@
             {% for child in children %}
                 <option
                     value="{{ child.id }}"
-                    {% if selected_child_id == child.id %}
+                    {% if selected_child_id == child.id|stringformat:"s" %}
                         selected
                     {% endif %}
                 >
@@ -175,7 +187,12 @@
             {% endfor %}
         </select>
     </div>
-
+    {% if child_error %}
+        <ul class="errorlist">
+            <li>{{ child_error }}</li>
+        </ul>
+    {% endif %}
+    
     <!-- 記録の種類（排便 or 欠席） -->
     {% if mode == "edit" %}
         <div class="record-form-label">
@@ -211,7 +228,7 @@
                 type="radio"
                 name="record_type"
                 value="bowel"
-                checked
+                {% if selected_record_type == "bowel" %}checked{% endif %}
             >
             <span>排便</span>
         </label>
@@ -220,6 +237,7 @@
                 type="radio"
                 name="record_type"
                 value="absence"
+                {% if selected_record_type == "absence" %}checked{% endif %}
             >
             <span>欠席</span>
         </label>
@@ -287,6 +305,14 @@
         {% endif %}
     </div>
 
+    {% if bowel_form.non_field_errors %}
+        <ul class="errorlist" id="bowel-errors">
+            {% for error in bowel_form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
     <!-- 欠席フォーム -->
     <div
         id="absence-fields"
@@ -341,8 +367,13 @@
         {% endif %}
     </div>
 
-    {{ bowel_form.errors }}
-    {{ absence_form.errors }}
+    {% if absence_form.non_field_errors %}
+        <ul class="errorlist" id="absence-errors">
+            {% for error in absence_form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
     <div class="record-submit-row">
     <button
@@ -476,6 +507,10 @@
     const bowelFields = document.getElementById("bowel-fields");
     // 欠席記録用の入力欄エリアを取得
     const absenceFields = document.getElementById("absence-fields");
+    // 排便記録のエラー表示を取得
+    const bowelErrors = document.getElementById("bowel-errors");
+    // 欠席記録のエラー表示を取得
+    const absenceErrors = document.getElementById("absence-errors");
 
     // 入力欄をまとめて disabled にする関数
     // disabled=true  → 入力できない
@@ -507,16 +542,26 @@
 
         // 排便記録が選択された場合
         if (selected === "bowel") {
-            bowelFields.style.display = "block";
-            absenceFields.style.display = "none";
-
+        bowelFields.style.display = "block";
+        absenceFields.style.display = "none";
+            if (bowelErrors) {
+                bowelErrors.style.display = "block";
+            }
+            if (absenceErrors) {
+                absenceErrors.style.display = "none";
+            }
             setDisabled(bowelFields, false);
             setDisabled(absenceFields, true);
         // 欠席記録が選択された場合
         } else if (selected === "absence") {
             bowelFields.style.display = "none";
             absenceFields.style.display = "block";
-
+            if (bowelErrors) {
+                bowelErrors.style.display = "none";
+            }
+            if (absenceErrors) {
+                absenceErrors.style.display = "block";
+            }
             setDisabled(bowelFields, true);
             setDisabled(absenceFields, false);
         }
