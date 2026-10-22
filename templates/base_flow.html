@@ -8,7 +8,9 @@
     {% block flow_left %}{% endblock %}
 
     {# 中央：画面タイトル #}
-    {% block page_title %}{% endblock %}
+    <span class="flow-page-title">
+      {% block page_title %}{% endblock %}
+    </span>
 
     {# 右側：保存 / 削除 など #}
     {% block flow_right %}{% endblock %}
