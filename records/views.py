@@ -355,6 +355,9 @@ def bowel_record_edit_view(request, pk):
     children = Child.objects.filter(
         family=request.user.family
     ).order_by("id")
+    
+    # 子ども未選択エラーの初期値
+    child_error = None
 
     if request.method == "POST":
         # instance=record を指定すると「新規作成」ではなく「既存データの更新」になる
@@ -373,13 +376,21 @@ def bowel_record_edit_view(request, pk):
 
         # POSTされた子どもを取得する
         child_id = request.POST.get("child_id")
-        child = get_object_or_404(
-            Child,
-            id=child_id,
-            family=request.user.family,
-        )
+        
+        # 子どもが未選択の場合は入力エラーにする
+        child = None
 
-        if bowel_form.is_valid():
+        if not child_id:
+            child_error = "記録する子どもを選択してください。"
+        else:
+            child = get_object_or_404(
+                Child,
+                id=child_id,
+                family=request.user.family,
+            )
+
+        # 子どもが選択され、フォームの入力内容も正しい場合だけ保存する
+        if bowel_form.is_valid() and child is not None:
             updated_record = bowel_form.save(commit=False)
 
             # child と record_date はフォームに含めていないので、viewでセットする
@@ -433,7 +444,12 @@ def bowel_record_edit_view(request, pk):
         "absence_form": absence_form,
         "date": record.record_date.isoformat(),
         "children": children,
-        "selected_child_id": record.child.id,
+        "selected_child_id": (
+            request.POST.get("child_id", "")
+            if request.method == "POST"
+            else str(record.child.id)
+        ),
+        "child_error": child_error,
         "record": record,
         "attachments": record.attachments.all(),
         "bowel_record": record,
@@ -468,6 +484,9 @@ def absence_record_edit_view(request, pk):
     children = Child.objects.filter(
         family=request.user.family
     ).order_by("id")
+    
+    # 子ども未選択エラーの初期値
+    child_error = None
 
     if request.method == "POST":
         # 排便フォームはこの画面では保存しない
@@ -484,13 +503,21 @@ def absence_record_edit_view(request, pk):
             posted_date = record.record_date
 
         child_id = request.POST.get("child_id")
-        child = get_object_or_404(
-            Child,
-            id=child_id,
-            family=request.user.family,
-        )
         
-        if absence_form.is_valid():
+        # 子どもが未選択の場合は入力エラーにする
+        child = None
+
+        if not child_id:
+            child_error = "記録する子どもを選択してください。"
+        else:
+            child = get_object_or_404(
+                Child,
+                id=child_id,
+                family=request.user.family,
+            )
+
+        # 子どもが選択され、フォームの入力内容も正しい場合だけ保存する
+        if absence_form.is_valid() and child is not None:
             updated_record = absence_form.save(commit=False)
             updated_record.child = child
             updated_record.record_date = posted_date
@@ -535,7 +562,12 @@ def absence_record_edit_view(request, pk):
         "absence_form": absence_form,
         "date": record.record_date.isoformat(),
         "children": children,
-        "selected_child_id": record.child.id,
+        "selected_child_id": (
+            request.POST.get("child_id", "")
+            if request.method == "POST"
+            else str(record.child.id)
+        ),
+        "child_error": child_error,
         "record": record,
         "attachments": record.attachments.all(),
         "bowel_record": bowel_record,
