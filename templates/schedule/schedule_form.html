@@ -51,6 +51,7 @@
 
     .schedule-form-control {
         flex: 1;
+        min-width: 0;
     }
 
     .schedule-time-line {
@@ -65,10 +66,12 @@
         white-space: nowrap;
     }
 
-    .schedule-time-inputs input[type="time"] {
-        width: 88px;
+    .schedule-form-control .schedule-time-inputs input[type="time"] {
+        width: 100px;
         min-width: 0;
+        min-height: 36px;
         padding: 4px 2px;
+        font-size: 16px;
         box-sizing: border-box;
     }
 
@@ -122,10 +125,14 @@
         margin-top: 0;
     }
 
+    #schedule-form .errorlist {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
     /* 入力欄をスマホで操作しやすい大きさにする */
     .schedule-form-control input[type="text"],
     .schedule-form-control input[type="date"],
-    .schedule-form-control input[type="time"],
     .schedule-form-control select {
         min-height: 36px;
         padding: 4px 6px;
@@ -229,6 +236,7 @@
     id="schedule-form" 
     method="post"
     enctype="multipart/form-data"
+    novalidate
 >
     {% csrf_token %}
     
@@ -269,10 +277,8 @@
         
             <div id="time-fields">
                 <div class="schedule-time-inputs">
-                    <span>開始</span>
                     {{ form.start_time }}
                     <span>～</span>
-                    <span>終了</span>
                     {{ form.end_time }}
                 </div>
 
