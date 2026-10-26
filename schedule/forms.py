@@ -135,6 +135,9 @@ class ScheduleForm(forms.ModelForm):
         # family:その家族に属する大人・子どもだけを予定メンバー候補として表示するために使う
         self.family = family
         
+        self.fields["date"].error_messages["required"] = "日付を選択してください。"
+        self.fields["title"].error_messages["required"] = "予定のタイトルを入力してください。"
+        
         # --- placeholder ---
         self.fields["title"].widget.attrs["placeholder"] = "タイトルを入力"
         self.fields["memo"].widget.attrs["placeholder"] = "メモを入力"
@@ -244,17 +247,16 @@ class ScheduleForm(forms.ModelForm):
         # 予定メンバー
         user_members = cleaned.get("user_members")
         child_members = cleaned.get("child_members")
-
+        
         # 大人・子どものどちらか1人以上必須
         if not user_members and not child_members:
             self.add_error(
                 "user_members",
                 "予定メンバーを1人以上選択してください。"
             )
-
-        # 日付が無いのはフォーム自体のエラー（ここは必須なので通常は起きない）
+            
         if not d:
-            raise forms.ValidationError("日付を選択してください")
+            return cleaned
 
         # --- 終日ON： start_at/end_at を自動セット ---
         if is_all_day:
@@ -266,9 +268,9 @@ class ScheduleForm(forms.ModelForm):
         # --- 終日OFF：開始・終了時刻が必要 ---   
         else:
             if not start_t:
-                self.add_error("start_time", "開始時刻を入力してください")
+                self.add_error("start_time", "開始時刻を入力してください。")
             if not end_t:
-                self.add_error("end_time", "終了時刻を入力してください")
+                self.add_error("end_time", "終了時刻を入力してください。")
 
             # 両方ある場合だけ start_at/end_at を作る
             if start_t and end_t:
@@ -278,7 +280,7 @@ class ScheduleForm(forms.ModelForm):
                 end_at = timezone.make_aware(end_naive)
 
                 if start_at >= end_at:
-                    self.add_error("end_time", "終了時刻は開始時刻より後にしてください")
+                    self.add_error("end_time", "終了時刻は開始時刻より後にしてください。")
 
                 cleaned["start_at"] = start_at
                 cleaned["end_at"] = end_at
