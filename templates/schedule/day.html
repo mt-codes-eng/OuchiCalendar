@@ -19,15 +19,12 @@
   type="button"
   onclick="openCreateChoiceDialog()"
   aria-label="予定・記録を追加"
-  style="border: none; background: none; padding: 0;"
+  class="day-add-button"
  >
   <img
         src="{% static 'images/icons/plus.svg' %}"
-        alt="追加"
-        width="20"
-        height="20"
-        style="vertical-align: middle;"
-      >
+        alt=""
+  >
  </button>
 {% endblock %}
 
@@ -37,11 +34,38 @@
   .day-list-item {
     margin-bottom: 16px;
   }
+  /* 予定・記録の見出し */
+  .day-section-title {
+      font-size: 20px;
+  }
+  /* 記録セクションの上に余白を設ける */
+  .day-record-title {
+      margin-top: 32px;
+  }
+  /* 日付横の追加ボタン */
+  .day-add-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 44px;
+      padding: 0;
+      margin-left: 0;
+      border: none;
+      background: none;
+      box-sizing: border-box;
+      vertical-align: middle;
+  }
+
+  .day-add-button img {
+      width: 24px;
+      height: 24px;
+  }
   </style>
   {# ------------------------------ #}
   {# 予定セクション #}
   {# ------------------------------ #}
-  <h2>予定</h2>
+  <h2 class="day-section-title">予定</h2>
 
   {% if schedules %}
     {# 予定があるときは一覧表示する #}
@@ -71,8 +95,7 @@
                   <img
                     src="{{ membership.user.image.url }}"
                     alt="{{ membership.user.name }}のアイコン"
-                    width="32"
-                    style="border-radius: 50%; vertical-align: middle;"
+                    class="member-icon"
                   >
                 {% endif %}
               {% endfor %}
@@ -83,8 +106,7 @@
                   <img
                     src="{{ membership.child.image.url }}"
                     alt="{{ membership.child.name }}のアイコン"
-                    width="32"
-                    style="border-radius: 50%; vertical-align: middle;"
+                    class="member-icon"
                   >
                 {% endif %}
               {% endfor %}
@@ -172,7 +194,7 @@
   {# ------------------------------ #}
   {# 記録セクション #}
   {# ------------------------------ #}
-  <h2>記録</h2>
+  <h2 class="day-section-title day-record-title">記録</h2>
   {% if bowel_records or absence_records %}
     <ul class="list-reset">
         {% for record in bowel_records %}
@@ -182,8 +204,7 @@
                         <img
                             src="{{ record.child.image.url }}"
                             alt="{{ record.child.name }}のアイコン"
-                            width="32"
-                            style="border-radius: 50%; vertical-align: middle;"
+                            class="member-icon"
                         >
                     {% endif %}
 
@@ -215,8 +236,7 @@
                         <img
                             src="{{ record.child.image.url }}"
                             alt="{{ record.child.name }}のアイコン"
-                            width="32"
-                            style="border-radius: 50%; vertical-align: middle;"
+                            class="member-icon"
                         >
                     {% endif %}
 
