@@ -145,8 +145,7 @@
       <img
         src="{{ request.user.image.url }}"
         alt="{{ request.user.name }}の個人アイコン"
-        width="40"
-        style="border-radius:50%;"
+        class="member-icon"
       >
     </p>
   </section>
@@ -222,8 +221,7 @@
           <img
             src="{{ member.image.url }}"
             alt="{{ member.name }}のアイコン"
-            width="40"
-            style="border-radius: 50%; vertical-align: middle;"
+            class="member-icon"
           >
           {{ member.name }}
           {% if member.color_hex %}
@@ -268,8 +266,7 @@
           <img
             src="{{ child.image.url }}"
             alt="{{ child.name }}のアイコン"
-            width="40"
-            style="border-radius: 50%; vertical-align: middle;"
+            class="member-icon"
           >
           {{ child.name }}
           {% if child.color_hex %}
