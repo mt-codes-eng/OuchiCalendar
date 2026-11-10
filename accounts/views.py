@@ -11,9 +11,32 @@ from color_assignments.models import FamilyColorAssignment
 
 def login_view(request):
     if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+        email = request.POST.get("email", "").strip()
+        password = request.POST.get("password", "")
 
+        # 入力エラーの初期値
+        email_error = None
+        password_error = None
+
+        # 未入力チェック
+        if not email:
+            email_error = "メールアドレスを入力してください。"
+
+        if not password:
+            password_error = "パスワードを入力してください。"
+
+        # 未入力がある場合はログイン処理を行わない
+        if email_error or password_error:
+            return render(
+                request,
+                "accounts/login.html",
+                {
+                    "email_error": email_error,
+                    "password_error": password_error,
+                    "entered_email": email,
+                }
+            )
+            
         # 本人確認を実行して結果を返す
         user = authenticate(request, username=email, password=password)
 
@@ -33,10 +56,13 @@ def login_view(request):
         else:
             # 認証失敗（メール or パスワード違い）
             return render(
-            request,
-            "accounts/login.html",
-            {"error": "メールアドレスまたはパスワードが違います"}
-        )
+                request,
+                "accounts/login.html",
+                {
+                    "error": "メールアドレスまたはパスワードが正しくありません。",
+                    "entered_email": email,
+                }
+            )
 
     return render(request, "accounts/login.html")
 
